@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prvenstva — Hrvatski curling savez</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ice: #eef3f6;
+    --ice-2: #dee8ee;
+    --sheet-line: #b9c8d1;
+    --navy: #1c2b39;
+    --navy-2: #2f4459;
+    --stone-red: #b2433a;
+    --stone-yellow: #c99a2e;
+    --text: #1c2b39;
+    --text-muted: #5c6f7c;
+    --white: #ffffff;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--ice); color:var(--text); font-family:'Inter', sans-serif; line-height:1.5;}
+  .wrap{max-width:980px; margin:0 auto; padding:0 24px 80px;}
+
+  header{background:var(--navy); color:var(--ice); padding:14px 24px 16px; position:relative; overflow:hidden;}
+  header .wrap{position:relative; z-index:2;}
+  .eyebrow{font-family:'IBM Plex Mono', monospace; font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:#9db3c4; margin:0 0 2px;}
+  h1{font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:clamp(17px,2.4vw,21px); margin:0 0 2px; letter-spacing:-0.01em;}
+  header p.lead{max-width:560px; color:#c3d2dc; font-size:11.5px; margin:0;}
+  .stone-decor{position:absolute; right:-40px; top:-40px; width:110px; height:110px; opacity:0.15;}
+
+  .controls{display:flex; flex-wrap:wrap; gap:10px; margin:28px 0 8px; align-items:center;}
+  .controls label{font-size:12.5px; color:var(--text-muted); font-family:'IBM Plex Mono', monospace; text-transform:uppercase; letter-spacing:0.05em; margin-right:6px;}
+  select{font-family:'Inter', sans-serif; font-size:14px; padding:8px 12px; border-radius:8px; border:1.5px solid var(--sheet-line); background:var(--white); color:var(--text); cursor:pointer;}
+
+  .tourn-title{font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:22px; margin:28px 0 4px;}
+  .tourn-meta{color:var(--text-muted); font-size:13.5px; margin-bottom:24px;}
+
+  section.block{margin-bottom:34px;}
+  h2.section-h{font-family:'Space Grotesk', sans-serif; font-size:17px; font-weight:600; margin:0 0 14px; padding-bottom:8px; border-bottom:1.5px solid var(--sheet-line); display:flex; align-items:center; gap:8px;}
+  h3.group-h{font-family:'Space Grotesk', sans-serif; font-size:15px; font-weight:600; margin:20px 0 8px; color:var(--navy-2);}
+  h4.round-h{font-family:'IBM Plex Mono', monospace; font-size:11.5px; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted); margin:14px 0 6px;}
+
+  .match-list{box-shadow:0 0 0 1px var(--sheet-line); border-radius:10px; overflow:hidden; background:var(--white);}
+  .match-row{display:grid; grid-template-columns: 78px 1fr auto 1fr 24px; align-items:center; gap:10px; padding:11px 14px; border-bottom:1px solid var(--ice-2); font-size:13.5px; cursor:pointer;}
+  .match-row:last-child{border-bottom:none;}
+  .match-row:hover{background:#f6f9fb;}
+  .match-date{font-family:'IBM Plex Mono', monospace; color:var(--text-muted); font-size:11.5px;}
+  .match-team{text-align:right;}
+  .match-team.right{text-align:left;}
+  .match-score{font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:14px; text-align:center; padding:3px 9px; border-radius:6px; background:var(--ice-2); white-space:nowrap;}
+  .match-score.notplayed{background:none; color:var(--text-muted); font-weight:400; font-size:12px;}
+  .winner{color:var(--navy);}
+  .loser{color:var(--text-muted); font-weight:400;}
+  .chevron{color:var(--text-muted); font-size:12px; text-align:right;}
+
+  table.standings{width:100%; border-collapse:collapse; background:var(--white); border-radius:10px; overflow:hidden; box-shadow:0 0 0 1px var(--sheet-line);}
+  table.standings th, table.standings td{text-align:left; padding:9px 12px; font-size:13.5px;}
+  table.standings thead th{font-family:'IBM Plex Mono', monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-muted); background:var(--ice-2); font-weight:500; border-bottom:1.5px solid var(--sheet-line);}
+  table.standings tbody tr{border-bottom:1px solid var(--ice-2);}
+  table.standings tbody tr:last-child{border-bottom:none;}
+  table.standings td.num, table.standings th.num{text-align:right; font-family:'IBM Plex Mono', monospace;}
+  .rank{display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background:var(--ice-2); font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--text-muted); margin-right:6px;}
+  .rank.podium-1{background:#f0d78c; color:#5c4a0e;}
+  .rank.podium-2{background:#dde3e8; color:#45525c;}
+  .rank.podium-3{background:#e4bfa8; color:#6b3f27;}
+
+  .doc-row{display:flex; gap:10px; flex-wrap:wrap;}
+  .doc-link{display:inline-flex; align-items:center; gap:8px; padding:9px 14px; background:var(--white); border:1.5px solid var(--sheet-line); border-radius:8px; font-size:13px; color:var(--navy-2); text-decoration:none; font-family:'Inter', sans-serif;}
+  .doc-link:hover{border-color:var(--navy-2);}
+  .doc-link .ic{font-size:15px;}
+
+  .empty-state{text-align:center; padding:36px 20px; color:var(--text-muted); font-size:13.5px; background:var(--white); border-radius:10px; box-shadow:0 0 0 1px var(--sheet-line);}
+  .note{font-size:12px; color:var(--text-muted); margin-top:8px; font-style:italic;}
+
+  /* modal */
+  .modal-overlay{display:none; position:fixed; inset:0; background:rgba(28,43,57,0.55); z-index:100; align-items:flex-start; justify-content:center; padding:40px 16px; overflow-y:auto;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--white); border-radius:14px; max-width:640px; width:100%; padding:28px 28px 26px; position:relative;}
+  .modal-close{position:absolute; top:16px; right:16px; width:30px; height:30px; border-radius:50%; border:none; background:var(--ice-2); font-size:16px; cursor:pointer; color:var(--navy);}
+  .modal h2{font-family:'Space Grotesk', sans-serif; font-size:19px; margin:0 0 4px;}
+  .modal .modal-meta{font-size:13px; color:var(--text-muted); margin-bottom:18px; display:grid; grid-template-columns:1fr 1fr; gap:4px 16px;}
+  .modal .modal-meta div span{color:var(--text); font-weight:500;}
+
+  /* scoreboard */
+  .scoreboard{border-radius:8px; overflow:hidden; border:1px solid var(--sheet-line); margin-bottom:20px;}
+  .sb-row{display:grid; grid-template-columns: 110px repeat(var(--n, 8), 1fr); }
+  .sb-row.header .sb-cell{background:var(--navy); color:var(--ice); font-family:'IBM Plex Mono', monospace; font-size:11px;}
+  .sb-cell{padding:8px 4px; text-align:center; font-size:14px; font-family:'Space Grotesk', sans-serif; font-weight:700; border-right:1px solid var(--ice-2); border-bottom:1px solid var(--ice-2);}
+  .sb-cell:last-child{border-right:none;}
+  .sb-team-label{text-align:left; font-family:'Inter', sans-serif; font-weight:600; font-size:13px; padding-left:10px; display:flex; align-items:center;}
+  .sb-row.team1 .sb-team-label{background:#b2433a; color:white;}
+  .sb-row.team2 .sb-team-label{background:#c99a2e; color:white;}
+  .sb-row.team1 .sb-cell:not(.sb-team-label){background:#faf1f0;}
+  .sb-row.team2 .sb-cell:not(.sb-team-label){background:#fbf6ea;}
+  .sb-cell.blank{color:var(--text-muted); font-weight:400;}
+  .sb-cell.total{background:var(--navy) !important; color:white !important;}
+
+  .roster-cols{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
+  .roster-col h4{font-family:'Space Grotesk', sans-serif; font-size:13.5px; margin:0 0 8px; color:var(--navy-2);}
+  .roster-item{display:flex; justify-content:space-between; font-size:13px; padding:5px 0; border-bottom:1px solid var(--ice-2);}
+  .roster-item:last-child{border-bottom:none;}
+  .roster-item .rname{font-weight:500;}
+  .roster-item .rrole{font-family:'IBM Plex Mono', monospace; font-size:10.5px; color:var(--text-muted); text-transform:uppercase;}
+  .badge{font-family:'IBM Plex Mono', monospace; font-size:10px; padding:2px 6px; border-radius:10px; background:var(--ice-2); color:var(--navy-2); margin-left:6px;}
+
+  footer{text-align:center; padding:30px 24px; color:var(--text-muted); font-size:12.5px;}
+  @media (max-width:600px){
+    .match-row{grid-template-columns: 60px 1fr auto 1fr 16px; font-size:12.5px;}
+    .roster-cols{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <svg class="stone-decor" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <circle cx="100" cy="100" r="90" fill="none" stroke="#ffffff" stroke-width="2"/>
+    <circle cx="100" cy="100" r="65" fill="none" stroke="#ffffff" stroke-width="2"/>
+    <circle cx="100" cy="100" r="40" fill="none" stroke="#ffffff" stroke-width="2"/>
+    <circle cx="100" cy="100" r="14" fill="#ffffff"/>
+  </svg>
+  <div class="wrap">
+    <p class="eyebrow">Hrvatski curling savez &mdash; arhiva prvenstava</p>
+    <h1>Pregled prvenstava</h1>
+    <p class="lead">Rezultati po skupinama i kolima, doigravanje, konačni poredak i detaljan pregled svake utakmice.</p>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="controls">
+    <div>
+      <label for="uzrastSel">Uzrast</label>
+      <select id="uzrastSel">
+        <option value="seniori">Seniori</option>
+      </select>
+    </div>
+    <div>
+      <label for="disSel">Disciplina</label>
+      <select id="disSel"></select>
+    </div>
+    <div>
+      <label for="seasonSel">Sezona</label>
+      <select id="seasonSel"></select>
+    </div>
+  </div>
+
+  <div id="content"></div>
+</div>
+
+<footer>Prototip &middot; podaci iz arhive PHC prvenstava &middot; statika &mdash; bez baze, bez servera</footer>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modalBody"></div>
+</div>
+
+<script>
+const DIS_LABELS = {'M':'Muškarci','Ž':'Žene','MC':'Mješoviti curling','MP':'Mješoviti parovi'};
+let DATA = {matches: [], tournaments: []};
+
+fetch('phc-data.json')
+  .then(r => r.json())
+  .then(data => { DATA = data; initFilters(); render(); })
+  .catch(err => {
+    document.getElementById('content').innerHTML =
+      '<div class="empty-state">Greška pri učitavanju phc-data.json — pokrenite lokalni server u ovoj mapi (npr. <code>npx serve</code>) jer preglednici blokiraju fetch za file://.</div>';
+  });
+
+function seasonLabel(season){
+  return `${season-1}-${season}`;
+}
+
+function formatDate(iso){
+  if(!iso) return '';
+  const [y,m,d] = iso.split('-');
+  return `${d}.${m}.${y}.`;
+}
+
+const DIS_ORDER = ['M', 'Ž', 'MC', 'MP'];
+
+function initFilters(){
+  const uzrastSel = document.getElementById('uzrastSel');
+  const disSel = document.getElementById('disSel');
+  const seasonSel = document.getElementById('seasonSel');
+
+  uzrastSel.addEventListener('change', () => {
+    updateDisOptions();
+    updateSeasonOptions();
+    render();
+  });
+  disSel.addEventListener('change', () => {
+    updateSeasonOptions();
+    render();
+  });
+  seasonSel.addEventListener('change', render);
+
+  updateDisOptions();
+  updateSeasonOptions();
+}
+
+function updateDisOptions(){
+  // Currently all data is "Seniori" — once other age categories exist, filter DATA.tournaments by uzrast here too.
+  const available = new Set(DATA.tournaments.map(t => t.dis));
+  const disList = DIS_ORDER.filter(d => available.has(d));
+  const disSel = document.getElementById('disSel');
+  const prev = disSel.value;
+  disSel.innerHTML = disList.map(d => `<option value="${d}">${DIS_LABELS[d] || d}</option>`).join('');
+  if(disList.includes(prev)) disSel.value = prev;
+}
+
+function updateSeasonOptions(){
+  const dis = document.getElementById('disSel').value;
+  const seasons = [...new Set(DATA.tournaments.filter(t => t.dis === dis).map(t => t.season))].sort((a,b) => b-a);
+  const seasonSel = document.getElementById('seasonSel');
+  const prev = Number(seasonSel.value);
+  seasonSel.innerHTML = seasons.map(s => `<option value="${s}">${seasonLabel(s)}</option>`).join('');
+  seasonSel.value = seasons.includes(prev) ? prev : seasons[0];
+}
+
+function render(){
+  const season = Number(document.getElementById('seasonSel').value);
+  const dis = document.getElementById('disSel').value;
+  const tourn = DATA.tournaments.find(t => t.season === season && t.dis === dis);
+  const content = document.getElementById('content');
+
+  if(!tourn){
+    content.innerHTML = '<div class="empty-state">Nema podataka o prvenstvu za odabranu sezonu i disciplinu.</div>';
+    return;
+  }
+
+  const matches = DATA.matches.filter(m => m.season === season && m.dis === dis && m.p === tourn.p);
+  const hasExplicitGroups = matches.some(m => m.phase.type === 'group' && m.group !== null);
+  const groupKey = m => hasExplicitGroups ? (m.group || '—') : '__single__';
+  const groups = hasExplicitGroups ? [...new Set(matches.map(m => m.group).filter(g => g !== null))].sort() : ['__single__'];
+
+  let html = '';
+  html += `<div class="tourn-title">PHC ${seasonLabel(season)} — ${DIS_LABELS[dis] || dis}</div>`;
+  html += `<div class="tourn-meta">${tourn.teamsCount || '?'} ekipa &middot; ${matches.length} utakmica</div>`;
+
+  // final standings — shown first
+  const MEDALS = {1:'🥇', 2:'🥈', 3:'🥉'};
+  html += `<section class="block"><h2 class="section-h">Konačni poredak</h2>`;
+  html += `<table class="standings"><thead><tr><th>Mjesto</th><th>Ekipa</th><th></th></tr></thead><tbody>`;
+  tourn.standings.forEach(s => {
+    const medal = MEDALS[s.place] || '';
+    html += `<tr><td>${s.place}. mjesto</td><td>${escapeHtml(s.team)}</td><td>${medal}</td></tr>`;
+  });
+  html += `</tbody></table></section>`;
+
+  html += `<h2 class="section-h">Rezultati</h2>`;
+
+  // groups + rounds
+  groups.forEach(g => {
+    const groupMatches = hasExplicitGroups
+      ? matches.filter(m => m.group === g && m.phase.type === 'group')
+      : matches.filter(m => m.phase.type === 'group');
+    if(groupMatches.length === 0) return;
+
+    html += `<section class="block">`;
+    if(hasExplicitGroups){
+      html += `<h2 class="section-h">Skupina ${g}</h2>`;
+    }
+
+    const rounds = [...new Set(groupMatches.map(m => m.phase.num))].sort((a,b)=>a-b);
+    rounds.forEach(rn => {
+      const roundMatches = groupMatches.filter(m => m.phase.num === rn).sort((a,b)=>a.matchNum-b.matchNum);
+      html += `<h4 class="round-h">${rn}. kolo</h4><div class="match-list">`;
+      html += roundMatches.map(matchRowHtml).join('');
+      html += `</div>`;
+    });
+
+    html += `<h3 class="group-h">Tablica</h3>`;
+    html += standingsTableHtml(computeGroupStandings(groupMatches));
+    html += `</section>`;
+  });
+
+  // playoff
+  const playoffMatches = matches.filter(m => m.phase.type === 'playoff');
+  if(playoffMatches.length){
+    html += `<section class="block"><h2 class="section-h">Doigravanje</h2>`;
+    const rounds = [...new Set(playoffMatches.map(m => m.phase.num))].sort((a,b)=>a-b);
+    rounds.forEach(rn => {
+      const rm = playoffMatches.filter(m => m.phase.num === rn).sort((a,b)=>a.matchNum-b.matchNum);
+      html += `<h4 class="round-h">${rm[0].phase.label}</h4><div class="match-list">`;
+      html += rm.map(matchRowHtml).join('');
+      html += `</div>`;
+    });
+    html += `</section>`;
+  }
+
+  // placement — least important first, final (P1) last
+  const placementMatches = matches.filter(m => m.phase.type === 'placement').sort((a,b)=>b.phase.num-a.phase.num);
+  if(placementMatches.length){
+    html += `<section class="block"><h2 class="section-h">Plasman</h2>`;
+    html += placementMatches.map(m => `<h4 class="round-h">${m.phase.label}</h4><div class="match-list">${matchRowHtml(m)}</div>`).join('');
+    html += `</section>`;
+  }
+
+  // documents (placeholder based on naming convention)
+  let html2 = '';
+  const seasonTag = `${season-1}-${season}`;
+  const disTag = dis;
+  const baseDoc = `PHC-${seasonTag}-${disTag}-S-A`;
+  html2 += `<section class="block"><h2 class="section-h">Dokumenti</h2>`;
+  html2 += `<div class="doc-row">
+    <a class="doc-link" href="#" onclick="return false;"><span class="ic">📄</span> Sustav i raspored prvenstva</a>
+    <a class="doc-link" href="#" onclick="return false;"><span class="ic">📄</span> Izvještaj s prvenstva</a>
+  </div>
+  <div class="note">Linkovi su placeholderi — pravi naziv/putanja dokumenata treba se potvrditi (imate konvenciju za zapisnike po utakmici, ali ne i za dokumente na razini prvenstva).</div>
+  </section>`;
+
+  // photos
+  html2 += `<section class="block"><h2 class="section-h">Fotografije</h2>
+  <div class="empty-state">Za ovo prvenstvo trenutno nema učitanih fotografija.</div>
+  </section>`;
+
+  content.innerHTML = html + html2;
+
+  // attach click handlers
+  content.querySelectorAll('.match-row').forEach(row => {
+    row.addEventListener('click', () => openMatchModal(row.dataset.id));
+  });
+}
+
+function matchRowHtml(m){
+  const scoreHtml = (m.played && m.score1 !== null)
+    ? `<div class="match-score">${m.score1.toFixed(0)} : ${m.score2.toFixed(0)}</div>`
+    : `<div class="match-score notplayed">nije odigrano</div>`;
+  return `
+    <div class="match-row" data-id="${m.id}">
+      <div class="match-date">${formatDate(m.date)}</div>
+      <div class="match-team ${m.winner===1?'winner':'loser'}">${escapeHtml(m.team1)}</div>
+      ${scoreHtml}
+      <div class="match-team right ${m.winner===2?'winner':'loser'}">${escapeHtml(m.team2)}</div>
+      <div class="chevron">›</div>
+    </div>
+  `;
+}
+
+function trimmedAverage(throws){
+  if(!throws.length) return null;
+  const sorted = [...throws].sort((a,b) => a - b); // ascending: best (shortest) first
+  const removeCount = sorted.length <= 10 ? 1 : 2;
+  const kept = removeCount < sorted.length ? sorted.slice(0, sorted.length - removeCount) : sorted;
+  return kept.reduce((s,v) => s+v, 0) / kept.length;
+}
+
+function formatRpp(v){
+  if(v == null) return '–';
+  return v.toFixed(1).replace('.', ',');
+}
+
+function computeGroupStandings(matches){
+  const table = {};
+  function ensure(team){
+    if(!table[team]) table[team] = {team, played:0, points:0, throws:[]};
+    return table[team];
+  }
+  matches.forEach(m => {
+    if(m.winner !== 1 && m.winner !== 2) return;
+    const t1 = ensure(m.team1), t2 = ensure(m.team2);
+    t1.played++; t2.played++;
+    if(m.winner === 1){ t1.points += 2; } else { t2.points += 2; }
+    if(m.throws1 && m.throws1.length) t1.throws.push(...m.throws1);
+    if(m.throws2 && m.throws2.length) t2.throws.push(...m.throws2);
+  });
+
+  // head-to-head lookup for tie-break between two teams
+  const h2h = {};
+  matches.forEach(m => {
+    if(m.winner !== 1 && m.winner !== 2) return;
+    const winner = m.winner === 1 ? m.team1 : m.team2;
+    h2h[m.team1 + '|' + m.team2] = winner;
+    h2h[m.team2 + '|' + m.team1] = winner;
+  });
+
+  const teams = Object.values(table);
+  teams.forEach(t => { t.rpp = trimmedAverage(t.throws); });
+
+  teams.sort((a, b) => {
+    if(b.points !== a.points) return b.points - a.points;
+    const key = a.team + '|' + b.team;
+    if(h2h[key]){
+      if(h2h[key] === a.team) return -1;
+      if(h2h[key] === b.team) return 1;
+    }
+    const da = a.rpp == null ? Infinity : a.rpp;
+    const db = b.rpp == null ? Infinity : b.rpp;
+    if(da !== db) return da - db;
+    return a.team.localeCompare(b.team);
+  });
+  return teams;
+}
+
+function standingsTableHtml(rows){
+  if(rows.length === 0) return '<div class="empty-state">Nema odigranih utakmica.</div>';
+  let h = `<table class="standings"><thead><tr><th>Ekipa</th><th class="num">Utakmica</th><th class="num">Bodova</th><th class="num">RPP</th></tr></thead><tbody>`;
+  rows.forEach((r,i) => {
+    h += `<tr><td><span class="rank">${i+1}</span>${escapeHtml(r.team)}</td><td class="num">${r.played}</td><td class="num">${r.points}</td><td class="num">${formatRpp(r.rpp)}</td></tr>`;
+  });
+  h += `</tbody></table>`;
+  return h;
+}
+
+function openMatchModal(id){
+  const m = DATA.matches.find(x => x.id === id);
+  if(!m) return;
+  const overlay = document.getElementById('modalOverlay');
+  const body = document.getElementById('modalBody');
+
+  let sbHtml = '';
+  if(m.ends && m.ends.length){
+    const n = m.ends.length;
+    const headerCells = m.ends.map((_,i) => `<div class="sb-cell">${i+1}</div>`).join('') + `<div class="sb-cell total">UK</div>`;
+    const t1Cells = m.ends.map(e => {
+      const val = e > 0 ? e : (e === 0 ? '–' : '');
+      return `<div class="sb-cell ${e<=0?'blank':''}">${e<=0?'–':e}</div>`;
+    }).join('') + `<div class="sb-cell total">${m.score1 !== null ? m.score1.toFixed(0) : '–'}</div>`;
+    const t2Cells = m.ends.map(e => {
+      return `<div class="sb-cell ${e>=0?'blank':''}">${e>=0?'–':Math.abs(e)}</div>`;
+    }).join('') + `<div class="sb-cell total">${m.score2 !== null ? m.score2.toFixed(0) : '–'}</div>`;
+
+    sbHtml = `
+      <div class="scoreboard">
+        <div class="sb-row header" style="--n:${n+1}"><div class="sb-cell sb-team-label">END</div>${headerCells}</div>
+        <div class="sb-row team1" style="--n:${n+1}"><div class="sb-cell sb-team-label">${escapeHtml(m.team1)}</div>${t1Cells}</div>
+        <div class="sb-row team2" style="--n:${n+1}"><div class="sb-cell sb-team-label">${escapeHtml(m.team2)}</div>${t2Cells}</div>
+      </div>
+    `;
+  } else {
+    sbHtml = `<div class="empty-state">Nema podataka o rezultatu po endovima.</div>`;
+  }
+
+  const rosterHtml = (roster) => roster.map(p => `
+    <div class="roster-item">
+      <span class="rname">${escapeHtml(p.name)}</span>
+      <span class="rrole">${p.position}${p.role ? `<span class="badge">${p.role}</span>` : ''}</span>
+    </div>
+  `).join('');
+
+  const seasonTag = `${m.season-1}-${m.season}`;
+  const kolIdent = m.phase.type === 'group' ? String(m.phase.num).padStart(2,'0') : m.phase.type[0].toUpperCase() + m.phase.num;
+  const zapisnikName = `PHC-${seasonTag}-${m.dis}-S-${m.group}-${kolIdent}-${String(m.matchNum).padStart(2,'0')}`;
+
+  body.innerHTML = `
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <h2>${escapeHtml(m.team1)} : ${escapeHtml(m.team2)}</h2>
+    <div class="modal-meta">
+      <div>Sezona: <span>${seasonLabel(m.season)}</span></div>
+      <div>Disciplina: <span>${m.disLabel}</span></div>
+      <div>Datum i vrijeme: <span>${m.date ? formatDate(m.date) : '—'} ${m.time || ''}</span></div>
+      <div>Faza: <span>${m.phase.label}, Skupina ${m.group}</span></div>
+      <div>Mjesto: <span>${escapeHtml(m.city || '—')}</span></div>
+      <div>Dvorana / Staza: <span>${escapeHtml(m.venue || '—')} / ${escapeHtml(m.rink || '—')}</span></div>
+    </div>
+    ${sbHtml}
+    <div class="roster-cols">
+      <div class="roster-col"><h4>${escapeHtml(m.team1)}</h4>${rosterHtml(m.roster1)}</div>
+      <div class="roster-col"><h4>${escapeHtml(m.team2)}</h4>${rosterHtml(m.roster2)}</div>
+    </div>
+    <div class="doc-row" style="margin-top:20px;">
+      <a class="doc-link" href="#" onclick="return false;"><span class="ic">📄</span> Zapisnik (${zapisnikName})</a>
+    </div>
+    <div class="note">Naziv zapisnika je izveden po dogovorenoj konvenciji — za D/P faze koristi npr. "D1"/"P1" umjesto broja kola; potvrdite je li to ispravno prije stvarne izrade poveznica.</div>
+  `;
+  overlay.classList.add('open');
+}
+
+function closeModal(){
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+document.getElementById('modalOverlay').addEventListener('click', (e) => {
+  if(e.target.id === 'modalOverlay') closeModal();
+});
+
+function escapeHtml(s){
+  if(s == null) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+</script>
+
+</body>
+</html>
