@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Statistika — Hrvatski curling savez</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ice: #eef3f6;
+    --ice-2: #dee8ee;
+    --sheet-line: #b9c8d1;
+    --navy: #1c2b39;
+    --navy-2: #2f4459;
+    --stone-red: #b2433a;
+    --stone-yellow: #c99a2e;
+    --text: #1c2b39;
+    --text-muted: #5c6f7c;
+    --white: #ffffff;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--ice); color:var(--text); font-family:'Inter', sans-serif; line-height:1.5;}
+  .wrap{max-width:1080px; margin:0 auto; padding:0 24px 80px;}
+
+  header{background:var(--navy); color:var(--ice); padding:14px 24px 16px; position:relative; overflow:hidden;}
+  header .wrap{position:relative; z-index:2;}
+  .header-top{display:flex; align-items:center; justify-content:space-between; gap:12px;}
+  .eyebrow{font-family:'IBM Plex Mono', monospace; font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:#9db3c4; margin:0 0 2px;}
+  h1{font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:clamp(17px,2.4vw,21px); margin:0 0 2px; letter-spacing:-0.01em;}
+  header p.lead{max-width:560px; color:#c3d2dc; font-size:11.5px; margin:0;}
+  .nav-pill{font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--ice); text-decoration:none; border:1px solid rgba(255,255,255,0.3); padding:4px 10px; border-radius:20px; white-space:nowrap;}
+  .nav-pill:hover{background:rgba(255,255,255,0.1);}
+  .stone-decor{position:absolute; right:-40px; top:-40px; width:110px; height:110px; opacity:0.15;}
+
+  .tabs{display:flex; gap:4px; flex-wrap:wrap; border-bottom:1.5px solid var(--sheet-line); margin:28px 0 24px;}
+  .tab-btn{font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:14px; background:none; border:none; padding:10px 16px 12px; cursor:pointer; color:var(--text-muted); border-bottom:3px solid transparent; margin-bottom:-1.5px;}
+  .tab-btn.active{color:var(--navy); border-bottom-color:var(--stone-red);}
+  .panel{display:none;}
+  .panel.active{display:block;}
+
+  .controls{display:flex; flex-wrap:wrap; gap:10px 20px; margin-bottom:24px; align-items:flex-end;}
+  .control-group{display:flex; flex-direction:column; gap:4px;}
+  .control-group label{font-size:11.5px; color:var(--text-muted); font-family:'IBM Plex Mono', monospace; text-transform:uppercase; letter-spacing:0.05em;}
+  select{font-family:'Inter', sans-serif; font-size:14px; padding:8px 12px; border-radius:8px; border:1.5px solid var(--sheet-line); background:var(--white); color:var(--text); cursor:pointer;}
+  .radio-row{display:flex; gap:6px;}
+  .radio-btn{font-family:'Inter', sans-serif; font-size:13px; padding:7px 14px; border-radius:20px; border:1.5px solid var(--sheet-line); background:var(--white); color:var(--text-muted); cursor:pointer;}
+  .radio-btn.active{background:var(--navy); color:var(--ice); border-color:var(--navy);}
+
+  .season-block{margin-bottom:36px;}
+  .season-title{font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:18px; margin:0 0 12px; padding-bottom:8px; border-bottom:1.5px solid var(--sheet-line);}
+  .dis-grid{display:grid; grid-template-columns:repeat(4, 1fr); gap:14px;}
+  .dis-col{background:var(--white); border-radius:10px; box-shadow:0 0 0 1px var(--sheet-line); overflow:hidden;}
+  .dis-col h3{font-family:'Space Grotesk', sans-serif; font-size:13.5px; font-weight:600; margin:0; padding:10px 12px; background:var(--ice-2); color:var(--navy);}
+  .standing-list{list-style:none; margin:0; padding:6px 0; counter-reset:rank;}
+  .standing-list li{padding:5px 12px; font-size:13px; border-bottom:1px solid var(--ice-2); counter-increment:rank;}
+  .standing-list li:last-child{border-bottom:none;}
+  .standing-list li::before{content:counter(rank) ". "; color:var(--text-muted); font-family:'IBM Plex Mono', monospace; font-size:11.5px;}
+  .empty-mini{padding:16px 12px; font-size:12.5px; color:var(--text-muted); text-align:center;}
+
+  table.stats-table{width:100%; border-collapse:collapse; background:var(--white); border-radius:10px; overflow:hidden; box-shadow:0 0 0 1px var(--sheet-line); margin-bottom:24px;}
+  table.stats-table th, table.stats-table td{padding:10px 14px; font-size:13.5px; text-align:right; border-bottom:1px solid var(--ice-2);}
+  table.stats-table th:first-child, table.stats-table td:first-child{text-align:left;}
+  table.stats-table thead th{font-family:'IBM Plex Mono', monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-muted); background:var(--ice-2); font-weight:500;}
+  table.stats-table td{font-family:'Space Grotesk', sans-serif; font-weight:600;}
+  table.stats-table tbody tr:last-child td{border-bottom:none;}
+  .hist-row td{font-family:'IBM Plex Mono', monospace; font-weight:400; font-size:12px; color:var(--text-muted);}
+
+  .h2h-wrap{overflow-x:auto;}
+  table.h2h-table{border-collapse:collapse; background:var(--white); border-radius:10px; overflow:hidden; box-shadow:0 0 0 1px var(--sheet-line); font-size:12.5px;}
+  table.h2h-table th, table.h2h-table td{padding:8px 10px; text-align:center; border:1px solid var(--ice-2); white-space:nowrap;}
+  table.h2h-table thead th{font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:11.5px; background:var(--ice-2); color:var(--navy);}
+  table.h2h-table tbody th{font-family:'Space Grotesk', sans-serif; font-weight:600; text-align:left; background:var(--ice-2); color:var(--navy); white-space:nowrap;}
+  table.h2h-table td.diag{background:repeating-linear-gradient(45deg, #2a3b4a, #2a3b4a 4px, #1c2b39 4px, #1c2b39 8px);}
+  table.h2h-table td.h2h-cell{font-family:'IBM Plex Mono', monospace;}
+  table.h2h-table td.h2h-empty{color:var(--sheet-line);}
+
+  .empty-state{text-align:center; padding:36px 20px; color:var(--text-muted); font-size:13.5px; background:var(--white); border-radius:10px; box-shadow:0 0 0 1px var(--sheet-line);}
+  .coming-soon{text-align:center; padding:60px 20px; color:var(--text-muted);}
+  .coming-soon h2{font-family:'Space Grotesk', sans-serif; color:var(--navy); font-size:20px; margin-bottom:8px;}
+
+  footer{text-align:center; padding:30px 24px; color:var(--text-muted); font-size:12.5px;}
+
+  @media (max-width:800px){ .dis-grid{grid-template-columns:repeat(2, 1fr);} }
+  @media (max-width:480px){ .dis-grid{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+
+<header>
+  <svg class="stone-decor" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <circle cx="100" cy="100" r="90" fill="none" stroke="#ffffff" stroke-width="2"/>
+    <circle cx="100" cy="100" r="65" fill="none" stroke="#ffffff" stroke-width="2"/>
+    <circle cx="100" cy="100" r="40" fill="none" stroke="#ffffff" stroke-width="2"/>
+    <circle cx="100" cy="100" r="14" fill="#ffffff"/>
+  </svg>
+  <div class="wrap">
+    <div class="header-top">
+      <p class="eyebrow">Hrvatski curling savez &mdash; arhiva prvenstava</p>
+      <a class="nav-pill" href="index.html">🏆 Prvenstva</a>
+    </div>
+    <h1>Statistika</h1>
+    <p class="lead">Poretci kroz sezone, agregatna statistika, međusobni susreti i još.</p>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="poretci">Poretci</button>
+    <button class="tab-btn" data-tab="statistika">Statistika</button>
+    <button class="tab-btn" data-tab="h2h">Međusobni susreti</button>
+    <button class="tab-btn" data-tab="ekipe">Ekipe i klubovi</button>
+    <button class="tab-btn" data-tab="igraci">Igrači</button>
+  </div>
+
+  <div class="panel active" id="panel-poretci">
+    <div class="controls">
+      <div class="control-group">
+        <label>Uzrast</label>
+        <div class="radio-row" id="poretciKatRow"></div>
+      </div>
+    </div>
+    <div id="poretciContent"></div>
+  </div>
+
+  <div class="panel" id="panel-statistika">
+    <div class="controls">
+      <div class="control-group">
+        <label>Uzrast</label>
+        <div class="radio-row" id="statKatRow"></div>
+      </div>
+      <div class="control-group">
+        <label>Od sezone</label>
+        <select id="statFromSel"></select>
+      </div>
+      <div class="control-group">
+        <label>Do sezone</label>
+        <select id="statToSel"></select>
+      </div>
+    </div>
+    <div id="statContent"></div>
+  </div>
+
+  <div class="panel" id="panel-h2h">
+    <div class="controls">
+      <div class="control-group">
+        <label>Uzrast</label>
+        <div class="radio-row" id="h2hKatRow"></div>
+      </div>
+      <div class="control-group">
+        <label>Disciplina</label>
+        <select id="h2hDisSel"></select>
+      </div>
+      <div class="control-group">
+        <label>Prikaz</label>
+        <div class="radio-row" id="h2hModeRow">
+          <button class="radio-btn active" data-mode="ekipe">Ekipe</button>
+          <button class="radio-btn" data-mode="klubovi">Klubovi</button>
+        </div>
+      </div>
+    </div>
+    <div id="h2hContent"></div>
+  </div>
+
+  <div class="panel" id="panel-ekipe">
+    <div class="coming-soon">
+      <h2>Statistika ekipa i klubova</h2>
+      <p>Ovaj pregled je u pripremi.</p>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-igraci">
+    <div class="coming-soon">
+      <h2>Statistika igrača</h2>
+      <p>Ovaj pregled je u pripremi.</p>
+    </div>
+  </div>
+</div>
+
+<footer>Prototip &middot; podaci iz arhive PHC prvenstava &middot; statika &mdash; bez baze, bez servera</footer>
+
+<script>
+const DIS_ORDER = ['M', 'Ž', 'MC', 'MP'];
+const DIS_LABELS = {'M':'Muškarci','Ž':'Žene','MC':'Mješoviti curling','MP':'Mješoviti parovi'};
+const KAT_LABELS = {'S':'Seniori','J':'Juniori','V':'Veterani'};
+
+let DATA = { matches: [], tournaments: [], clubs: {} };
+
+fetch('phc-data.json')
+  .then(r => r.json())
+  .then(data => {
+    DATA = data;
+    initKatRadios();
+    initStatSeasonSelects();
+    initH2hDisSelect();
+    renderActiveTab();
+  })
+  .catch(err => {
+    document.querySelectorAll('.panel').forEach(p => {
+      p.innerHTML = '<div class="empty-state">Greška pri učitavanju phc-data.json — pokrenite lokalni server u ovoj mapi (npr. <code>npx serve</code>).</div>';
+    });
+  });
+
+function seasonLabel(season){ return `${season-1}-${season}`; }
+function escapeHtml(s){
+  if(s == null) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+    renderActiveTab();
+  });
+});
+
+function activeTab(){ return document.querySelector('.tab-btn.active').dataset.tab; }
+
+function renderActiveTab(){
+  const tab = activeTab();
+  if(tab === 'poretci') renderPoretci();
+  else if(tab === 'statistika') renderStatistika();
+  else if(tab === 'h2h') renderH2h();
+}
+
+function availableKats(){
+  return [...new Set(DATA.tournaments.map(t => t.kat))].sort();
+}
+
+function initKatRadios(){
+  const kats = availableKats();
+  ['poretciKatRow', 'statKatRow', 'h2hKatRow'].forEach(rowId => {
+    const row = document.getElementById(rowId);
+    row.innerHTML = kats.map((k,i) => `<button class="radio-btn${i===0?' active':''}" data-kat="${k}">${KAT_LABELS[k]||k}</button>`).join('');
+    row.querySelectorAll('.radio-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        row.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderActiveTab();
+      });
+    });
+  });
+}
+
+function getKat(rowId){
+  const active = document.querySelector(`#${rowId} .radio-btn.active`);
+  return active ? active.dataset.kat : (availableKats()[0] || 'S');
+}
+
+function renderPoretci(){
+  const kat = getKat('poretciKatRow');
+  const seasons = [...new Set(DATA.tournaments.filter(t => t.kat === kat).map(t => t.season))].sort((a,b) => b-a);
+  const content = document.getElementById('poretciContent');
+
+  if(seasons.length === 0){
+    content.innerHTML = '<div class="empty-state">Nema podataka za odabrani uzrast.</div>';
+    return;
+  }
+
+  let html = '';
+  seasons.forEach(season => {
+    html += `<div class="season-block"><div class="season-title">Sezona ${seasonLabel(season)}</div><div class="dis-grid">`;
+    DIS_ORDER.forEach(dis => {
+      const tourn = DATA.tournaments.find(t => t.season === season && t.dis === dis && t.kat === kat);
+      const num = tourn ? tourn.p : null;
+      html += `<div class="dis-col"><h3>${DIS_LABELS[dis]} (${num != null ? num : '-'})</h3>`;
+      if(tourn && tourn.standings.length){
+        html += '<ol class="standing-list">' + tourn.standings.map(s => `<li>${escapeHtml(s.team)}</li>`).join('') + '</ol>';
+      } else {
+        html += '<div class="empty-mini">—</div>';
+      }
+      html += `</div>`;
+    });
+    html += `</div></div>`;
+  });
+  content.innerHTML = html;
+}
+
+function initStatSeasonSelects(){
+  const seasons = [...new Set(DATA.tournaments.map(t => t.season))].sort((a,b) => a-b);
+  const fromSel = document.getElementById('statFromSel');
+  const toSel = document.getElementById('statToSel');
+  const opts = seasons.map(s => `<option value="${s}">${seasonLabel(s)}</option>`).join('');
+  fromSel.innerHTML = opts;
+  toSel.innerHTML = opts;
+  fromSel.value = seasons[0];
+  toSel.value = seasons[seasons.length - 1];
+  fromSel.addEventListener('change', renderStatistika);
+  toSel.addEventListener('change', renderStatistika);
+}
+
+function renderStatistika(){
+  const kat = getKat('statKatRow');
+  const from = Number(document.getElementById('statFromSel').value);
+  const to = Number(document.getElementById('statToSel').value);
+  const content = document.getElementById('statContent');
+
+  if(from > to){
+    content.innerHTML = '<div class="empty-state">"Od sezone" mora biti prije ili jednako "Do sezone".</div>';
+    return;
+  }
+
+  const perDis = {};
+  DIS_ORDER.forEach(dis => {
+    const tourns = DATA.tournaments.filter(t => t.kat === kat && t.dis === dis && t.season >= from && t.season <= to);
+    const matches = DATA.matches.filter(m => m.kat === kat && m.dis === dis && m.season >= from && m.season <= to && (m.winner === 1 || m.winner === 2));
+    let endsCount = 0, pointsTotal = 0;
+    const hist = new Array(9).fill(0);
+    matches.forEach(m => {
+      (m.ends || []).forEach(e => {
+        endsCount++;
+        const val = Math.abs(e);
+        pointsTotal += val;
+        hist[Math.min(val, 8)]++;
+      });
+    });
+    perDis[dis] = { prvenstava: tourns.length, utakmica: matches.length, endova: endsCount, poena: pointsTotal, hist };
+  });
+
+  let html = `<table class="stats-table"><thead><tr><th></th>${DIS_ORDER.map(d => `<th>${DIS_LABELS[d]}</th>`).join('')}</tr></thead><tbody>`;
+  html += `<tr><td>Odigranih prvenstava</td>${DIS_ORDER.map(d => `<td>${perDis[d].prvenstava}</td>`).join('')}</tr>`;
+  html += `<tr><td>Odigranih utakmica</td>${DIS_ORDER.map(d => `<td>${perDis[d].utakmica}</td>`).join('')}</tr>`;
+  html += `<tr><td>Odigranih endova</td>${DIS_ORDER.map(d => `<td>${perDis[d].endova}</td>`).join('')}</tr>`;
+  html += `<tr><td>Osvojeno kamenova (poena ukupno)</td>${DIS_ORDER.map(d => `<td>${perDis[d].poena}</td>`).join('')}</tr>`;
+  for(let i = 0; i <= 8; i++){
+    const label = i === 8 ? '8+ poena po endu' : `${i} poena po endu`;
+    html += `<tr class="hist-row"><td>${label}</td>${DIS_ORDER.map(d => `<td>${perDis[d].hist[i]}</td>`).join('')}</tr>`;
+  }
+  html += `</tbody></table>`;
+  content.innerHTML = html;
+}
+
+function initH2hDisSelect(){
+  const sel = document.getElementById('h2hDisSel');
+  sel.innerHTML = DIS_ORDER.map(d => `<option value="${d}">${DIS_LABELS[d]}</option>`).join('');
+  sel.addEventListener('change', renderH2h);
+  document.querySelectorAll('#h2hModeRow .radio-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#h2hModeRow .radio-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderH2h();
+    });
+  });
+}
+
+function getH2hMode(){
+  const active = document.querySelector('#h2hModeRow .radio-btn.active');
+  return active ? active.dataset.mode : 'ekipe';
+}
+
+function renderH2h(){
+  const kat = getKat('h2hKatRow');
+  const dis = document.getElementById('h2hDisSel').value;
+  const groupByClub = getH2hMode() === 'klubovi';
+  const content = document.getElementById('h2hContent');
+
+  const matches = DATA.matches.filter(m => m.kat === kat && m.dis === dis && (m.winner === 1 || m.winner === 2));
+  const clubMap = (DATA.clubs && DATA.clubs[dis]) || {};
+  const entityName = (team) => groupByClub ? (clubMap[team] || team) : team;
+
+  const entitiesSet = new Set();
+  matches.forEach(m => { entitiesSet.add(entityName(m.team1)); entitiesSet.add(entityName(m.team2)); });
+  const entities = [...entitiesSet].sort();
+
+  if(entities.length === 0){
+    content.innerHTML = '<div class="empty-state">Nema odigranih utakmica za odabranu disciplinu/uzrast.</div>';
+    return;
+  }
+
+  const record = {};
+  entities.forEach(a => { record[a] = {}; entities.forEach(b => { record[a][b] = { w: 0, l: 0 }; }); });
+
+  matches.forEach(m => {
+    const e1 = entityName(m.team1), e2 = entityName(m.team2);
+    if(e1 === e2) return;
+    if(m.winner === 1){ record[e1][e2].w++; record[e2][e1].l++; }
+    else { record[e2][e1].w++; record[e1][e2].l++; }
+  });
+
+  let html = '<div class="h2h-wrap"><table class="h2h-table"><thead><tr><th></th>';
+  html += entities.map(e => `<th>${escapeHtml(e)}</th>`).join('');
+  html += '</tr></thead><tbody>';
+  entities.forEach(rowE => {
+    html += `<tr><th>${escapeHtml(rowE)}</th>`;
+    entities.forEach(colE => {
+      if(rowE === colE){
+        html += '<td class="diag"></td>';
+      } else {
+        const rec = record[rowE][colE];
+        if(rec.w === 0 && rec.l === 0){
+          html += '<td class="h2h-empty">–</td>';
+        } else {
+          html += `<td class="h2h-cell">${rec.w}-${rec.l}</td>`;
+        }
+      }
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table></div>';
+  html += '<div class="note" style="margin-top:10px; font-size:12px; color:var(--text-muted);">Format ćelije: pobjede-porazi za momčad/klub iz retka, protiv momčadi/kluba iz stupca.</div>';
+  content.innerHTML = html;
+}
+</script>
+
+</body>
+</html>
