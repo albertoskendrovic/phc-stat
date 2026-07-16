@@ -79,31 +79,35 @@
   .modal-overlay.open{display:flex;}
   .modal{background:var(--white); border-radius:14px; max-width:640px; width:100%; padding:28px 28px 26px; position:relative;}
   .modal-close{position:absolute; top:16px; right:16px; width:30px; height:30px; border-radius:50%; border:none; background:var(--ice-2); font-size:16px; cursor:pointer; color:var(--navy);}
-  .modal h2{font-family:'Space Grotesk', sans-serif; font-size:19px; margin:0 0 4px;}
-  .modal .modal-meta{font-size:13px; color:var(--text-muted); margin-bottom:18px; display:grid; grid-template-columns:1fr 1fr; gap:4px 16px;}
-  .modal .modal-meta div span{color:var(--text); font-weight:500;}
+  .modal .info-block{font-size:13.5px; color:var(--text-muted); margin-bottom:20px; display:flex; flex-direction:column; gap:5px;}
+  .modal .info-block div span{color:var(--text); font-weight:500;}
 
-  /* scoreboard */
-  .scoreboard{border-radius:8px; overflow:hidden; border:1px solid var(--sheet-line); margin-bottom:20px;}
-  .sb-row{display:grid; grid-template-columns: 110px repeat(var(--n, 8), 1fr); }
-  .sb-row.header .sb-cell{background:var(--navy); color:var(--ice); font-family:'IBM Plex Mono', monospace; font-size:11px;}
-  .sb-cell{padding:8px 4px; text-align:center; font-size:14px; font-family:'Space Grotesk', sans-serif; font-weight:700; border-right:1px solid var(--ice-2); border-bottom:1px solid var(--ice-2);}
-  .sb-cell:last-child{border-right:none;}
-  .sb-team-label{text-align:left; font-family:'Inter', sans-serif; font-weight:600; font-size:13px; padding-left:10px; display:flex; align-items:center;}
-  .sb-row.team1 .sb-team-label{background:#b2433a; color:white;}
-  .sb-row.team2 .sb-team-label{background:#c99a2e; color:white;}
-  .sb-row.team1 .sb-cell:not(.sb-team-label){background:#faf1f0;}
-  .sb-row.team2 .sb-cell:not(.sb-team-label){background:#fbf6ea;}
-  .sb-cell.blank{color:var(--text-muted); font-weight:400;}
-  .sb-cell.total{background:var(--navy) !important; color:white !important;}
+  /* scoreboard table */
+  table.scoreboard-table{width:100%; border-collapse:collapse; margin-bottom:22px; box-shadow:0 0 0 1px var(--sheet-line); border-radius:8px; overflow:hidden;}
+  table.scoreboard-table th, table.scoreboard-table td{padding:7px 4px; text-align:center; font-size:13.5px; border-right:1px solid var(--ice-2); border-bottom:1px solid var(--ice-2);}
+  table.scoreboard-table th:first-child, table.scoreboard-table td:first-child{text-align:left; padding-left:12px;}
+  table.scoreboard-table th{background:var(--navy); color:var(--ice); font-family:'IBM Plex Mono', monospace; font-size:10.5px; text-transform:uppercase; font-weight:500; border-right:1px solid rgba(255,255,255,0.15);}
+  table.scoreboard-table td{font-family:'Space Grotesk', sans-serif; font-weight:700;}
+  table.scoreboard-table td:last-child, table.scoreboard-table th:last-child{border-right:none;}
+  table.scoreboard-table th:last-child{background:var(--navy); color:var(--ice);}
+  table.scoreboard-table td:last-child{color:var(--navy); font-size:15px;}
+  table.scoreboard-table tr.team1-row td{background:#faf1f0;}
+  table.scoreboard-table tr.team2-row td{background:#fbf6ea;}
+  table.scoreboard-table tr.team1-row td:first-child{color:#8a2f28;}
+  table.scoreboard-table tr.team2-row td:first-child{color:#8a6a10;}
+  table.scoreboard-table td.na{color:var(--text-muted); font-weight:400;}
+  .pk-hammer{font-size:14px;}
 
+  /* roster tables */
   .roster-cols{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
-  .roster-col h4{font-family:'Space Grotesk', sans-serif; font-size:13.5px; margin:0 0 8px; color:var(--navy-2);}
-  .roster-item{display:flex; justify-content:space-between; font-size:13px; padding:5px 0; border-bottom:1px solid var(--ice-2);}
-  .roster-item:last-child{border-bottom:none;}
-  .roster-item .rname{font-weight:500;}
-  .roster-item .rrole{font-family:'IBM Plex Mono', monospace; font-size:10.5px; color:var(--text-muted); text-transform:uppercase;}
-  .badge{font-family:'IBM Plex Mono', monospace; font-size:10px; padding:2px 6px; border-radius:10px; background:var(--ice-2); color:var(--navy-2); margin-left:6px;}
+  table.roster-table{width:100%; border-collapse:collapse; box-shadow:0 0 0 1px var(--sheet-line); border-radius:8px; overflow:hidden;}
+  table.roster-table thead th{background:var(--ice-2); font-family:'Space Grotesk', sans-serif; font-size:13.5px; font-weight:600; padding:8px 12px; text-align:left; color:var(--navy);}
+  table.roster-table thead th.num{text-align:right; font-family:'IBM Plex Mono', monospace; font-weight:500; font-size:12px; color:var(--text-muted);}
+  table.roster-table tbody td{padding:6px 8px; font-size:13px; border-top:1px solid var(--ice-2);}
+  table.roster-table tbody td.num{text-align:right; font-family:'IBM Plex Mono', monospace; color:var(--text-muted); font-size:11.5px;}
+  table.roster-table tbody td.rot{text-align:center; font-size:15px;}
+  .order-circle{display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background:var(--ice-2); font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--navy-2);}
+  .role-tag{font-family:'IBM Plex Mono', monospace; font-size:10.5px; color:var(--text-muted); text-transform:uppercase;}
 
   footer{text-align:center; padding:30px 24px; color:var(--text-muted); font-size:12.5px;}
   @media (max-width:600px){
@@ -403,66 +407,150 @@ function standingsTableHtml(rows){
   return h;
 }
 
+const ZAPISNICI_BASE = 'zapisnici'; // prilagodite ako su PDF zapisnici u drugoj mapi na siteu
+
+function rawFaza(phase){
+  const prefix = { group: 'K', playoff: 'D', placement: 'P' }[phase.type] || '?';
+  return `${prefix}${phase.num}`;
+}
+
+function zapisnikPath(m){
+  const seasonTag = `${m.season - 1}-${m.season}`;
+  const group = m.group || 'A';
+  const filename = `PHC-${seasonTag}-${m.dis}-${m.kat}-${group}-${rawFaza(m.phase)}-${m.matchNum}.pdf`;
+  return `${ZAPISNICI_BASE}/${seasonTag}/${filename}`;
+}
+
 function openMatchModal(id){
   const m = DATA.matches.find(x => x.id === id);
   if(!m) return;
   const overlay = document.getElementById('modalOverlay');
   const body = document.getElementById('modalBody');
 
-  let sbHtml = '';
-  if(m.ends && m.ends.length){
-    const n = m.ends.length;
-    const headerCells = m.ends.map((_,i) => `<div class="sb-cell">${i+1}</div>`).join('') + `<div class="sb-cell total">UK</div>`;
-    const t1Cells = m.ends.map(e => {
-      const val = e > 0 ? e : (e === 0 ? '–' : '');
-      return `<div class="sb-cell ${e<=0?'blank':''}">${e<=0?'–':e}</div>`;
-    }).join('') + `<div class="sb-cell total">${m.score1 !== null ? m.score1.toFixed(0) : '–'}</div>`;
-    const t2Cells = m.ends.map(e => {
-      return `<div class="sb-cell ${e>=0?'blank':''}">${e>=0?'–':Math.abs(e)}</div>`;
-    }).join('') + `<div class="sb-cell total">${m.score2 !== null ? m.score2.toFixed(0) : '–'}</div>`;
+  // --- info blok ---
+  const utakmicaLine = m.group ? `Skupina ${m.group}, ${m.phase.label}` : m.phase.label;
+  const timeShort = m.time ? m.time.slice(0,5) : '';
+  const mjestoParts = [m.city, m.venue, m.rink ? `staza ${m.rink}` : null].filter(Boolean);
 
-    sbHtml = `
-      <div class="scoreboard">
-        <div class="sb-row header" style="--n:${n+1}"><div class="sb-cell sb-team-label">END</div>${headerCells}</div>
-        <div class="sb-row team1" style="--n:${n+1}"><div class="sb-cell sb-team-label">${escapeHtml(m.team1)}</div>${t1Cells}</div>
-        <div class="sb-row team2" style="--n:${n+1}"><div class="sb-cell sb-team-label">${escapeHtml(m.team2)}</div>${t2Cells}</div>
-      </div>
-    `;
-  } else {
-    sbHtml = `<div class="empty-state">Nema podataka o rezultatu po endovima.</div>`;
+  const infoHtml = `
+    <div class="info-block">
+      <div>Sezona: <span>${seasonLabel(m.season)}</span></div>
+      <div>Disciplina: <span>${m.disLabel} (${m.katLabel})</span></div>
+      <div>Utakmica: <span>${utakmicaLine}</span></div>
+      <div>Vrijeme: <span>${m.date ? formatDate(m.date) : '—'} ${timeShort}h</span></div>
+      <div>Mjesto: <span>${escapeHtml(mjestoParts.join(', ') || '—')}</span></div>
+    </div>
+  `;
+
+  // --- scoreboard tablica (uvijek 8 endova + DE + Rez.) ---
+  // Prati posjed hammera kroz utakmicu: pobjednik enda gubi hammer sljedeći
+  // end; kod neriješenog (0) enda hammer ostaje istoj ekipi, a "0" se upisuje
+  // ekipi koja ga TRENUTNO nema (odnosno koja je zadnja osvojila poen).
+  const endsArr = m.ends || [];
+  const TOTAL_SLOTS = 9; // 8 redovnih + 1 DE
+  const cells1 = new Array(TOTAL_SLOTS).fill('');
+  const cells2 = new Array(TOTAL_SLOTS).fill('');
+  let hammerTeam = m.pk || null;
+  const playedCount = Math.min(endsArr.length, TOTAL_SLOTS);
+  for (let i = 0; i < playedCount; i++){
+    const e = endsArr[i];
+    if(e > 0){ cells1[i] = String(e); hammerTeam = 2; }
+    else if(e < 0){ cells2[i] = String(Math.abs(e)); hammerTeam = 1; }
+    else if(hammerTeam === 1){ cells2[i] = '0'; }
+    else if(hammerTeam === 2){ cells1[i] = '0'; }
+  }
+  const firstUnplayedIdx = playedCount < TOTAL_SLOTS ? playedCount : null;
+
+  function slotCell(i, cellsArr){
+    if(i === firstUnplayedIdx) return `<td class="na">X</td>`;
+    return `<td>${cellsArr[i]}</td>`;
   }
 
-  const rosterHtml = (roster) => roster.map(p => `
-    <div class="roster-item">
-      <span class="rname">${escapeHtml(p.name)}</span>
-      <span class="rrole">${p.position}${p.role ? `<span class="badge">${p.role}</span>` : ''}</span>
-    </div>
-  `).join('');
+  const headerEndCells = Array.from({length:8}, (_,i) => `<th>${i+1}</th>`).join('');
+  const team1EndCells = Array.from({length:8}, (_,i) => slotCell(i, cells1)).join('');
+  const team2EndCells = Array.from({length:8}, (_,i) => slotCell(i, cells2)).join('');
+  const deCell1 = slotCell(8, cells1);
+  const deCell2 = slotCell(8, cells2);
 
-  const seasonTag = `${m.season-1}-${m.season}`;
-  const kolIdent = m.phase.type === 'group' ? String(m.phase.num).padStart(2,'0') : m.phase.type[0].toUpperCase() + m.phase.num;
-  const zapisnikName = `PHC-${seasonTag}-${m.dis}-S-${m.group}-${kolIdent}-${String(m.matchNum).padStart(2,'0')}`;
+  const hammer = (teamNum) => m.pk === teamNum ? `<span class="pk-hammer">🔨</span>` : '';
+
+  const scoreboardHtml = endsArr.length ? `
+    <table class="scoreboard-table">
+      <thead><tr><th>Ekipa</th><th>PK</th>${headerEndCells}<th>DE</th><th>Rez.</th></tr></thead>
+      <tbody>
+        <tr class="team1-row"><td>${escapeHtml(m.team1)}</td><td>${hammer(1)}</td>${team1EndCells}${deCell1}<td>${m.score1 !== null ? m.score1.toFixed(0) : '–'}</td></tr>
+        <tr class="team2-row"><td>${escapeHtml(m.team2)}</td><td>${hammer(2)}</td>${team2EndCells}${deCell2}<td>${m.score2 !== null ? m.score2.toFixed(0) : '–'}</td></tr>
+      </tbody>
+    </table>
+  ` : `<div class="empty-state">Nema podataka o rezultatu po endovima.</div>`;
+
+  // --- sastavi ekipa (uvijek 5 pozicija: 1,2,3,4,R) ---
+  const CANONICAL_POSITIONS = [
+    { position: 'Prvi', label: '1' },
+    { position: 'Drugi', label: '2' },
+    { position: 'Treći', label: '3' },
+    { position: 'Četvrti', label: '4' },
+    { position: 'Rezerva', label: 'R' },
+  ];
+
+  function fmtCm(n){
+    return n.toFixed(1).replace('.', ',') + ' cm';
+  }
+
+  function rosterTableHtml(teamName, roster){
+    const total = roster.reduce((s,p) => s + (p.lsd ? p.lsd.distance : 0), 0);
+    const totalDisplay = roster.some(p => p.lsd) ? fmtCm(total) : '';
+    const rows = CANONICAL_POSITIONS.map(slot => {
+      const p = roster.find(x => x.position === slot.position);
+      if(!p){
+        return `
+          <tr>
+            <td><span class="order-circle">${slot.label}</span></td>
+            <td class="rot"></td>
+            <td>-</td>
+            <td class="rot"></td>
+            <td class="num"></td>
+          </tr>
+        `;
+      }
+      const roleShort = p.role === 'Skip' ? 'S' : (p.role === 'Vice-skip' ? 'V' : '');
+      const rotIcon = p.lsd ? (p.lsd.rotation === 'D' ? '↻' : '↺') : '';
+      const dist = p.lsd ? fmtCm(p.lsd.distance) : '';
+      return `
+        <tr>
+          <td><span class="order-circle">${slot.label}</span></td>
+          <td class="rot">${roleShort ? `<span class="role-tag">${roleShort}</span>` : ''}</td>
+          <td>${escapeHtml(p.name)}</td>
+          <td class="rot">${rotIcon}</td>
+          <td class="num">${dist}</td>
+        </tr>
+      `;
+    }).join('');
+    return `
+      <table class="roster-table">
+        <thead><tr><th colspan="4">${escapeHtml(teamName)}</th><th class="num">${totalDisplay}</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    `;
+  }
+
+  const rosterHtml = `
+    <div class="roster-cols">
+      ${rosterTableHtml(m.team1, m.roster1)}
+      ${rosterTableHtml(m.team2, m.roster2)}
+    </div>
+  `;
+
+  const zapisnikHref = zapisnikPath(m);
 
   body.innerHTML = `
     <button class="modal-close" onclick="closeModal()">×</button>
-    <h2>${escapeHtml(m.team1)} : ${escapeHtml(m.team2)}</h2>
-    <div class="modal-meta">
-      <div>Sezona: <span>${seasonLabel(m.season)}</span></div>
-      <div>Disciplina: <span>${m.disLabel}</span></div>
-      <div>Datum i vrijeme: <span>${m.date ? formatDate(m.date) : '—'} ${m.time || ''}</span></div>
-      <div>Faza: <span>${m.phase.label}, Skupina ${m.group}</span></div>
-      <div>Mjesto: <span>${escapeHtml(m.city || '—')}</span></div>
-      <div>Dvorana / Staza: <span>${escapeHtml(m.venue || '—')} / ${escapeHtml(m.rink || '—')}</span></div>
-    </div>
-    ${sbHtml}
-    <div class="roster-cols">
-      <div class="roster-col"><h4>${escapeHtml(m.team1)}</h4>${rosterHtml(m.roster1)}</div>
-      <div class="roster-col"><h4>${escapeHtml(m.team2)}</h4>${rosterHtml(m.roster2)}</div>
-    </div>
+    ${infoHtml}
+    ${scoreboardHtml}
+    ${rosterHtml}
     <div class="doc-row" style="margin-top:20px;">
-      <a class="doc-link" href="#" onclick="return false;"><span class="ic">📄</span> Zapisnik (${zapisnikName})</a>
+      <a class="doc-link" href="${zapisnikHref}" target="_blank" rel="noopener"><span class="ic">📄</span> Zapisnik</a>
     </div>
-    <div class="note">Naziv zapisnika je izveden po dogovorenoj konvenciji — za D/P faze koristi npr. "D1"/"P1" umjesto broja kola; potvrdite je li to ispravno prije stvarne izrade poveznica.</div>
   `;
   overlay.classList.add('open');
 }
