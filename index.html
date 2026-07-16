@@ -83,23 +83,23 @@
   .modal .info-block div span{color:var(--text); font-weight:500;}
 
   /* scoreboard table */
-  table.scoreboard-table{width:100%; border-collapse:collapse; margin-bottom:22px; box-shadow:0 0 0 1px var(--sheet-line); border-radius:8px; overflow:hidden;}
-  table.scoreboard-table th, table.scoreboard-table td{padding:7px 4px; text-align:center; font-size:13.5px; border-right:1px solid var(--ice-2); border-bottom:1px solid var(--ice-2);}
+  table.scoreboard-table{width:100%; table-layout:fixed; border-collapse:collapse; margin-bottom:22px; box-shadow:0 0 0 1px #7d8a94; border-radius:8px; overflow:hidden;}
+  table.scoreboard-table th, table.scoreboard-table td{padding:7px 4px; text-align:center; font-size:13.5px; border-right:1px solid #7d8a94; border-bottom:1px solid #7d8a94;}
   table.scoreboard-table th:first-child, table.scoreboard-table td:first-child{text-align:left; padding-left:12px;}
-  table.scoreboard-table th{background:var(--navy); color:var(--ice); font-family:'IBM Plex Mono', monospace; font-size:10.5px; text-transform:uppercase; font-weight:500; border-right:1px solid rgba(255,255,255,0.15);}
-  table.scoreboard-table td{font-family:'Space Grotesk', sans-serif; font-weight:700;}
+  table.scoreboard-table th{background:var(--navy); color:var(--ice); font-family:'IBM Plex Mono', monospace; font-size:10.5px; text-transform:uppercase; font-weight:500; border-right:1px solid rgba(255,255,255,0.25);}
+  table.scoreboard-table td{font-family:'Space Grotesk', sans-serif; font-weight:700; color:#111;}
   table.scoreboard-table td:last-child, table.scoreboard-table th:last-child{border-right:none;}
   table.scoreboard-table th:last-child{background:var(--navy); color:var(--ice);}
-  table.scoreboard-table td:last-child{color:var(--navy); font-size:15px;}
-  table.scoreboard-table tr.team1-row td{background:#faf1f0;}
-  table.scoreboard-table tr.team2-row td{background:#fbf6ea;}
-  table.scoreboard-table tr.team1-row td:first-child{color:#8a2f28;}
-  table.scoreboard-table tr.team2-row td:first-child{color:#8a6a10;}
-  table.scoreboard-table td.na{color:var(--text-muted); font-weight:400;}
+  table.scoreboard-table td:last-child{color:#111; font-size:15px; font-weight:800;}
+  table.scoreboard-table tr.team1-row td{background:#f2a9a1;}
+  table.scoreboard-table tr.team2-row td{background:#f0d878;}
+  table.scoreboard-table tr.team1-row td:first-child{color:#111; font-weight:700;}
+  table.scoreboard-table tr.team2-row td:first-child{color:#111; font-weight:700;}
+  table.scoreboard-table td.na{color:#555; font-weight:400;}
   .pk-hammer{font-size:14px;}
 
   /* roster tables */
-  .roster-cols{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
+  .roster-cols{display:flex; flex-direction:column; gap:16px;}
   table.roster-table{width:100%; border-collapse:collapse; box-shadow:0 0 0 1px var(--sheet-line); border-radius:8px; overflow:hidden;}
   table.roster-table thead th{background:var(--ice-2); font-family:'Space Grotesk', sans-serif; font-size:13.5px; font-weight:600; padding:8px 12px; text-align:left; color:var(--navy);}
   table.roster-table thead th.num{text-align:right; font-family:'IBM Plex Mono', monospace; font-weight:500; font-size:12px; color:var(--text-muted);}
@@ -112,7 +112,6 @@
   footer{text-align:center; padding:30px 24px; color:var(--text-muted); font-size:12.5px;}
   @media (max-width:600px){
     .match-row{grid-template-columns: 60px 1fr auto 1fr 16px; font-size:12.5px;}
-    .roster-cols{grid-template-columns:1fr;}
   }
 </style>
 </head>
@@ -301,17 +300,16 @@ function render(){
     html += `</section>`;
   }
 
-  // documents (placeholder based on naming convention)
+  // documents
   let html2 = '';
   const seasonTag = `${season-1}-${season}`;
-  const disTag = dis;
-  const baseDoc = `PHC-${seasonTag}-${disTag}-S-A`;
+  const kat = tourn.kat || 'S';
+  const docBase = `zapisnici/${seasonTag}/PHC-${seasonTag}-${dis}-${kat}`;
   html2 += `<section class="block"><h2 class="section-h">Dokumenti</h2>`;
   html2 += `<div class="doc-row">
-    <a class="doc-link" href="#" onclick="return false;"><span class="ic">📄</span> Sustav i raspored prvenstva</a>
-    <a class="doc-link" href="#" onclick="return false;"><span class="ic">📄</span> Izvještaj s prvenstva</a>
+    <a class="doc-link" href="${docBase}-Sustav.pdf" target="_blank" rel="noopener"><span class="ic">📄</span> Sustav i raspored prvenstva</a>
+    <a class="doc-link" href="${docBase}-Izvještaj.pdf" target="_blank" rel="noopener"><span class="ic">📄</span> Izvještaj s prvenstva</a>
   </div>
-  <div class="note">Linkovi su placeholderi — pravi naziv/putanja dokumenata treba se potvrditi (imate konvenciju za zapisnike po utakmici, ali ne i za dokumente na razini prvenstva).</div>
   </section>`;
 
   // photos
@@ -476,6 +474,13 @@ function openMatchModal(id){
 
   const scoreboardHtml = endsArr.length ? `
     <table class="scoreboard-table">
+      <colgroup>
+        <col style="width:30%">
+        <col style="width:8%">
+        ${'<col style="width:5.5%">'.repeat(8)}
+        <col style="width:5.5%">
+        <col style="width:8%">
+      </colgroup>
       <thead><tr><th>Ekipa</th><th>PK</th>${headerEndCells}<th>DE</th><th>Rez.</th></tr></thead>
       <tbody>
         <tr class="team1-row"><td>${escapeHtml(m.team1)}</td><td>${hammer(1)}</td>${team1EndCells}${deCell1}<td>${m.score1 !== null ? m.score1.toFixed(0) : '–'}</td></tr>
@@ -486,21 +491,28 @@ function openMatchModal(id){
 
   // --- sastavi ekipa (uvijek 5 pozicija: 1,2,3,4,R) ---
   const CANONICAL_POSITIONS = [
-    { position: 'Prvi', label: '1' },
-    { position: 'Drugi', label: '2' },
-    { position: 'Treći', label: '3' },
     { position: 'Četvrti', label: '4' },
+    { position: 'Treći', label: '3' },
+    { position: 'Drugi', label: '2' },
+    { position: 'Prvi', label: '1' },
     { position: 'Rezerva', label: 'R' },
+  ];
+  // U mješovitim parovima (MP) igraju samo dva igrača po ekipi — "Prvi" je
+  // uvijek igračica (Ž), "Drugi" je uvijek igrač (M).
+  const MP_POSITIONS = [
+    { position: 'Prvi', label: 'Ž' },
+    { position: 'Drugi', label: 'M' },
   ];
 
   function fmtCm(n){
     return n.toFixed(1).replace('.', ',') + ' cm';
   }
 
-  function rosterTableHtml(teamName, roster){
+  function rosterTableHtml(teamName, roster, dis){
     const total = roster.reduce((s,p) => s + (p.lsd ? p.lsd.distance : 0), 0);
     const totalDisplay = roster.some(p => p.lsd) ? fmtCm(total) : '';
-    const rows = CANONICAL_POSITIONS.map(slot => {
+    const positions = dis === 'MP' ? MP_POSITIONS : CANONICAL_POSITIONS;
+    const rows = positions.map(slot => {
       const p = roster.find(x => x.position === slot.position);
       if(!p){
         return `
@@ -536,8 +548,8 @@ function openMatchModal(id){
 
   const rosterHtml = `
     <div class="roster-cols">
-      ${rosterTableHtml(m.team1, m.roster1)}
-      ${rosterTableHtml(m.team2, m.roster2)}
+      ${rosterTableHtml(m.team1, m.roster1, m.dis)}
+      ${rosterTableHtml(m.team2, m.roster2, m.dis)}
     </div>
   `;
 
