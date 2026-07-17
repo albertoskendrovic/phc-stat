@@ -64,6 +64,7 @@
   table.standings tbody tr{border-bottom:1px solid var(--ice-2);}
   table.standings tbody tr:last-child{border-bottom:none;}
   table.standings td.num, table.standings th.num{text-align:right; font-family:'IBM Plex Mono', monospace;}
+  table.standings td.medal-cell{width:36px; text-align:right; padding-left:0;}
   .rank{display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background:var(--ice-2); font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--text-muted); margin-right:6px;}
   .rank.podium-1{background:#f0d78c; color:#5c4a0e;}
   .rank.podium-2{background:#dde3e8; color:#45525c;}
@@ -158,7 +159,7 @@
   <div id="content"></div>
 </div>
 
-<footer>Prototip &middot; podaci iz arhive PHC prvenstava &middot; statika &mdash; bez baze, bez servera</footer>
+<footer></footer>
 
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal" id="modalBody"></div>
@@ -250,10 +251,10 @@ function render(){
   // final standings — shown first
   const MEDALS = {1:'🥇', 2:'🥈', 3:'🥉'};
   html += `<section class="block"><h2 class="section-h">Konačni poredak</h2>`;
-  html += `<table class="standings"><thead><tr><th>Mjesto</th><th>Ekipa</th><th></th></tr></thead><tbody>`;
+  html += `<table class="standings"><thead><tr><th>Ekipa</th><th></th></tr></thead><tbody>`;
   tourn.standings.forEach(s => {
     const medal = MEDALS[s.place] || '';
-    html += `<tr><td>${s.place}. mjesto</td><td>${escapeHtml(s.team)}</td><td>${medal}</td></tr>`;
+    html += `<tr><td><span class="rank">${s.place}</span>${escapeHtml(s.team)}</td><td class="medal-cell">${medal}</td></tr>`;
   });
   html += `</tbody></table></section>`;
 
