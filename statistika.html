@@ -74,6 +74,10 @@
   .standing-list .medal-slot{width:18px; text-align:right; flex-shrink:0;}
   .standing-list .rank-num{display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background:var(--ice-2); font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--text-muted); flex-shrink:0;}
   .empty-mini{padding:16px 12px; font-size:12.5px; color:var(--text-muted); text-align:center;}
+  .kat-subcard{border:1px solid var(--sheet-line); border-radius:8px; overflow:hidden; margin-bottom:10px;}
+  .kat-subcard:last-child{margin-bottom:0;}
+  .kat-subcard-title{font-family:'Space Grotesk', sans-serif; font-size:12px; font-weight:600; color:var(--navy); background:var(--ice-2); padding:6px 12px;}
+  .kat-subcard .standing-list{padding:2px 0;}
 
   table.stats-table{width:100%; max-width:620px; table-layout:fixed; border-collapse:collapse; background:var(--white); border-radius:10px; overflow:hidden; box-shadow:0 0 0 1px var(--sheet-line); margin-bottom:24px;}
   table.stats-table th, table.stats-table td{padding:9px 14px; font-size:13.5px; text-align:right; border-bottom:1px solid var(--ice-2);}
@@ -383,6 +387,8 @@ function getSeasonRange(){
 }
 
 
+const KAT_ORDER = ['S', 'J', 'V'];
+
 function renderPoretci(){
   const kat = currentState().kat;
   const dis = currentState().dis;
@@ -403,20 +409,27 @@ function renderPoretci(){
   seasons.forEach(season => {
     html += `<div class="season-block"><div class="season-title">Sezona ${seasonLabel(season)}</div><div class="dis-grid"${gridStyle}>`;
     disList.forEach(d => {
-      const tourn = DATA.tournaments.find(t => t.season === season && t.dis === d && (kat==='sve'||t.kat===kat));
-      if(!tourn){
+      let tourns = DATA.tournaments.filter(t => t.season === season && t.dis === d && (kat==='sve'||t.kat===kat));
+      tourns.sort((a,b) => KAT_ORDER.indexOf(a.kat) - KAT_ORDER.indexOf(b.kat));
+
+      if(tourns.length === 0){
         html += `<div class="dis-col dis-col-empty"></div>`;
         return;
       }
-      html += `<div class="dis-col"><h3>${DIS_LABELS[d]} (${tourn.p}.)</h3>`;
-      if(tourn.standings.length){
-        html += '<ol class="standing-list">' + tourn.standings.map((s,i) => {
-          const medal = MEDALS[s.place] || '';
-          return `<li><span class="rank-num">${s.place}</span><span class="team-name">${escapeHtml(s.team)}</span><span class="medal-slot">${medal}</span></li>`;
-        }).join('') + '</ol>';
-      } else {
-        html += '<div class="empty-mini">—</div>';
-      }
+
+      html += `<div class="dis-col"><h3>${DIS_LABELS[d]}${tourns.length===1 ? ` (${tourns[0].p}.)` : ''}</h3>`;
+      tourns.forEach(tourn => {
+        if(tourns.length > 1) html += `<div class="kat-subcard"><div class="kat-subcard-title">${KAT_LABELS[tourn.kat] || tourn.kat} (${tourn.p}.)</div>`;
+        if(tourn.standings.length){
+          html += '<ol class="standing-list">' + tourn.standings.map((s,i) => {
+            const medal = MEDALS[s.place] || '';
+            return `<li><span class="rank-num">${s.place}</span><span class="team-name">${escapeHtml(s.team)}</span><span class="medal-slot">${medal}</span></li>`;
+          }).join('') + '</ol>';
+        } else {
+          html += '<div class="empty-mini">—</div>';
+        }
+        if(tourns.length > 1) html += `</div>`;
+      });
       html += `</div>`;
     });
     html += `</div></div>`;

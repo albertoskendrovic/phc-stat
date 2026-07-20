@@ -74,6 +74,10 @@
   .doc-link{display:inline-flex; align-items:center; gap:8px; padding:9px 14px; background:var(--white); border:1.5px solid var(--sheet-line); border-radius:8px; font-size:13px; color:var(--navy-2); text-decoration:none; font-family:'Inter', sans-serif;}
   .doc-link:hover{border-color:var(--navy-2);}
   .doc-link .ic{font-size:15px;}
+  .pdf-preview-block{margin-top:20px;}
+  .pdf-preview-label{font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:14px; color:var(--navy); margin-bottom:8px;}
+  .pdf-embed{width:100%; height:480px; border:1.5px solid var(--sheet-line); border-radius:8px; background:var(--ice-2); display:block;}
+  .pdf-fallback-link{margin-top:10px;}
 
   .empty-state{text-align:center; padding:36px 20px; color:var(--text-muted); font-size:13.5px; background:var(--white); border-radius:10px; box-shadow:0 0 0 1px var(--sheet-line);}
   .note{font-size:12px; color:var(--text-muted); margin-top:8px; font-style:italic;}
@@ -116,6 +120,7 @@
   footer{text-align:center; padding:30px 24px; color:var(--text-muted); font-size:12.5px;}
   @media (max-width:600px){
     .match-row{grid-template-columns: 60px 1fr auto 1fr 16px; font-size:12.5px;}
+    .pdf-embed{height:340px;}
   }
 </style>
 </head>
@@ -142,9 +147,7 @@
   <div class="controls">
     <div>
       <label for="uzrastSel">Uzrast</label>
-      <select id="uzrastSel">
-        <option value="seniori">Seniori</option>
-      </select>
+      <select id="uzrastSel"></select>
     </div>
     <div>
       <label for="disSel">Disciplina</label>
@@ -167,6 +170,7 @@
 
 <script>
 const DIS_LABELS = {'M':'Muškarci','Ž':'Žene','MC':'Mješoviti curling','MP':'Mješoviti parovi'};
+const KAT_LABELS = {'S':'Seniori','J':'Juniori','V':'Veterani'};
 let DATA = {matches: [], tournaments: []};
 
 fetch('phc-data.json')
@@ -205,23 +209,35 @@ function initFilters(){
   });
   seasonSel.addEventListener('change', render);
 
+  updateKatOptions();
   updateDisOptions();
   updateSeasonOptions();
 }
 
+function updateKatOptions(){
+  const kats = [...new Set(DATA.tournaments.map(t => t.kat))].sort();
+  const uzrastSel = document.getElementById('uzrastSel');
+  const prev = uzrastSel.value;
+  uzrastSel.innerHTML = kats.map(k => `<option value="${k}">${KAT_LABELS[k] || k}</option>`).join('');
+  if(kats.includes(prev)) uzrastSel.value = prev;
+  else uzrastSel.value = kats.includes('S') ? 'S' : kats[0];
+}
+
 function updateDisOptions(){
-  // Currently all data is "Seniori" — once other age categories exist, filter DATA.tournaments by uzrast here too.
-  const available = new Set(DATA.tournaments.map(t => t.dis));
+  const kat = document.getElementById('uzrastSel').value;
+  const available = new Set(DATA.tournaments.filter(t => t.kat === kat).map(t => t.dis));
   const disList = DIS_ORDER.filter(d => available.has(d));
   const disSel = document.getElementById('disSel');
   const prev = disSel.value;
   disSel.innerHTML = disList.map(d => `<option value="${d}">${DIS_LABELS[d] || d}</option>`).join('');
   if(disList.includes(prev)) disSel.value = prev;
+  else disSel.value = disList.includes('M') ? 'M' : disList[0];
 }
 
 function updateSeasonOptions(){
+  const kat = document.getElementById('uzrastSel').value;
   const dis = document.getElementById('disSel').value;
-  const seasons = [...new Set(DATA.tournaments.filter(t => t.dis === dis).map(t => t.season))].sort((a,b) => b-a);
+  const seasons = [...new Set(DATA.tournaments.filter(t => t.dis === dis && t.kat === kat).map(t => t.season))].sort((a,b) => b-a);
   const seasonSel = document.getElementById('seasonSel');
   const prev = Number(seasonSel.value);
   seasonSel.innerHTML = seasons.map(s => `<option value="${s}">${seasonLabel(s)}</option>`).join('');
@@ -229,9 +245,10 @@ function updateSeasonOptions(){
 }
 
 function render(){
+  const kat = document.getElementById('uzrastSel').value;
   const season = Number(document.getElementById('seasonSel').value);
   const dis = document.getElementById('disSel').value;
-  const tourn = DATA.tournaments.find(t => t.season === season && t.dis === dis);
+  const tourn = DATA.tournaments.find(t => t.season === season && t.dis === dis && t.kat === kat);
   const content = document.getElementById('content');
 
   if(!tourn){
@@ -239,7 +256,7 @@ function render(){
     return;
   }
 
-  const matches = DATA.matches.filter(m => m.season === season && m.dis === dis && m.p === tourn.p);
+  const matches = DATA.matches.filter(m => m.season === season && m.dis === dis && m.p === tourn.p && m.kat === kat);
   const hasExplicitGroups = matches.some(m => m.phase.type === 'group' && m.group !== null);
   const groupKey = m => hasExplicitGroups ? (m.group || '—') : '__single__';
   const groups = hasExplicitGroups ? [...new Set(matches.map(m => m.group).filter(g => g !== null))].sort() : ['__single__'];
@@ -310,7 +327,6 @@ function render(){
   // documents
   let html2 = '';
   const seasonTag = `${season-1}-${season}`;
-  const kat = tourn.kat || 'S';
   const docBase = `zapisnici/${seasonTag}/PHC-${seasonTag}-${dis}-${kat}`;
   html2 += `<section class="block"><h2 class="section-h">Dokumenti</h2>`;
   html2 += `<div class="doc-row">
@@ -367,10 +383,12 @@ function computeGroupStandings(matches){
     return table[team];
   }
   matches.forEach(m => {
-    if(m.winner !== 1 && m.winner !== 2) return;
+    if(m.winner !== 1 && m.winner !== 2 && !m.played) return; // stvarno neodigrano — ne broji se
     const t1 = ensure(m.team1), t2 = ensure(m.team2);
     t1.played++; t2.played++;
-    if(m.winner === 1){ t1.points += 2; } else { t2.points += 2; }
+    if(m.winner === 1){ t1.points += 2; }
+    else if(m.winner === 2){ t2.points += 2; }
+    else { t1.points += 1; t2.points += 1; } // neriješeno — po 1 bod objema ekipama
     if(m.throws1 && m.throws1.length) t1.throws.push(...m.throws1);
     if(m.throws2 && m.throws2.length) t2.throws.push(...m.throws2);
   });
@@ -567,8 +585,10 @@ function openMatchModal(id){
     ${infoHtml}
     ${scoreboardHtml}
     ${rosterHtml}
-    <div class="doc-row" style="margin-top:20px;">
-      <a class="doc-link" href="${zapisnikHref}" target="_blank" rel="noopener"><span class="ic">📄</span> Zapisnik</a>
+    <div class="pdf-preview-block">
+      <div class="pdf-preview-label">📄 Zapisnik</div>
+      <iframe class="pdf-embed" src="${zapisnikHref}" title="Zapisnik s utakmice"></iframe>
+      <a class="doc-link pdf-fallback-link" href="${zapisnikHref}" target="_blank" rel="noopener">Otvori u novom prozoru / preuzmi</a>
     </div>
   `;
   overlay.classList.add('open');
