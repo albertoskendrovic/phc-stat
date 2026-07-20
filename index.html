@@ -3,10 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Prvenstva — Hrvatski curling savez</title>
+<title>Hrvatski curling savez — Prvenstva i statistika</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+
+  /* --- baza za spojenu jednostraničnu aplikaciju --- */
+  .wrap{max-width:1080px; margin:0 auto; padding:0 24px 80px;}
+  .page-section{display:none;}
+  .page-section.active{display:block;}
+  .page-nav{display:flex; gap:6px;}
+  .page-nav-btn{font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--ice); text-decoration:none; border:1px solid rgba(255,255,255,0.3); padding:4px 10px; border-radius:20px; white-space:nowrap; background:none; cursor:pointer;}
+  .page-nav-btn.active{background:rgba(255,255,255,0.18); border-color:rgba(255,255,255,0.5);}
+  .page-nav-btn:hover{background:rgba(255,255,255,0.1);}
+
+
   :root{
     --ice: #eef3f6;
     --ice-2: #dee8ee;
@@ -21,7 +32,221 @@
   }
   *{box-sizing:border-box;}
   body{margin:0; background:var(--ice); color:var(--text); font-family:'Inter', sans-serif; line-height:1.5;}
-  .wrap{max-width:980px; margin:0 auto; padding:0 24px 80px;}
+  
+
+  header{background:var(--navy); color:var(--ice); padding:14px 24px 16px; position:relative; overflow:hidden;}
+  header .wrap{position:relative; z-index:2;}
+  .header-top{display:flex; align-items:center; justify-content:space-between; gap:12px;}
+  .eyebrow{font-family:'IBM Plex Mono', monospace; font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:#9db3c4; margin:0 0 2px;}
+  h1{font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:clamp(17px,2.4vw,21px); margin:0 0 2px; letter-spacing:-0.01em;}
+  header p.lead{max-width:560px; color:#c3d2dc; font-size:11.5px; margin:0;}
+  .nav-pill{font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--ice); text-decoration:none; border:1px solid rgba(255,255,255,0.3); padding:4px 10px; border-radius:20px; white-space:nowrap;}
+  .nav-pill:hover{background:rgba(255,255,255,0.1);}
+  .stone-decor{position:absolute; right:-40px; top:-40px; width:110px; height:110px; opacity:0.15;}
+
+  .tabs{display:flex; gap:4px; flex-wrap:wrap; border-bottom:1.5px solid var(--sheet-line); margin:28px 0 24px;}
+  .tab-btn{font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:14px; background:none; border:none; padding:10px 16px 12px; cursor:pointer; color:var(--text-muted); border-bottom:3px solid transparent; margin-bottom:-1.5px;}
+  .tab-btn.active{color:var(--navy); border-bottom-color:var(--stone-red);}
+  .panel{display:none;}
+  .panel.active{display:block;}
+
+  #page-statistika .controls{display:flex; flex-wrap:wrap; gap:10px 20px; margin-bottom:24px; align-items:flex-end;}
+  .control-group{display:flex; flex-direction:column; gap:4px;}
+  .control-group label{font-size:11.5px; color:var(--text-muted); font-family:'IBM Plex Mono', monospace; text-transform:uppercase; letter-spacing:0.05em;}
+  select{font-family:'Inter', sans-serif; font-size:14px; padding:8px 12px; border-radius:8px; border:1.5px solid var(--sheet-line); background:var(--white); color:var(--text); cursor:pointer;}
+  #page-statistika .radio-row{display:flex; gap:6px;}
+  .radio-btn{font-family:'Inter', sans-serif; font-size:13px; padding:7px 14px; border-radius:20px; border:1.5px solid var(--sheet-line); background:var(--white); color:var(--text-muted); cursor:pointer;}
+  .radio-btn.active{background:var(--navy); color:var(--ice); border-color:var(--navy);}
+  .radio-btn.sve-btn{border-color:var(--stone-yellow); color:var(--stone-yellow); font-weight:600;}
+  .radio-btn.sve-btn.active{background:var(--stone-yellow); color:#fff; border-color:var(--stone-yellow);}
+  .radio-btn:disabled{opacity:0.35; cursor:not-allowed;}
+
+  .filter-bar{display:flex; flex-wrap:wrap; gap:24px; background:var(--white); border-radius:10px; box-shadow:0 0 0 1px var(--sheet-line); padding:16px 20px; margin:24px 0; align-items:flex-start;}
+  .filter-bar.disabled-group{opacity:0.4;}
+  .filter-group{display:flex; flex-direction:column; gap:6px;}
+  .filter-group-label{font-family:'IBM Plex Mono', monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted); border-bottom:1px solid var(--ice-2); padding-bottom:4px;}
+  .filter-group.is-inactive{opacity:0.35;}
+  .season-controls{display:flex; align-items:center; gap:8px;}
+  .season-dd{display:flex; flex-direction:row; align-items:center; gap:5px; opacity:0.55; transition:opacity 0.15s;}
+  .season-controls.season-is-range .season-dd{opacity:1;}
+  .season-dd-label{font-size:11px; color:var(--text-muted); font-family:'IBM Plex Mono', monospace; text-transform:uppercase;}
+  .season-dd select{padding:6px 8px; font-size:13px;}
+
+  .season-block{margin-bottom:36px; max-width:820px;}
+  .season-title{font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:18px; margin:0 0 12px; padding-bottom:8px; border-bottom:1.5px solid var(--sheet-line);}
+  .dis-grid{display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; align-items:start;}
+  .dis-col{background:var(--white); border-radius:10px; box-shadow:0 0 0 1px var(--sheet-line); overflow:hidden;}
+  .dis-col.dis-col-empty{visibility:hidden;}
+  .dis-col h3{font-family:'Space Grotesk', sans-serif; font-size:12.5px; font-weight:600; margin:0; padding:9px 10px; background:var(--ice-2); color:var(--navy);}
+  .standing-list{list-style:none; margin:0; padding:6px 0;}
+  .standing-list li{padding:5px 10px; font-size:12.5px; border-bottom:1px solid var(--ice-2); display:flex; align-items:center; gap:5px;}
+  .standing-list li:last-child{border-bottom:none;}
+  .standing-list .team-name{flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .standing-list .medal-slot{width:18px; text-align:right; flex-shrink:0;}
+  .standing-list .rank-num{display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background:var(--ice-2); font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--text-muted); flex-shrink:0;}
+  .empty-mini{padding:16px 12px; font-size:12.5px; color:var(--text-muted); text-align:center;}
+  .kat-section-h{font-family:'Space Grotesk', sans-serif; font-size:14px; font-weight:600; color:var(--navy-2); margin:14px 0 8px; padding-left:2px;}
+  .kat-section-h:first-of-type{margin-top:2px;}
+
+  table.stats-table{width:100%; max-width:620px; table-layout:fixed; border-collapse:collapse; background:var(--white); border-radius:10px; overflow:hidden; box-shadow:0 0 0 1px var(--sheet-line); margin-bottom:24px;}
+  table.stats-table th, table.stats-table td{padding:9px 14px; font-size:13.5px; text-align:right; border-bottom:1px solid var(--ice-2);}
+  table.stats-table th:first-child, table.stats-table td:first-child{text-align:left;}
+  table.stats-table thead th{font-family:'IBM Plex Mono', monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-muted); background:var(--ice-2); font-weight:500;}
+  table.stats-table td{font-family:'Space Grotesk', sans-serif; font-weight:600;}
+  table.stats-table tbody tr:last-child td{border-bottom:none;}
+  col.label-col{width:22%;}
+  tr.main-row td{border-bottom:none; border-top:1.5px solid var(--sheet-line);}
+  tbody tr.main-row:first-child td{border-top:none;}
+  tr.sub-row td{font-family:'IBM Plex Mono', monospace; font-weight:400; font-size:12px; color:var(--text-muted); padding-top:3px; padding-bottom:3px; border-top:none; border-bottom:none;}
+  tr.sub-row td:first-child{padding-left:24px;}
+  table.stats-table th.total-col, table.stats-table td.total-col{background:var(--ice-2); font-weight:700;}
+  tr.sub-row td.total-col{font-weight:500; background:#e4ebee;}
+
+  .record-block{margin-bottom:30px;}
+  .record-title{font-family:'Space Grotesk', sans-serif; font-size:15px; font-weight:600; color:var(--navy); margin:0 0 10px;}
+  table.records-table{max-width:560px;}
+  table.records-table th:nth-child(1), table.records-table td:nth-child(1){width:16%;}
+  table.records-table th:nth-child(2), table.records-table td:nth-child(2){width:38%;}
+  table.records-table th:nth-child(3), table.records-table td:nth-child(3){width:16%;}
+  table.records-table th:nth-child(4), table.records-table td:nth-child(4){width:16%;}
+  table.records-table th:nth-child(5), table.records-table td:nth-child(5){width:16%;}
+  table.records-table td, table.records-table th{text-align:left;}
+  table.records-table td.num-cell, table.records-table th:nth-child(4){text-align:right; font-family:'IBM Plex Mono', monospace;}
+  table.records-table td{font-family:'Inter', sans-serif; font-weight:400; font-size:13px;}
+
+  .h2h-wrap{overflow-x:auto; overflow-y:hidden; border-radius:10px;}
+  table.h2h-table{width:100%; table-layout:fixed; border-collapse:collapse; background:var(--white); border-radius:10px; overflow:hidden; box-shadow:0 0 0 1px var(--sheet-line); font-size:11.5px;}
+  table.h2h-table th, table.h2h-table td{padding:6px 4px; text-align:center; border:1px solid var(--ice-2); overflow-wrap:break-word;}
+  table.h2h-table th:first-child, table.h2h-table td:first-child{width:130px;}
+  table.h2h-table thead th{font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:10.5px; background:var(--ice-2); color:var(--navy); line-height:1.2;}
+  table.h2h-table tbody th{font-family:'Space Grotesk', sans-serif; font-weight:600; text-align:left; background:var(--ice-2); color:var(--navy);}
+  table.h2h-table td.diag{background:repeating-linear-gradient(45deg, #2a3b4a, #2a3b4a 4px, #1c2b39 4px, #1c2b39 8px);}
+  table.h2h-table td.h2h-cell{font-family:'IBM Plex Mono', monospace; line-height:1.5;}
+  table.h2h-table .h2h-pct{font-size:10px; color:var(--text-muted); font-weight:400;}
+  table.h2h-table td.h2h-empty{color:var(--sheet-line);}
+
+  table.ekipe-table{border-collapse:separate; border-spacing:0; background:var(--white); box-shadow:0 0 0 1px var(--sheet-line); font-size:12px; white-space:nowrap;}
+  table.ekipe-table th, table.ekipe-table td{padding:7px 9px; text-align:right; border:1px solid var(--ice-2);}
+  table.ekipe-table th{font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:10.5px; background:var(--ice-2); color:var(--navy); text-align:center; white-space:normal; max-width:80px;}
+  table.ekipe-table td.ekipe-rank, table.ekipe-table th.ekipe-rank{text-align:center; color:var(--text-muted); font-family:'IBM Plex Mono', monospace; position:sticky; left:0; background:var(--white); z-index:2; min-width:36px;}
+  table.ekipe-table td.ekipe-name, table.ekipe-table th.ekipe-name{text-align:left; font-family:'Space Grotesk', sans-serif; font-weight:600; color:var(--navy); position:sticky; left:36px; background:var(--white); z-index:1; box-shadow:2px 0 4px -2px rgba(0,0,0,0.15);}
+  table.ekipe-table thead th.ekipe-rank, table.ekipe-table thead th.ekipe-name{background:var(--ice-2); z-index:3;}
+  .top-scrollbar{overflow-x:auto; overflow-y:hidden; height:14px;}
+  .top-scrollbar-spacer{height:1px;}
+  table.ekipe-table td.cell-best{background:#d7ecd9; font-weight:700;}
+  table.ekipe-table td.cell-worst{background:#f6d9d6;}
+
+  .empty-state{text-align:center; padding:36px 20px; color:var(--text-muted); font-size:13.5px; background:var(--white); border-radius:10px; box-shadow:0 0 0 1px var(--sheet-line);}
+  .coming-soon{text-align:center; padding:60px 20px; color:var(--text-muted);}
+  .coming-soon h2{font-family:'Space Grotesk', sans-serif; color:var(--navy); font-size:20px; margin-bottom:8px;}
+
+  footer{text-align:center; padding:30px 24px; color:var(--text-muted); font-size:12.5px;}
+
+  @media (max-width:800px){
+    .dis-grid{grid-template-columns:1fr;}
+    .dis-col.dis-col-empty{display:none;}
+  }
+  /* modal (utakmica, klub/ekipa/igrač detalji) */
+  .modal-overlay{display:none; position:fixed; inset:0; background:rgba(28,43,57,0.55); z-index:100; align-items:flex-start; justify-content:center; padding:40px 16px; overflow-y:auto;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--white); border-radius:14px; max-width:640px; width:100%; padding:28px 28px 26px; position:relative;}
+  .modal-close{position:absolute; top:16px; right:16px; width:30px; height:30px; border-radius:50%; border:none; background:var(--ice-2); font-size:16px; cursor:pointer; color:var(--navy);}
+  .modal .info-block{font-size:13.5px; color:var(--text-muted); margin-bottom:20px; display:flex; flex-direction:column; gap:5px;}
+  .modal .info-block div span{color:var(--text); font-weight:500;}
+  .modal h2.entity-title{font-family:'Space Grotesk', sans-serif; font-size:19px; margin:0 0 16px; color:var(--navy);}
+
+  table.scoreboard-table{width:100%; table-layout:fixed; border-collapse:collapse; margin-bottom:22px; box-shadow:0 0 0 1px #7d8a94; border-radius:8px; overflow:hidden;}
+  table.scoreboard-table th, table.scoreboard-table td{padding:7px 4px; text-align:center; font-size:13.5px; border-right:1px solid #7d8a94; border-bottom:1px solid #7d8a94;}
+  table.scoreboard-table th:first-child, table.scoreboard-table td:first-child{text-align:left; padding-left:12px;}
+  table.scoreboard-table th{background:var(--navy); color:var(--ice); font-family:'IBM Plex Mono', monospace; font-size:10.5px; text-transform:uppercase; font-weight:500; border-right:1px solid rgba(255,255,255,0.25);}
+  table.scoreboard-table td{font-family:'Space Grotesk', sans-serif; font-weight:700; color:#111;}
+  table.scoreboard-table td:last-child, table.scoreboard-table th:last-child{border-right:none;}
+  table.scoreboard-table th:last-child{background:var(--navy); color:var(--ice);}
+  table.scoreboard-table td:last-child{color:#111; font-size:15px; font-weight:800;}
+  table.scoreboard-table tr.team1-row td{background:#f2a9a1;}
+  table.scoreboard-table tr.team2-row td{background:#f0d878;}
+  table.scoreboard-table tr.team1-row td:first-child{color:#111; font-weight:700;}
+  table.scoreboard-table tr.team2-row td:first-child{color:#111; font-weight:700;}
+  table.scoreboard-table td.na{color:#555; font-weight:400;}
+  .pk-hammer{font-size:14px;}
+
+  .roster-cols{display:flex; flex-direction:column; gap:16px;}
+  table.roster-table{width:100%; border-collapse:collapse; box-shadow:0 0 0 1px var(--sheet-line); border-radius:8px; overflow:hidden;}
+  table.roster-table thead th{background:var(--ice-2); font-family:'Space Grotesk', sans-serif; font-size:13.5px; font-weight:600; padding:8px 12px; text-align:left; color:var(--navy);}
+  table.roster-table thead th.num{text-align:right; font-family:'IBM Plex Mono', monospace; font-weight:500; font-size:12px; color:var(--text-muted);}
+  table.roster-table tbody td{padding:6px 8px; font-size:13px; border-top:1px solid var(--ice-2);}
+  table.roster-table tbody td.num{text-align:right; font-family:'IBM Plex Mono', monospace; color:var(--text-muted); font-size:11.5px;}
+  table.roster-table tbody td.rot{text-align:center; font-size:15px;}
+  .order-circle{display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background:var(--ice-2); font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--navy-2);}
+  .role-tag{font-family:'IBM Plex Mono', monospace; font-size:10.5px; color:var(--text-muted); text-transform:uppercase;}
+
+  .pdf-preview-block{margin-top:20px;}
+  .pdf-preview-label{font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:14px; color:var(--navy); margin-bottom:8px;}
+  .pdf-embed{width:100%; height:480px; border:1.5px solid var(--sheet-line); border-radius:8px; background:var(--ice-2); display:block;}
+  .pdf-fallback-link{margin-top:10px;}
+  .pdf-mobile-btn{display:none;}
+  .doc-link{display:inline-flex; align-items:center; gap:8px; padding:9px 14px; background:var(--white); border:1.5px solid var(--sheet-line); border-radius:8px; font-size:13px; color:var(--navy-2); text-decoration:none; font-family:'Inter', sans-serif;}
+  .doc-link:hover{border-color:var(--navy-2);}
+
+  .photo-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:10px;}
+  .photo-thumb{aspect-ratio:1; border-radius:8px; overflow:hidden; cursor:pointer; box-shadow:0 0 0 1px var(--sheet-line);}
+  .photo-thumb img{width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.15s;}
+  .photo-thumb:hover img{transform:scale(1.06);}
+
+  .video-thumb{position:relative; aspect-ratio:1; border-radius:8px; overflow:hidden; cursor:pointer; box-shadow:0 0 0 1px var(--sheet-line); background:#000;}
+  .video-thumb video{width:100%; height:100%; object-fit:cover; display:block; pointer-events:none;}
+  .video-play-icon{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:22px; color:#fff; background:rgba(0,0,0,0.15); text-shadow:0 1px 4px rgba(0,0,0,0.6);}
+  .video-thumb:hover .video-play-icon{background:rgba(0,0,0,0.3);}
+  .video-modal-player{width:100%; max-height:70vh; border-radius:8px; display:block; background:#000;}
+
+  .lightbox{display:flex; align-items:center; justify-content:center; gap:12px;}
+  .lightbox-image{max-width:100%; max-height:70vh; border-radius:8px; display:block;}
+  .lightbox-nav{background:var(--ice-2); border:none; border-radius:50%; width:38px; height:38px; font-size:20px; color:var(--navy); cursor:pointer; flex-shrink:0;}
+  .lightbox-nav:hover{background:var(--sheet-line);}
+  .lightbox-nav:disabled{opacity:0.3; cursor:default;}
+  .lightbox-footer{display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-top:10px;}
+  .lightbox-counter{font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--text-muted); flex-shrink:0;}
+  .lightbox-caption{font-family:'Space Grotesk', sans-serif; font-size:14.5px; font-weight:600; color:var(--navy);}
+
+  /* klik-link stil za nazive ekipa/klubova/igrača — isti "hover zatamni + ručica" princip kao kod redaka utakmica */
+  .clickable-name{cursor:pointer; border-radius:6px; transition:background 0.1s;}
+  .clickable-name:hover{background:#f6f9fb;}
+  table.ekipe-table td.ekipe-name.clickable-name:hover, table.ekipe-table th.ekipe-name.clickable-name:hover{background:#f6f9fb;}
+  .clickable-cell{cursor:pointer;}
+  .clickable-cell:hover{background:#f6f9fb !important;}
+  tr.clickable-row, li.clickable-row{cursor:pointer;}
+  tr.clickable-row:hover td{background:#f6f9fb;}
+  li.clickable-row:hover{background:#f6f9fb;}
+
+  /* postignuća kroz vrijeme (klub/ekipa/igrač detalj) */
+  .achv-table{width:100%; border-collapse:collapse; font-size:12.5px; margin-top:6px;}
+  .achv-table th, .achv-table td{padding:6px 8px; text-align:left; border-bottom:1px solid var(--ice-2);}
+  .achv-table th{font-family:'IBM Plex Mono', monospace; font-size:10.5px; text-transform:uppercase; color:var(--text-muted); background:var(--ice-2);}
+  .achv-table td.num, .achv-table th.num{text-align:right; font-family:'IBM Plex Mono', monospace;}
+  .place-cell{display:inline-flex; align-items:center; justify-content:flex-end; gap:4px;}
+  .place-medal{display:inline-block; width:16px; text-align:left;}
+
+  @media (max-width:600px){
+    .pdf-desktop-view{display:none;}
+    .pdf-mobile-btn{display:inline-flex;}
+  }
+
+
+  :root{
+    --ice: #eef3f6;
+    --ice-2: #dee8ee;
+    --sheet-line: #b9c8d1;
+    --navy: #1c2b39;
+    --navy-2: #2f4459;
+    --stone-red: #b2433a;
+    --stone-yellow: #c99a2e;
+    --text: #1c2b39;
+    --text-muted: #5c6f7c;
+    --white: #ffffff;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--ice); color:var(--text); font-family:'Inter', sans-serif; line-height:1.5;}
+  #page-prvenstva > .wrap{max-width:980px;}
 
   header{background:var(--navy); color:var(--ice); padding:14px 24px 16px; position:relative; overflow:hidden;}
   header .wrap{position:relative; z-index:2;}
@@ -33,9 +258,13 @@
   .nav-pill:hover{background:rgba(255,255,255,0.1);}
   .stone-decor{position:absolute; right:-40px; top:-40px; width:110px; height:110px; opacity:0.15;}
 
-  .controls{display:flex; flex-wrap:wrap; gap:10px; margin:28px 0 8px; align-items:center;}
-  .controls label{font-size:12.5px; color:var(--text-muted); font-family:'IBM Plex Mono', monospace; text-transform:uppercase; letter-spacing:0.05em; margin-right:6px;}
-  select{font-family:'Inter', sans-serif; font-size:14px; padding:8px 12px; border-radius:8px; border:1.5px solid var(--sheet-line); background:var(--white); color:var(--text); cursor:pointer;}
+  #page-prvenstva .controls{gap:24px; margin:28px 0 8px; align-items:flex-start;}
+  #page-prvenstva .controls > div{display:flex; flex-direction:column; gap:6px;}
+  .controls label{font-size:12.5px; color:var(--text-muted); font-family:'IBM Plex Mono', monospace; text-transform:uppercase; letter-spacing:0.05em;}
+  #page-prvenstva select{font-size:13px; padding:7px 12px;}
+  #page-prvenstva .radio-row{display:flex; gap:6px; flex-wrap:wrap;}
+  .radio-btn{font-family:'Inter', sans-serif; font-size:13px; padding:7px 14px; border-radius:20px; border:1.5px solid var(--sheet-line); background:var(--white); color:var(--text-muted); cursor:pointer;}
+  .radio-btn.active{background:var(--navy); color:var(--ice); border-color:var(--navy);}
 
   .tourn-title{font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:22px; margin:28px 0 4px;}
   .tourn-meta{color:var(--text-muted); font-size:13.5px; margin-bottom:24px;}
@@ -78,6 +307,8 @@
   .pdf-preview-label{font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:14px; color:var(--navy); margin-bottom:8px;}
   .pdf-embed{width:100%; height:480px; border:1.5px solid var(--sheet-line); border-radius:8px; background:var(--ice-2); display:block;}
   .pdf-fallback-link{margin-top:10px;}
+  .pdf-mobile-btn{display:none;}
+  .modal h2.entity-title{font-family:'Space Grotesk', sans-serif; font-size:19px; margin:0 0 16px; color:var(--navy);}
 
   .empty-state{text-align:center; padding:36px 20px; color:var(--text-muted); font-size:13.5px; background:var(--white); border-radius:10px; box-shadow:0 0 0 1px var(--sheet-line);}
   .note{font-size:12px; color:var(--text-muted); margin-top:8px; font-style:italic;}
@@ -86,6 +317,7 @@
   .modal-overlay{display:none; position:fixed; inset:0; background:rgba(28,43,57,0.55); z-index:100; align-items:flex-start; justify-content:center; padding:40px 16px; overflow-y:auto;}
   .modal-overlay.open{display:flex;}
   .modal{background:var(--white); border-radius:14px; max-width:640px; width:100%; padding:28px 28px 26px; position:relative;}
+  .modal.modal-wide{max-width:880px;}
   .modal-close{position:absolute; top:16px; right:16px; width:30px; height:30px; border-radius:50%; border:none; background:var(--ice-2); font-size:16px; cursor:pointer; color:var(--navy);}
   .modal .info-block{font-size:13.5px; color:var(--text-muted); margin-bottom:20px; display:flex; flex-direction:column; gap:5px;}
   .modal .info-block div span{color:var(--text); font-weight:500;}
@@ -120,8 +352,10 @@
   footer{text-align:center; padding:30px 24px; color:var(--text-muted); font-size:12.5px;}
   @media (max-width:600px){
     .match-row{grid-template-columns: 60px 1fr auto 1fr 16px; font-size:12.5px;}
-    .pdf-embed{height:340px;}
+    .pdf-desktop-view{display:none;}
+    .pdf-mobile-btn{display:inline-flex;}
   }
+
 </style>
 </head>
 <body>
@@ -136,22 +370,26 @@
   <div class="wrap">
     <div class="header-top">
       <p class="eyebrow">Hrvatski curling savez &mdash; arhiva prvenstava</p>
-      <a class="nav-pill" href="statistika.html">📊 Statistika</a>
+      <div class="page-nav">
+        <button class="page-nav-btn active" data-page="prvenstva">🏆 Prvenstva</button>
+        <button class="page-nav-btn" data-page="statistika">📊 Statistika</button>
+      </div>
     </div>
-    <h1>Pregled prvenstava</h1>
-    <p class="lead">Rezultati po skupinama i kolima, doigravanje, konačni poredak i detaljan pregled svake utakmice.</p>
+    <h1>Prvenstva i statistika</h1>
+    <p class="lead">Rezultati po skupinama i kolima, poretci kroz sezone, agregatna statistika, međusobni susreti i još.</p>
   </div>
 </header>
 
+<div id="page-prvenstva" class="page-section active">
 <div class="wrap">
-  <div class="controls">
+  <div class="controls filter-bar">
     <div>
-      <label for="uzrastSel">Uzrast</label>
-      <select id="uzrastSel"></select>
+      <label>Kategorija</label>
+      <div class="radio-row" id="uzrastRow"></div>
     </div>
     <div>
-      <label for="disSel">Disciplina</label>
-      <select id="disSel"></select>
+      <label>Disciplina</label>
+      <div class="radio-row" id="disRow"></div>
     </div>
     <div>
       <label for="seasonSel">Sezona</label>
@@ -161,6 +399,79 @@
 
   <div id="content"></div>
 </div>
+</div>
+
+<div id="page-statistika" class="page-section">
+<div class="wrap">
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="poretci">Poretci</button>
+    <button class="tab-btn" data-tab="statistika">Statistika</button>
+    <button class="tab-btn" data-tab="rekordi">Rekordi</button>
+    <button class="tab-btn" data-tab="klubovi">Klubovi</button>
+    <button class="tab-btn" data-tab="ekipe">Ekipe</button>
+    <button class="tab-btn" data-tab="klubovih2h">Klubovi međusobno</button>
+    <button class="tab-btn" data-tab="ekipeh2h">Ekipe međusobno</button>
+    <button class="tab-btn" data-tab="igraci">Igrači</button>
+  </div>
+
+  <div class="filter-bar">
+    <div class="filter-group">
+      <div class="filter-group-label">Kategorija</div>
+      <div class="radio-row" id="globalKatRow"></div>
+    </div>
+    <div class="filter-group" id="globalDisGroup">
+      <div class="filter-group-label">Disciplina</div>
+      <div class="radio-row" id="globalDisRow"></div>
+    </div>
+    <div class="filter-group">
+      <div class="filter-group-label">Sezona</div>
+      <div class="season-controls">
+        <button class="radio-btn sve-btn active" id="seasonSveBtn">Sve</button>
+        <div class="season-dd">
+          <span class="season-dd-label">Od</span>
+          <select id="globalSeasonFrom"></select>
+        </div>
+        <div class="season-dd">
+          <span class="season-dd-label">Do</span>
+          <select id="globalSeasonTo"></select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel active" id="panel-poretci">
+    <div id="poretciContent"></div>
+  </div>
+
+  <div class="panel" id="panel-statistika">
+    <div id="statContent"></div>
+  </div>
+
+  <div class="panel" id="panel-rekordi">
+    <div id="rekordiContent"></div>
+  </div>
+
+  <div class="panel" id="panel-klubovi">
+    <div id="kluboviContent"></div>
+  </div>
+
+  <div class="panel" id="panel-ekipe">
+    <div id="ekipeContent"></div>
+  </div>
+
+  <div class="panel" id="panel-klubovih2h">
+    <div id="klubovih2hContent"></div>
+  </div>
+
+  <div class="panel" id="panel-ekipeh2h">
+    <div id="ekipeh2hContent"></div>
+  </div>
+
+  <div class="panel" id="panel-igraci">
+    <div id="igraciContent"></div>
+  </div>
+</div>
+</div>
 
 <footer></footer>
 
@@ -169,20 +480,376 @@
 </div>
 
 <script>
+
+const DIS_ORDER = ['M', 'Ž', 'MC', 'MP'];
 const DIS_LABELS = {'M':'Muškarci','Ž':'Žene','MC':'Mješoviti curling','MP':'Mješoviti parovi'};
 const KAT_LABELS = {'S':'Seniori','J':'Juniori','V':'Veterani'};
-let DATA = {matches: [], tournaments: []};
+
+// Tabovi za koje "Disciplina" filter NIJE primjenjiv (prikazuju sve discipline u stupcima)
+const NO_DIS_TABS = new Set([]);
+
+const TAB_IDS = ['poretci','statistika','rekordi','klubovi','ekipe','klubovih2h','ekipeh2h','igraci'];
+const TAB_STATE = {};
+TAB_IDS.forEach(t => { TAB_STATE[t] = { kat: 'sve', dis: 'sve', seasonMode: 'sve', seasonFrom: null, seasonTo: null }; });
+
+let DATA = { matches: [], tournaments: [], clubs: {} };
+let MIN_SEASON = null, MAX_SEASON = null;
 
 fetch('phc-data.json')
   .then(r => r.json())
-  .then(data => { DATA = data; initFilters(); render(); })
+  .then(data => {
+    DATA = data;
+    const seasons = data.tournaments.map(t => t.season);
+    MIN_SEASON = Math.min(...seasons);
+    MAX_SEASON = Math.max(...seasons);
+    NHC_ANCHOR_SEASON = MAX_SEASON;
+    TAB_IDS.forEach(t => { TAB_STATE[t].seasonFrom = MIN_SEASON; TAB_STATE[t].seasonTo = MAX_SEASON; });
+
+    // --- Statistika ---
+    initUniversalFilters();
+    updateFilterVisibility();
+    syncFilterBarToState();
+    renderActiveTab();
+
+    // --- Prvenstva ---
+    initFilters();
+    render();
+  })
   .catch(err => {
-    document.getElementById('content').innerHTML =
-      '<div class="empty-state">Greška pri učitavanju phc-data.json — pokrenite lokalni server u ovoj mapi (npr. <code>npx serve</code>) jer preglednici blokiraju fetch za file://.</div>';
+    document.querySelectorAll('.panel > div').forEach(p => {
+      p.innerHTML = '<div class="empty-state">Greška pri učitavanju phc-data.json — pokrenite lokalni server u ovoj mapi (npr. <code>npx serve</code>).</div>';
+    });
+    const prvenstvaContent = document.getElementById('content');
+    if(prvenstvaContent){
+      prvenstvaContent.innerHTML = '<div class="empty-state">Greška pri učitavanju phc-data.json — pokrenite lokalni server u ovoj mapi (npr. <code>npx serve</code>).</div>';
+    }
   });
 
-function seasonLabel(season){
-  return `${season-1}-${season}`;
+function seasonLabel(season){ return `${season-1}-${season}`; }
+function escapeHtml(s){
+  if(s == null) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// Dodaje sinkronizirani scrollbar IZNAD širokih tablica (isti mehanizam kao
+// donji, prirodni scrollbar) — korisno kad je tablica preduga da bi se vidio
+// donji scrollbar bez skrolanja cijele stranice.
+function addTopScrollbar(containerEl, scrollWrapEl){
+  const inner = scrollWrapEl.firstElementChild;
+  if(!inner) return;
+  const top = document.createElement('div');
+  top.className = 'top-scrollbar';
+  const spacer = document.createElement('div');
+  spacer.className = 'top-scrollbar-spacer';
+  spacer.style.width = inner.scrollWidth + 'px';
+  top.appendChild(spacer);
+  containerEl.insertBefore(top, scrollWrapEl);
+
+  let syncing = false;
+  top.addEventListener('scroll', () => {
+    if(syncing) return;
+    syncing = true;
+    scrollWrapEl.scrollLeft = top.scrollLeft;
+    syncing = false;
+  });
+  scrollWrapEl.addEventListener('scroll', () => {
+    if(syncing) return;
+    syncing = true;
+    top.scrollLeft = scrollWrapEl.scrollLeft;
+    syncing = false;
+  });
+}
+
+// ---------- tabs ----------
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+    updateFilterVisibility();
+    syncFilterBarToState();
+    renderActiveTab();
+  });
+});
+
+function activeTab(){ return document.querySelector('.tab-btn.active').dataset.tab; }
+function currentState(){ return TAB_STATE[activeTab()]; }
+
+function updateFilterVisibility(){
+  const tab = activeTab();
+  const disGroup = document.getElementById('globalDisGroup');
+  disGroup.classList.toggle('is-inactive', NO_DIS_TABS.has(tab));
+  disGroup.querySelectorAll('button').forEach(b => b.disabled = NO_DIS_TABS.has(tab));
+}
+
+// Odražava spremljeno stanje AKTIVNOG taba na kontrolama filtera (bez okidanja re-rendera)
+function syncFilterBarToState(){
+  const st = currentState();
+  document.querySelectorAll('#globalKatRow .radio-btn').forEach(b => b.classList.toggle('active', b.dataset.kat === st.kat));
+  document.querySelectorAll('#globalDisRow .radio-btn').forEach(b => b.classList.toggle('active', b.dataset.dis === st.dis));
+  document.getElementById('seasonSveBtn').classList.toggle('active', st.seasonMode === 'sve');
+  document.getElementById('globalSeasonFrom').value = st.seasonFrom ?? MIN_SEASON;
+  document.getElementById('globalSeasonTo').value = st.seasonTo ?? MAX_SEASON;
+  document.querySelector('.season-controls').classList.toggle('season-is-range', st.seasonMode === 'range');
+}
+
+function renderActiveTab(){
+  const tab = activeTab();
+  if(tab === 'poretci') renderPoretci();
+  else if(tab === 'statistika') renderStatistika();
+  else if(tab === 'rekordi') renderRekordi();
+  else if(tab === 'klubovi') renderKlubovi();
+  else if(tab === 'ekipe') renderEkipe();
+  else if(tab === 'klubovih2h') renderKluboviH2h();
+  else if(tab === 'ekipeh2h') renderEkipeH2h();
+  else if(tab === 'igraci') renderIgraci();
+}
+
+// ---------- univerzalni filteri (izgled dijeljen, stanje po tabu) ----------
+function availableKats(){
+  return [...new Set(DATA.tournaments.map(t => t.kat))].sort((a,b) => KAT_ORDER.indexOf(a) - KAT_ORDER.indexOf(b));
+}
+
+function initUniversalFilters(){
+  // Kategorija
+  const kats = availableKats();
+  const katRow = document.getElementById('globalKatRow');
+  katRow.innerHTML = '<button class="radio-btn sve-btn active" data-kat="sve">Sve</button>' +
+    kats.map(k => `<button class="radio-btn" data-kat="${k}">${KAT_LABELS[k]||k}</button>`).join('');
+  katRow.querySelectorAll('.radio-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      katRow.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentState().kat = btn.dataset.kat;
+      renderActiveTab();
+    });
+  });
+
+  // Disciplina
+  const disRow = document.getElementById('globalDisRow');
+  disRow.innerHTML = '<button class="radio-btn sve-btn active" data-dis="sve">Sve</button>' +
+    DIS_ORDER.map(d => `<button class="radio-btn" data-dis="${d}">${DIS_LABELS[d]}</button>`).join('');
+  disRow.querySelectorAll('.radio-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if(btn.disabled) return;
+      disRow.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentState().dis = btn.dataset.dis;
+      renderActiveTab();
+    });
+  });
+
+  // Sezona
+  const seasons = [...new Set(DATA.tournaments.map(t => t.season))].sort((a,b) => a-b);
+  const fromSel = document.getElementById('globalSeasonFrom');
+  const toSel = document.getElementById('globalSeasonTo');
+  const optsDesc = [...seasons].sort((a,b) => b-a).map(s => `<option value="${s}">${seasonLabel(s)}</option>`).join('');
+  fromSel.innerHTML = optsDesc;
+  toSel.innerHTML = optsDesc;
+  fromSel.value = seasons[0];
+  toSel.value = seasons[seasons.length - 1];
+
+  const sveBtn = document.getElementById('seasonSveBtn');
+  sveBtn.addEventListener('click', () => {
+    const st = currentState();
+    st.seasonMode = 'sve';
+    sveBtn.classList.add('active');
+    document.querySelector('.season-controls').classList.remove('season-is-range');
+    renderActiveTab();
+  });
+  function onRangeChange(){
+    const st = currentState();
+    st.seasonMode = 'range';
+    st.seasonFrom = Number(fromSel.value);
+    st.seasonTo = Number(toSel.value);
+    sveBtn.classList.remove('active');
+    document.querySelector('.season-controls').classList.add('season-is-range');
+    renderActiveTab();
+  }
+  fromSel.addEventListener('change', onRangeChange);
+  toSel.addEventListener('change', onRangeChange);
+}
+
+function getSeasonRange(){
+  const st = currentState();
+  if(st.seasonMode === 'sve') return [MIN_SEASON, MAX_SEASON];
+  return [st.seasonFrom, st.seasonTo];
+}
+
+
+const KAT_ORDER = ['S', 'J', 'V'];
+
+function renderDisGridHtml(season, katForBlock, disList, gridStyle, MEDALS){
+  let html = `<div class="dis-grid"${gridStyle}>`;
+  disList.forEach(d => {
+    const tourn = DATA.tournaments.find(t => t.season === season && t.dis === d && t.kat === katForBlock);
+    if(!tourn){
+      html += `<div class="dis-col dis-col-empty"></div>`;
+      return;
+    }
+    html += `<div class="dis-col"><h3>${DIS_LABELS[d]} (${tourn.p}.)</h3>`;
+    if(tourn.standings.length){
+      html += '<ol class="standing-list">' + tourn.standings.map(s => {
+        const medal = MEDALS[s.place] || '';
+        return `<li class="clickable-row" data-roster-team="${escapeHtml(s.team)}" data-roster-season="${season}" data-roster-dis="${d}" data-roster-kat="${katForBlock}"><span class="rank-num">${s.place}</span><span class="team-name">${escapeHtml(s.team)}</span><span class="medal-slot">${medal}</span></li>`;
+      }).join('') + '</ol>';
+    } else {
+      html += '<div class="empty-mini">—</div>';
+    }
+    html += `</div>`;
+  });
+  html += `</div>`;
+  return html;
+}
+
+function renderPoretci(){
+  const kat = currentState().kat;
+  const dis = currentState().dis;
+  const disList = dis === 'sve' ? DIS_ORDER : [dis];
+  const [from, to] = getSeasonRange();
+  const seasons = [...new Set(DATA.tournaments.filter(t => (kat==='sve'||t.kat===kat) && disList.includes(t.dis) && t.season >= from && t.season <= to).map(t => t.season))].sort((a,b) => b-a);
+  const content = document.getElementById('poretciContent');
+
+  if(seasons.length === 0){
+    content.innerHTML = '<div class="empty-state">Nema podataka za odabranu kategoriju/disciplinu.</div>';
+    return;
+  }
+
+  const MEDALS = {1:'🥇', 2:'🥈', 3:'🥉'};
+  const gridStyle = disList.length === 1 ? ' style="grid-template-columns:minmax(0,340px);"' : '';
+
+  let html = '';
+  seasons.forEach(season => {
+    html += `<div class="season-block"><div class="season-title">Sezona ${seasonLabel(season)}</div>`;
+
+    // koje kategorije uopće postoje ove sezone (u bilo kojoj od odabranih disciplina)?
+    const katsThisSeason = kat === 'sve'
+      ? KAT_ORDER.filter(k => DATA.tournaments.some(t => t.season === season && t.kat === k && disList.includes(t.dis)))
+      : [kat];
+
+    if(katsThisSeason.length > 1){
+      katsThisSeason.forEach(k => {
+        html += `<h4 class="kat-section-h">${KAT_LABELS[k] || k}</h4>`;
+        html += renderDisGridHtml(season, k, disList, gridStyle, MEDALS);
+      });
+    } else {
+      html += renderDisGridHtml(season, katsThisSeason[0], disList, gridStyle, MEDALS);
+    }
+
+    html += `</div>`;
+  });
+  content.innerHTML = html;
+
+  content.querySelectorAll('[data-roster-team]').forEach(el => {
+    el.addEventListener('click', () => {
+      const s = Number(el.dataset.rosterSeason);
+      const d = el.dataset.rosterDis;
+      const k = el.dataset.rosterKat;
+      const t = DATA.tournaments.find(x => x.season === s && x.dis === d && x.kat === k);
+      if(t) openTeamRosterModal(el.dataset.rosterTeam, t, s, d, k);
+    });
+  });
+}
+
+function renderStatistika(){
+  const kat = currentState().kat;
+  const dis = currentState().dis;
+  const disList = dis === 'sve' ? DIS_ORDER : [dis];
+  const [from, to] = getSeasonRange();
+  const content = document.getElementById('statContent');
+
+  if(from > to){
+    content.innerHTML = '<div class="empty-state">"Od sezone" mora biti prije ili jednako "Do sezone".</div>';
+    return;
+  }
+
+  const perDis = {};
+  disList.forEach(d => {
+    const tourns = DATA.tournaments.filter(t => (kat==='sve'||t.kat===kat) && t.dis === d && t.season >= from && t.season <= to);
+    // "Utakmica" broji SVE prijavljene utakmice (uklj. npr. diskvalifikacije) —
+    // dok se endovi/poeni računaju samo iz stvarno odigranih (imaju podatke o endovima).
+    const allMatches = DATA.matches.filter(m => (kat==='sve'||m.kat===kat) && m.dis === d && m.season >= from && m.season <= to);
+    const playedMatches = allMatches.filter(m => m.played);
+    let endsCount = 0, pointsTotal = 0;
+    const hist = new Array(9).fill(0);
+    playedMatches.forEach(m => {
+      (m.ends || []).forEach(e => {
+        endsCount++;
+        const val = Math.abs(e);
+        pointsTotal += val;
+        hist[Math.min(val, 8)]++;
+      });
+    });
+    perDis[d] = { prvenstava: tourns.length, utakmica: allMatches.length, endova: endsCount, poena: pointsTotal, hist };
+  });
+
+  const total = { prvenstava: 0, utakmica: 0, endova: 0, poena: 0, hist: new Array(9).fill(0) };
+  disList.forEach(d => {
+    total.prvenstava += perDis[d].prvenstava;
+    total.utakmica += perDis[d].utakmica;
+    total.endova += perDis[d].endova;
+    total.poena += perDis[d].poena;
+    for(let i=0;i<=8;i++) total.hist[i] += perDis[d].hist[i];
+  });
+
+  function ratio(a, b){
+    return b > 0 ? (a / b).toFixed(1).replace('.', ',') : '–';
+  }
+
+  const showTotal = disList.length > 1;
+  const cols = showTotal ? [...disList, '__total__'] : disList;
+  const colVal = (d, val) => d === '__total__' ? total[val] : perDis[d][val];
+  const colHist = (d, i) => d === '__total__' ? total.hist[i] : perDis[d].hist[i];
+
+  function row(label, getter, opts){
+    opts = opts || {};
+    const cells = cols.map(d => {
+      const cls = d === '__total__' ? ' class="total-col"' : '';
+      return `<td${cls}>${getter(d)}</td>`;
+    }).join('');
+    return `<tr class="${opts.sub ? 'sub-row' : 'main-row'}"><td>${label}</td>${cells}</tr>`;
+  }
+
+  let html = `<table class="stats-table"><colgroup><col class="label-col">${cols.map(()=>'<col class="data-col">').join('')}</colgroup>`;
+  html += `<thead><tr><th></th>${disList.map(d => `<th>${DIS_LABELS[d]}</th>`).join('')}${showTotal ? '<th class="total-col">Ukupno</th>' : ''}</tr></thead><tbody>`;
+
+  html += row('Prvenstava', d => colVal(d,'prvenstava'));
+
+  html += row('Utakmica', d => colVal(d,'utakmica'));
+  html += row('Po prvenstvu', d => ratio(colVal(d,'utakmica'), colVal(d,'prvenstava')), {sub:true});
+
+  html += row('Endova', d => colVal(d,'endova'));
+  html += row('Po utakmici', d => ratio(colVal(d,'endova'), colVal(d,'utakmica')), {sub:true});
+
+  html += row('Kamena', d => colVal(d,'poena'));
+  html += row('Po utakmici', d => ratio(colVal(d,'poena'), colVal(d,'utakmica')), {sub:true});
+  html += row('Po endu', d => ratio(colVal(d,'poena'), colVal(d,'endova')), {sub:true});
+
+  html += row('Poena', d => '');
+  for(let i = 0; i <= 8; i++){
+    const label = `${i}`;
+    html += row(label, d => { const v = colHist(d, i); return v === 0 ? '-' : v; }, {sub:true});
+  }
+
+  html += `</tbody></table>`;
+  content.innerHTML = html;
+}
+
+function countSteals(m){
+  if(m.pk == null || !m.ends || !m.ends.length) return 0;
+  let hammerTeam = m.pk;
+  let steals = 0;
+  m.ends.forEach(e => {
+    if(e > 0){
+      if(hammerTeam === 2) steals++;
+      hammerTeam = 2;
+    } else if(e < 0){
+      if(hammerTeam === 1) steals++;
+      hammerTeam = 1;
+    }
+  });
+  return steals;
 }
 
 function formatDate(iso){
@@ -191,22 +858,998 @@ function formatDate(iso){
   return `${d}.${m}.${y}.`;
 }
 
-const DIS_ORDER = ['M', 'Ž', 'MC', 'MP'];
+function recordsTableHtml(rows, valueLabel){
+  if(rows.length === 0) return '<div class="empty-mini">Nema podataka.</div>';
+  let h = `<table class="stats-table records-table"><thead><tr><th>Disciplina</th><th>Utakmica</th><th>Rezultat</th><th>${valueLabel}</th><th>Datum</th></tr></thead><tbody>`;
+  rows.forEach(r => {
+    h += `<tr class="clickable-cell" onclick="openMatchModal('${r.id}')"><td>${escapeHtml(r.dis)}</td><td>${escapeHtml(r.team1)} - ${escapeHtml(r.team2)}</td><td>${r.score1}:${r.score2}</td><td class="num-cell">${r.value}</td><td>${formatDate(r.date)}</td></tr>`;
+  });
+  h += '</tbody></table>';
+  return h;
+}
+
+function renderRekordi(){
+  const kat = currentState().kat;
+  const dis = currentState().dis;
+  const [from, to] = getSeasonRange();
+  const content = document.getElementById('rekordiContent');
+
+  const played = DATA.matches.filter(m => (kat==='sve'||m.kat===kat) && (dis==='sve'||m.dis===dis) && m.season >= from && m.season <= to && m.played && m.score1 != null && m.score2 != null);
+
+  function topN(list, metricFn, n){
+    const withMetric = list.map(m => ({ m, val: metricFn(m) })).filter(x => x.val != null);
+    withMetric.sort((a,b) => b.val - a.val || (b.m.date || '').localeCompare(a.m.date || ''));
+    return withMetric.slice(0, n);
+  }
+
+  function toRow(m, val){
+    return {
+      id: m.id, katLabel: m.katLabel, dis: m.dis, team1: m.team1, team2: m.team2,
+      score1: m.score1.toFixed(0), score2: m.score2.toFixed(0), date: m.date, value: val
+    };
+  }
+
+  let html = '';
+
+  const margin = topN(played, m => Math.abs(m.score1 - m.score2), 5);
+  html += `<div class="record-block"><h3 class="record-title">Najuvjerljivije pobjede</h3>`;
+  html += recordsTableHtml(margin.map(x => toRow(x.m, x.val.toFixed(0))), 'Razlika');
+  html += `</div>`;
+
+  const mostStones = topN(played, m => m.score1 + m.score2, 5);
+  html += `<div class="record-block"><h3 class="record-title">Utakmice s najviše kamena</h3>`;
+  html += recordsTableHtml(mostStones.map(x => toRow(x.m, x.val.toFixed(0))), 'Ukupno kamena');
+  html += `</div>`;
+
+  let leastStones = played.map(m => ({m, val: m.score1 + m.score2})).sort((a,b) => a.val - b.val || (b.m.date||'').localeCompare(a.m.date||'')).slice(0,5);
+  html += `<div class="record-block"><h3 class="record-title">Utakmice s najmanje kamena</h3>`;
+  html += recordsTableHtml(leastStones.map(x => toRow(x.m, x.val.toFixed(0))), 'Ukupno kamena');
+  html += `</div>`;
+
+  const steals = topN(played, m => countSteals(m), 5);
+  html += `<div class="record-block"><h3 class="record-title">Utakmice s najviše ukradenih endova</h3>`;
+  html += recordsTableHtml(steals.map(x => toRow(x.m, x.val)), 'Ukradenih endova');
+  html += `<div class="note" style="font-size:11.5px; color:var(--text-muted); margin-top:6px;">Ukraden end = end koji je osvojila ekipa bez hammera (nije imala posljednji kamen tog enda).</div>`;
+  html += `</div>`;
+
+  const endRecords = [];
+  played.forEach(m => {
+    (m.ends || []).forEach(e => { endRecords.push({ m, val: Math.abs(e) }); });
+  });
+  endRecords.sort((a,b) => b.val - a.val || (b.m.date||'').localeCompare(a.m.date||''));
+  let topEnds = endRecords.slice(0,5);
+  html += `<div class="record-block"><h3 class="record-title">Najviše kamena u jednom endu</h3>`;
+  html += recordsTableHtml(topEnds.map(x => toRow(x.m, x.val)), 'Kamena u endu');
+  html += `</div>`;
+
+  content.innerHTML = html;
+}
+
+// --- NHC bodovi ("Najbolji hrvatski curlingaši") ---
+// bodovi(n,T) = 100 * ((T-n+1)/T)^2 ; zadnjih 5 sezona s težinama 100/80/60/40/20%
+const NHC_WEIGHTS = [1, 0.8, 0.6, 0.4, 0.2];
+let NHC_ANCHOR_SEASON = null;
+
+function nhcSeasonWeight(season){
+  const offset = NHC_ANCHOR_SEASON - season;
+  if(offset < 0 || offset >= NHC_WEIGHTS.length) return 0;
+  return NHC_WEIGHTS[offset];
+}
+
+function nhcPoints(place, teamsCount){
+  if(!place || !teamsCount || teamsCount <= 0) return 0;
+  const x = teamsCount - place + 1;
+  if(x <= 0) return 0;
+  return 100 * (x * x) / (teamsCount * teamsCount);
+}
+
+function nhcContribution(t, place){
+  const w = nhcSeasonWeight(t.season);
+  if(w === 0) return 0;
+  const teamsCount = t.teamsCount || t.standings.length;
+  return nhcPoints(place, teamsCount) * w;
+}
+
+// Skuplja SVA prvenstva koja su ušla u NHC izračun za dani entitet (klub/ekipa
+// ili igrač), zajedno s međukoracima izračuna, radi transparentnog prikaza.
+function getNhcBreakdown(name, groupByClub, kat, dis, isPlayer){
+  const disList = dis === 'sve' ? DIS_ORDER : [dis];
+  let clubMap = {};
+  if(!isPlayer) disList.forEach(d => Object.assign(clubMap, (DATA.clubs && DATA.clubs[d]) || {}));
+
+  const rows = [];
+  DATA.tournaments.forEach(t => {
+    if(kat !== 'sve' && t.kat !== kat) return;
+    if(!disList.includes(t.dis)) return;
+    const weight = nhcSeasonWeight(t.season);
+    if(weight === 0) return; // izvan zadnjih 5 sezona — ne ulazi u izračun
+
+    if(isPlayer){
+      t.standings.forEach(s => {
+        const players = t.rosterPool[s.team] || [];
+        if(!players.includes(name)) return;
+        pushRow(t, s, weight);
+      });
+    } else {
+      t.standings.forEach(s => {
+        const entity = groupByClub ? (clubMap[s.team] || s.team) : s.team;
+        if(entity !== name) return;
+        pushRow(t, s, weight);
+      });
+    }
+  });
+
+  function pushRow(t, s, weight){
+    const teamsCount = t.teamsCount || t.standings.length;
+    const basePoints = nhcPoints(s.place, teamsCount);
+    rows.push({
+      season: t.season, dis: t.dis, kat: t.kat, p: t.p,
+      place: s.place, teamsCount, team: s.team,
+      basePoints, weightPct: Math.round(weight * 100), weighted: basePoints * weight,
+    });
+  }
+
+  rows.sort((a,b) => b.season - a.season || (a.dis).localeCompare(b.dis));
+  return rows;
+}
+
+function openNhcBreakdownModal(name, groupByClub, kat, dis, isPlayer){
+  const overlay = document.getElementById('modalOverlay');
+  const body = document.getElementById('modalBody');
+  body.classList.add('modal-wide');
+
+  const rows = getNhcBreakdown(name, groupByClub, kat, dis, isPlayer);
+  const total = rows.reduce((s, r) => s + r.weighted, 0);
+
+  let tableHtml;
+  if(rows.length === 0){
+    tableHtml = '<div class="empty-mini">Nema prvenstava u zadnjih 5 sezona koja bi ulazila u izračun.</div>';
+  } else {
+    tableHtml = `<table class="achv-table"><thead><tr>
+      <th>Sezona</th><th>Disciplina</th><th>Kategorija</th><th class="num">Mjesto</th>
+      <th class="num">Broj ekipa</th><th class="num">Bodovi</th><th class="num">Težina sezone</th><th class="num">Doprinos</th>
+    </tr></thead><tbody>`;
+    rows.forEach(r => {
+      tableHtml += `<tr>
+        <td>${seasonLabel(r.season)}</td>
+        <td>${DIS_LABELS[r.dis]||r.dis}</td>
+        <td>${KAT_LABELS[r.kat]||r.kat}</td>
+        <td class="num">${r.place}.</td>
+        <td class="num">${r.teamsCount}</td>
+        <td class="num">${r.basePoints.toFixed(1).replace('.', ',')}</td>
+        <td class="num">${r.weightPct}%</td>
+        <td class="num">${r.weighted.toFixed(1).replace('.', ',')}</td>
+      </tr>`;
+    });
+    tableHtml += `<tr><td colspan="7" style="text-align:right; font-weight:700;">Ukupno (zaokruženo)</td><td class="num" style="font-weight:700;">${Math.round(total)}</td></tr>`;
+    tableHtml += '</tbody></table>';
+  }
+
+  body.innerHTML = `
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <h2 class="entity-title">NHC bodovi — ${escapeHtml(name)}</h2>
+    <div class="info-block">
+      <div>Formula za izračun NHC bodova: <span>100 × (1 − (mjesto−1)/broj&nbsp;ekipa)<sup>2</sup></span></div>
+      <div>Gleda se zadnjih 5 sezona s težinom 100% / 80% / 60% / 40% / 20% (najnovija prema najstarijoj)</div>
+    </div>
+    ${tableHtml}
+  `;
+  overlay.classList.add('open');
+}
+
+function computeTeamClubStats(kat, dis, groupByClub, seasonFrom, seasonTo){
+  const disList = dis === 'sve' ? DIS_ORDER : [dis];
+  let clubMap = {};
+  disList.forEach(d => Object.assign(clubMap, (DATA.clubs && DATA.clubs[d]) || {}));
+  const entityName = team => groupByClub ? (clubMap[team] || team) : team;
+
+  // NHC bodovi uvijek gledaju SVA prvenstva (vlastiti prozor od 5 sezona, neovisan
+  // o univerzalnom filteru sezone) — zato koristimo odvojen, nefiltriran skup za to.
+  const allTournaments = DATA.tournaments.filter(t => (kat==='sve'||t.kat===kat) && disList.includes(t.dis));
+  const tournaments = allTournaments.filter(t => t.season >= seasonFrom && t.season <= seasonTo);
+  const matches = DATA.matches.filter(m => (kat==='sve'||m.kat===kat) && disList.includes(m.dis) && m.season >= seasonFrom && m.season <= seasonTo);
+
+  const stats = {};
+  function ensure(e){
+    if(!stats[e]) stats[e] = {
+      name: e,
+      medals: {1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0},
+      tournamentsSet: new Set(),
+      utakmica: 0, played: 0, endova: 0,
+      w: 0, d: 0, l: 0,
+      stonesFor: 0, stonesAgainst: 0,
+      endsFor: 0, endsAgainst: 0,
+      stolenBy: 0, stolenFrom: 0,
+      asTeam1: 0, asTeam2: 0,
+      pkWon: 0, lsdMatches: 0, lsdThrows: [],
+      nhc: 0,
+    };
+    return stats[e];
+  }
+
+  tournaments.forEach(t => {
+    t.standings.forEach(s => {
+      const e = entityName(s.team);
+      const acc = ensure(e);
+      acc.tournamentsSet.add(`${t.season}-${t.p}`);
+      if(s.place >= 1 && s.place <= 9) acc.medals[s.place]++;
+    });
+  });
+
+  // NHC bodovi: uvijek iz NEFILTRIRANOG skupa (vlastiti prozor od zadnjih 5 sezona)
+  allTournaments.forEach(t => {
+    t.standings.forEach(s => {
+      const e = entityName(s.team);
+      const acc = ensure(e);
+      acc.nhc += nhcContribution(t, s.place);
+    });
+  });
+
+  matches.forEach(m => {
+    const e1 = entityName(m.team1), e2 = entityName(m.team2);
+    const a1 = ensure(e1), a2 = ensure(e2);
+    a1.utakmica++; a2.utakmica++;
+    a1.asTeam1++; a2.asTeam2++;
+
+    if(m.usesLSD){
+      a1.lsdMatches++; a2.lsdMatches++;
+      if(m.pk === 1) a1.pkWon++;
+      if(m.pk === 2) a2.pkWon++;
+      (m.throws1 || []).forEach(v => a1.lsdThrows.push(v));
+      (m.throws2 || []).forEach(v => a2.lsdThrows.push(v));
+    }
+
+    if(m.winner === 1){ a1.w++; a2.l++; }
+    else if(m.winner === 2){ a2.w++; a1.l++; }
+    else if(m.played){ a1.d++; a2.d++; }
+
+    if(m.played){
+      a1.played++; a2.played++;
+      if(m.score1 != null && m.score2 != null){
+        a1.stonesFor += m.score1; a1.stonesAgainst += m.score2;
+        a2.stonesFor += m.score2; a2.stonesAgainst += m.score1;
+      }
+      let hammerTeam = m.pk;
+      (m.ends || []).forEach(e => {
+        a1.endova++; a2.endova++;
+        if(e > 0){
+          a1.endsFor++; a2.endsAgainst++;
+          if(hammerTeam === 2){ a1.stolenBy++; a2.stolenFrom++; }
+          hammerTeam = 2;
+        } else if(e < 0){
+          a2.endsFor++; a1.endsAgainst++;
+          if(hammerTeam === 1){ a2.stolenBy++; a1.stolenFrom++; }
+          hammerTeam = 1;
+        }
+      });
+    }
+  });
+
+  return stats;
+}
+
+function avg(sum, count){ return count > 0 ? sum / count : null; }
+function fmtAvg(v){ return v == null ? '–' : v.toFixed(1).replace('.', ','); }
+
+function renderKlubovi(){ renderEkipeOrKlubovi(true, 'kluboviContent'); }
+function renderEkipe(){ renderEkipeOrKlubovi(false, 'ekipeContent'); }
+
+function renderEkipeOrKlubovi(groupByClub, contentElId){
+  const kat = currentState().kat;
+  const dis = currentState().dis;
+  const [seasonFrom, seasonTo] = getSeasonRange();
+  const content = document.getElementById(contentElId);
+
+  const statsMap = computeTeamClubStats(kat, dis, groupByClub, seasonFrom, seasonTo);
+  const rows = Object.values(statsMap).map(a => {
+    const medalsTotal = a.medals[1] + a.medals[2] + a.medals[3];
+    const medalPoints = a.medals[1]*3 + a.medals[2]*2 + a.medals[3]*1;
+    const points = a.w*2 + a.d;
+    const maxPoints = (a.w+a.d+a.l)*2;
+    const uspjeh = maxPoints > 0 ? Math.round((points/maxPoints)*100) : null;
+    const lsdAvg = a.lsdThrows.length ? a.lsdThrows.reduce((s,v)=>s+v,0)/a.lsdThrows.length : null;
+    return {
+      name: a.name,
+      nhc: Math.round(a.nhc * 10) / 10,
+      medalsTotal, gold: a.medals[1], silver: a.medals[2], bronze: a.medals[3], medalPoints,
+      p4: a.medals[4], p5: a.medals[5], p6: a.medals[6], p7: a.medals[7], p8: a.medals[8], p9: a.medals[9],
+      prvenstava: a.tournamentsSet.size,
+      utakmica: a.utakmica, endova: a.endova,
+      w: a.w, d: a.d, l: a.l,
+      points, uspjeh,
+      stonesFor: a.stonesFor, stonesForAvg: avg(a.stonesFor, a.played),
+      stonesAgainst: a.stonesAgainst, stonesAgainstAvg: avg(a.stonesAgainst, a.played),
+      endsFor: a.endsFor, endsForAvg: avg(a.endsFor, a.played),
+      endsAgainst: a.endsAgainst, endsAgainstAvg: avg(a.endsAgainst, a.played),
+      stolenBy: a.stolenBy, stolenByAvg: avg(a.stolenBy, a.played),
+      stolenFrom: a.stolenFrom, stolenFromAvg: avg(a.stolenFrom, a.played),
+      asTeam1: a.asTeam1, asTeam2: a.asTeam2,
+      pkWon: a.pkWon, lsdMatches: a.lsdMatches,
+      lsdAvg,
+    };
+  });
+
+  rows.sort((a,b) => b.nhc - a.nhc || b.medalPoints - a.medalPoints || b.w - a.w || a.l - b.l);
+
+  if(rows.length === 0){
+    content.innerHTML = '<div class="empty-state">Nema podataka za odabranu disciplinu/uzrast.</div>';
+    return;
+  }
+
+  const numericKeys = ['nhc','medalsTotal','gold','silver','bronze','medalPoints','prvenstava','utakmica','endova','w','d','l','points','uspjeh','stonesFor','stonesForAvg','stonesAgainst','stonesAgainstAvg','endsFor','endsForAvg','endsAgainst','endsAgainstAvg','stolenBy','stolenByAvg','stolenFrom','stolenFromAvg'];
+  const invertGood = new Set(['stonesAgainst','stonesAgainstAvg','endsAgainst','endsAgainstAvg','stolenFrom','stolenFromAvg','l']);
+  const bounds = {};
+  numericKeys.forEach(k => {
+    const vals = rows.map(r => r[k]).filter(v => v != null);
+    if(vals.length < 2) return;
+    bounds[k] = { min: Math.min(...vals), max: Math.max(...vals) };
+  });
+  function cellClass(k, v){
+    if(v == null || !bounds[k] || bounds[k].min === bounds[k].max) return '';
+    const isBest = invertGood.has(k) ? v === bounds[k].min : v === bounds[k].max;
+    if(isBest) return ' class="cell-best"';
+    return '';
+  }
+
+  let cols = [
+    {k:'nhc', label:'NHC bodovi', dec:true},
+    {k:'medalPoints', label:'Bodova za medalje'},
+    {k:'medalsTotal', label:'Ukupno medalja'},
+    {k:'gold', label:'Zlatnih'},
+    {k:'silver', label:'Srebrnih'},
+    {k:'bronze', label:'Brončanih'},
+    {k:'p4', label:'4. mjesto'}, {k:'p5', label:'5. mjesto'}, {k:'p6', label:'6. mjesto'},
+    {k:'p7', label:'7. mjesto'}, {k:'p8', label:'8. mjesto'}, {k:'p9', label:'9. mjesto'},
+    {k:'prvenstava', label:'Odigrano prvenstava'},
+    {k:'utakmica', label:'Odigrano utakmica'},
+    {k:'endova', label:'Odigrano endova'},
+    {k:'w', label:'Pobjeda'}, {k:'d', label:'Remija'}, {k:'l', label:'Poraza'},
+    {k:'points', label:'Osvojeno bodova'},
+    {k:'uspjeh', label:'Uspješnost', pct:true},
+    {k:'stonesFor', label:'Osvojeno kamena'}, {k:'stonesForAvg', label:'Prosjek', avg:true},
+    {k:'stonesAgainst', label:'Izgubljeno kamena'}, {k:'stonesAgainstAvg', label:'Prosjek', avg:true},
+    {k:'endsFor', label:'Osvojeno endova'}, {k:'endsForAvg', label:'Prosjek', avg:true},
+    {k:'endsAgainst', label:'Izgubljeno endova'}, {k:'endsAgainstAvg', label:'Prosjek', avg:true},
+    {k:'stolenBy', label:'Ukrao endova'}, {k:'stolenByAvg', label:'Prosjek', avg:true},
+    {k:'stolenFrom', label:'Ukradeno endova'}, {k:'stolenFromAvg', label:'Prosjek', avg:true},
+  ];
+  // sakrij "mjesto" stupce koji su posve nula (npr. 8./9. mjesto ako prvenstvo nema toliko ekipa)
+  const placementKeys = new Set(['p4','p5','p6','p7','p8','p9']);
+  cols = cols.filter(c => !placementKeys.has(c.k) || rows.some(r => r[c.k]));
+
+  let html = '<div class="h2h-wrap"><table class="ekipe-table"><thead><tr><th class="ekipe-rank"></th><th class="ekipe-name">Naziv</th>';
+  html += cols.map(c => `<th>${c.label}</th>`).join('');
+  html += '<th>Tamni / Svijetli</th><th>PK (posl. kamen 1. enda)</th><th>Precizno polaganje prosjek (cm)</th>';
+  html += '</tr></thead><tbody>';
+
+  rows.forEach((r, i) => {
+    html += `<tr><td class="ekipe-rank">${i+1}.</td><td class="ekipe-name clickable-name" data-entity="${escapeHtml(r.name)}">${escapeHtml(r.name)}</td>`;
+    cols.forEach(c => {
+      let v = r[c.k];
+      let display = v == null || v === 0 ? '' : v;
+      if(c.pct) display = v == null ? '' : `${v}%`;
+      if(c.avg) display = fmtAvg(v);
+      if(c.dec) display = (v == null || v === 0) ? '' : Math.round(v);
+      let attrs = cellClass(c.k, v);
+      if(c.k === 'nhc'){
+        attrs = attrs ? attrs.replace('class="', 'class="clickable-cell ') : ' class="clickable-cell"';
+        attrs += ` data-nhc-entity="${escapeHtml(r.name)}"`;
+      }
+      html += `<td${attrs}>${display}</td>`;
+    });
+    html += `<td>${r.asTeam1} / ${r.asTeam2}</td>`;
+    html += `<td>${r.pkWon} / ${r.lsdMatches}</td>`;
+    html += `<td>${fmtAvg(r.lsdAvg)}</td>`;
+    html += '</tr>';
+  });
+  html += '</tbody></table></div>';
+  html += '<div class="note" style="margin-top:10px; font-size:12px; color:var(--text-muted);">Tamni/Svijetli = broj utakmica gdje je ekipa bila prva (tamni kamen) / druga (svijetli kamen) navedena. PK = koliko je puta ekipa imala posljednji kamen 1. enda, od ukupno utakmica s preciznim polaganjem.</div>';
+  content.innerHTML = html;
+  const wrapEl = content.querySelector(".h2h-wrap");
+  if(wrapEl) addTopScrollbar(content, wrapEl);
+  content.querySelectorAll("[data-entity]").forEach(el => {
+    el.addEventListener("click", () => openEntityModal(el.dataset.entity, groupByClub, kat, dis, seasonFrom, seasonTo));
+  });
+  content.querySelectorAll("[data-nhc-entity]").forEach(el => {
+    el.addEventListener("click", () => openNhcBreakdownModal(el.dataset.nhcEntity, groupByClub, kat, dis, false));
+  });
+}
+
+function computePlayerStats(kat, dis, seasonFrom, seasonTo){
+  const disList = dis === 'sve' ? DIS_ORDER : [dis];
+  const allTournaments = DATA.tournaments.filter(t => (kat==='sve'||t.kat===kat) && disList.includes(t.dis));
+  const tournaments = allTournaments.filter(t => t.season >= seasonFrom && t.season <= seasonTo);
+  const matches = DATA.matches.filter(m => (kat==='sve'||m.kat===kat) && disList.includes(m.dis) && m.season >= seasonFrom && m.season <= seasonTo);
+
+  const stats = {};
+  function ensure(name){
+    if(!stats[name]) stats[name] = {
+      name,
+      medals: {1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0},
+      tournamentsSet: new Set(),
+      utakmica: 0, endova: 0,
+      w: 0, d: 0, l: 0,
+      posCount: {'Prvi':0,'Drugi':0,'Treći':0,'Četvrti':0,'Rezerva':0},
+      skipCount: 0, viceCount: 0,
+      lsdThrows: [],
+      nhc: 0,
+    };
+    return stats[name];
+  }
+
+  tournaments.forEach(t => {
+    t.standings.forEach(s => {
+      const players = t.rosterPool[s.team] || [];
+      players.forEach(p => {
+        const acc = ensure(p);
+        if(s.place >= 1 && s.place <= 9) acc.medals[s.place]++;
+      });
+    });
+  });
+
+  // NHC bodovi: uvijek iz NEFILTRIRANOG skupa (vlastiti prozor od zadnjih 5 sezona)
+  allTournaments.forEach(t => {
+    t.standings.forEach(s => {
+      const players = t.rosterPool[s.team] || [];
+      players.forEach(p => { ensure(p).nhc += nhcContribution(t, s.place); });
+    });
+  });
+
+  matches.forEach(m => {
+    [[m.roster1, 1], [m.roster2, 2]].forEach(([roster, side]) => {
+      (roster || []).forEach(p => {
+        const acc = ensure(p.name);
+        acc.utakmica++;
+        acc.tournamentsSet.add(`${m.season}-${m.p}`);
+        if(p.position && acc.posCount[p.position] != null) acc.posCount[p.position]++;
+        if(p.role === 'Skip') acc.skipCount++;
+        else if(p.role === 'Vice-skip') acc.viceCount++;
+        if(p.lsd) acc.lsdThrows.push(p.lsd.distance);
+
+        if(m.winner === side) acc.w++;
+        else if(m.winner === 1 || m.winner === 2) acc.l++;
+        else if(m.played) acc.d++;
+
+        if(m.played) acc.endova += (m.ends || []).length;
+      });
+    });
+  });
+
+  return stats;
+}
+
+function renderIgraci(){
+  const kat = currentState().kat;
+  const dis = currentState().dis;
+  const [seasonFrom, seasonTo] = getSeasonRange();
+  const content = document.getElementById('igraciContent');
+
+  const statsMap = computePlayerStats(kat, dis, seasonFrom, seasonTo);
+  const rows = Object.values(statsMap).map(a => {
+    const medalsTotal = a.medals[1] + a.medals[2] + a.medals[3];
+    const medalPoints = a.medals[1]*3 + a.medals[2]*2 + a.medals[3]*1;
+    const points = a.w*2 + a.d;
+    const maxPoints = (a.w+a.d+a.l)*2;
+    const uspjeh = maxPoints > 0 ? Math.round((points/maxPoints)*100) : null;
+    const lsdCount = a.lsdThrows.length;
+    const lsdAvg = lsdCount ? a.lsdThrows.reduce((s,v)=>s+v,0)/lsdCount : null;
+    return {
+      name: a.name,
+      nhc: Math.round(a.nhc * 10) / 10,
+      medalsTotal, gold: a.medals[1], silver: a.medals[2], bronze: a.medals[3], medalPoints,
+      prvenstava: a.tournamentsSet.size,
+      utakmica: a.utakmica, endova: a.endova,
+      w: a.w, d: a.d, l: a.l, points, uspjeh,
+      lsdCount, lsdAvg,
+      skip: a.skipCount, vice: a.viceCount,
+      p1: a.posCount['Prvi'], p2: a.posCount['Drugi'], p3: a.posCount['Treći'], p4: a.posCount['Četvrti'], pr: a.posCount['Rezerva'],
+    };
+  });
+
+  rows.sort((a,b) => b.nhc - a.nhc || b.medalPoints - a.medalPoints || b.w - a.w || a.l - b.l);
+
+  if(rows.length === 0){
+    content.innerHTML = '<div class="empty-state">Nema podataka za odabranu disciplinu/uzrast.</div>';
+    return;
+  }
+
+  const numericKeys = ['nhc','medalsTotal','gold','silver','bronze','medalPoints','prvenstava','utakmica','endova','w','d','l','points','uspjeh','lsdCount','lsdAvg','skip','vice','p1','p2','p3','p4','pr'];
+  const invertGood = new Set(['l','lsdAvg']);
+  const bounds = {};
+  numericKeys.forEach(k => {
+    const vals = rows.map(r => r[k]).filter(v => v != null);
+    if(vals.length < 2) return;
+    bounds[k] = { min: Math.min(...vals), max: Math.max(...vals) };
+  });
+  function cellClass(k, v){
+    if(v == null || !bounds[k] || bounds[k].min === bounds[k].max) return '';
+    const isBest = invertGood.has(k) ? v === bounds[k].min : v === bounds[k].max;
+    if(isBest) return ' class="cell-best"';
+    return '';
+  }
+
+  let cols = [
+    {k:'nhc', label:'NHC bodovi', dec:true},
+    {k:'medalPoints', label:'Bodova za medalje'},
+    {k:'medalsTotal', label:'Ukupno medalja'},
+    {k:'gold', label:'Zlatnih'},
+    {k:'silver', label:'Srebrnih'},
+    {k:'bronze', label:'Brončanih'},
+    {k:'prvenstava', label:'Odigrano prvenstava'},
+    {k:'utakmica', label:'Odigrano utakmica'},
+    {k:'endova', label:'Odigrano endova'},
+    {k:'w', label:'Pobjeda'}, {k:'d', label:'Remija'}, {k:'l', label:'Poraza'},
+    {k:'points', label:'Osvojeno bodova'},
+    {k:'uspjeh', label:'Uspješnost', pct:true},
+    {k:'lsdCount', label:'Preciznih polaganja'},
+    {k:'lsdAvg', label:'Prosjek PP (cm)', avg:true},
+    {k:'skip', label:'Skip'}, {k:'vice', label:'Vice-skip'},
+    {k:'p1', label:'Prvi'}, {k:'p2', label:'Drugi'}, {k:'p3', label:'Treći'}, {k:'p4', label:'Četvrti'}, {k:'pr', label:'Rezerva'},
+  ];
+  // MP (mješoviti parovi) igraju samo 2 igrača (Ž/M), nemaju Skip/Vice-skip ni 4 pozicije
+  if(dis === 'MP'){
+    const mpExclude = new Set(['skip','vice','p1','p2','p3','p4','pr']);
+    cols = cols.filter(c => !mpExclude.has(c.k));
+  }
+
+  let html = '<div class="h2h-wrap"><table class="ekipe-table"><thead><tr><th class="ekipe-rank"></th><th class="ekipe-name">Ime i prezime</th>';
+  html += cols.map(c => `<th>${c.label}</th>`).join('');
+  html += '</tr></thead><tbody>';
+
+  rows.forEach((r, i) => {
+    html += `<tr><td class="ekipe-rank">${i+1}.</td><td class="ekipe-name clickable-name" data-player="${escapeHtml(r.name)}">${escapeHtml(r.name)}</td>`;
+    cols.forEach(c => {
+      let v = r[c.k];
+      let display = v == null || v === 0 ? '' : v;
+      if(c.pct) display = v == null ? '' : `${v}%`;
+      if(c.avg) display = fmtAvg(v);
+      if(c.dec) display = (v == null || v === 0) ? '' : Math.round(v);
+      let attrs = cellClass(c.k, v);
+      if(c.k === 'nhc'){
+        attrs = attrs ? attrs.replace('class="', 'class="clickable-cell ') : ' class="clickable-cell"';
+        attrs += ` data-nhc-player="${escapeHtml(r.name)}"`;
+      }
+      html += `<td${attrs}>${display}</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table></div>';
+  content.innerHTML = html;
+  const wrapEl = content.querySelector(".h2h-wrap");
+  if(wrapEl) addTopScrollbar(content, wrapEl);
+  content.querySelectorAll("[data-player]").forEach(el => {
+    el.addEventListener("click", () => openPlayerModal(el.dataset.player, kat, dis, seasonFrom, seasonTo));
+  });
+  content.querySelectorAll("[data-nhc-player]").forEach(el => {
+    el.addEventListener("click", () => openNhcBreakdownModal(el.dataset.nhcPlayer, false, kat, dis, true));
+  });
+}
+
+function renderKluboviH2h(){ renderH2h(true, 'klubovih2hContent'); }
+function renderEkipeH2h(){ renderH2h(false, 'ekipeh2hContent'); }
+
+function renderH2h(groupByClub, contentElId){
+  const kat = currentState().kat;
+  const dis = currentState().dis;
+  const disList = dis === 'sve' ? DIS_ORDER : [dis];
+  const [from, to] = getSeasonRange();
+  const content = document.getElementById(contentElId);
+
+  const matches = DATA.matches.filter(m => (kat==='sve'||m.kat===kat) && disList.includes(m.dis) && m.season >= from && m.season <= to && (m.winner === 1 || m.winner === 2 || m.played));
+  let clubMap = {};
+  disList.forEach(d => Object.assign(clubMap, (DATA.clubs && DATA.clubs[d]) || {}));
+  const entityName = (team) => groupByClub ? (clubMap[team] || team) : team;
+
+  const entitiesSet = new Set();
+  matches.forEach(m => { entitiesSet.add(entityName(m.team1)); entitiesSet.add(entityName(m.team2)); });
+  const entities = [...entitiesSet].sort((a,b) => a.localeCompare(b, 'hr'));
+
+  if(entities.length === 0){
+    content.innerHTML = '<div class="empty-state">Nema odigranih utakmica za odabranu disciplinu/kategoriju.</div>';
+    return;
+  }
+
+  const record = {};
+  entities.forEach(a => { record[a] = {}; entities.forEach(b => { record[a][b] = { w: 0, d: 0, l: 0 }; }); });
+
+  matches.forEach(m => {
+    const e1 = entityName(m.team1), e2 = entityName(m.team2);
+    if(e1 === e2) return;
+    if(m.winner === 1){ record[e1][e2].w++; record[e2][e1].l++; }
+    else if(m.winner === 2){ record[e2][e1].w++; record[e1][e2].l++; }
+    else if(m.played){ record[e1][e2].d++; record[e2][e1].d++; }
+  });
+
+  let html = '<div class="h2h-wrap"><table class="h2h-table"><thead><tr><th></th>';
+  html += entities.map(e => `<th class="clickable-name" data-entity="${escapeHtml(e)}">${escapeHtml(e)}</th>`).join('');
+  html += '</tr></thead><tbody>';
+  entities.forEach(rowE => {
+    html += `<tr><th class="clickable-name" data-entity="${escapeHtml(rowE)}">${escapeHtml(rowE)}</th>`;
+    entities.forEach(colE => {
+      if(rowE === colE){
+        html += '<td class="diag"></td>';
+      } else {
+        const rec = record[rowE][colE];
+        if(rec.w === 0 && rec.d === 0 && rec.l === 0){
+          html += '<td class="h2h-empty">–</td>';
+        } else {
+          const totalGames = rec.w + rec.d + rec.l;
+          const points = rec.w * 2 + rec.d * 1;
+          const maxPoints = totalGames * 2;
+          const pct = maxPoints > 0 ? Math.round((points / maxPoints) * 100) : 0;
+          html += `<td class="h2h-cell clickable-cell" data-pair-a="${escapeHtml(rowE)}" data-pair-b="${escapeHtml(colE)}">${rec.w}-${rec.d}-${rec.l}<br><span class="h2h-pct">${pct}%</span></td>`;
+        }
+      }
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table></div>';
+  html += '<div class="note" style="margin-top:10px; font-size:12px; color:var(--text-muted);">Format ćelije: pobjede-neriješeno-porazi za momčad/klub iz retka, protiv momčadi/kluba iz stupca. Klik na naziv otvara detalje, klik na ćeliju otvara popis međusobnih utakmica.</div>';
+  content.innerHTML = html;
+  const wrapEl = content.querySelector(".h2h-wrap");
+  if(wrapEl) addTopScrollbar(content, wrapEl);
+  content.querySelectorAll('[data-entity]').forEach(el => {
+    el.addEventListener('click', () => openEntityModal(el.dataset.entity, groupByClub, kat, dis, from, to));
+  });
+  content.querySelectorAll('[data-pair-a]').forEach(el => {
+    el.addEventListener('click', () => openH2hMatchListModal(el.dataset.pairA, el.dataset.pairB, groupByClub, dis, kat));
+  });
+}
+// ===================== Prozor s detaljima utakmice =====================
+// (isti dizajn/logika kao na pregledu prvenstava — kopirano da bude dostupno i ovdje)
+
+async function fileExists(url){
+  try {
+    const res = await fetch(url, { cache: 'no-store' });
+    return res.ok;
+  } catch(e){
+    return false;
+  }
+}
+
+// Učitava tekstualnu datoteku s natpisima (npr. "foto.txt"), formata:
+//   3: Brončana medalja: Vis
+// Vraća objekt {3: "Brončana medalja: Vis", ...} ili prazan objekt ako datoteka ne postoji.
+async function loadCaptions(url){
+  try {
+    const res = await fetch(url, { cache: 'no-store' });
+    if(!res.ok) return {};
+    const text = await res.text();
+    const map = {};
+    text.split('\n').forEach(line => {
+      const m = line.match(/^\s*(\d+)\s*:\s*(.+?)\s*$/);
+      if(m) map[Number(m[1])] = m[2];
+    });
+    return map;
+  } catch(e){
+    return {};
+  }
+}
+
+const DATA_BASE = 'podaci';
+
+function rawFaza(phase){
+  const prefix = { group: 'K', playoff: 'D', placement: 'P' }[phase.type] || '?';
+  return `${prefix}${phase.num}`;
+}
+
+function zapisnikPath(m){
+  const seasonTag = `${m.season - 1}-${m.season}`;
+  const group = m.group || 'A';
+  const filename = `PHC-${seasonTag}-${m.dis}-${m.kat}-${group}-${rawFaza(m.phase)}-${m.matchNum}.pdf`;
+  return `${DATA_BASE}/${seasonTag}/${m.dis}-${m.kat}/${filename}`;
+}
+
+async function openMatchModal(id){
+  const m = DATA.matches.find(x => x.id === id);
+  if(!m) return;
+  const overlay = document.getElementById('modalOverlay');
+  const body = document.getElementById('modalBody');
+  body.classList.remove('modal-wide');
+
+  const utakmicaLine = m.group ? `Skupina ${m.group}, ${m.phase.label}` : m.phase.label;
+  const timeShort = m.time ? m.time.slice(0,5) : '';
+  const mjestoParts = [m.city, m.venue, m.rink ? `staza ${m.rink}` : null].filter(Boolean);
+
+  const infoHtml = `
+    <div class="info-block">
+      <div>Sezona: <span>${seasonLabel(m.season)}</span></div>
+      <div>Disciplina: <span>${m.disLabel} (${m.katLabel})</span></div>
+      <div>Utakmica: <span>${utakmicaLine}</span></div>
+      <div>Vrijeme: <span>${m.date ? formatDate(m.date) : '—'} ${timeShort}h</span></div>
+      <div>Mjesto: <span>${escapeHtml(mjestoParts.join(', ') || '—')}</span></div>
+    </div>
+  `;
+
+  const endsArr = m.ends || [];
+  const TOTAL_SLOTS = 9;
+  const cells1 = new Array(TOTAL_SLOTS).fill('');
+  const cells2 = new Array(TOTAL_SLOTS).fill('');
+  let hammerTeam = m.pk || null;
+  const playedCount = Math.min(endsArr.length, TOTAL_SLOTS);
+  for (let i = 0; i < playedCount; i++){
+    const e = endsArr[i];
+    if(e > 0){ cells1[i] = String(e); hammerTeam = 2; }
+    else if(e < 0){ cells2[i] = String(Math.abs(e)); hammerTeam = 1; }
+    else if(hammerTeam === 1){ cells2[i] = '0'; }
+    else if(hammerTeam === 2){ cells1[i] = '0'; }
+  }
+  const firstUnplayedIdx = playedCount < TOTAL_SLOTS ? playedCount : null;
+
+  function slotCell(i, cellsArr){
+    if(i === firstUnplayedIdx) return `<td class="na">X</td>`;
+    return `<td>${cellsArr[i]}</td>`;
+  }
+
+  const headerEndCells = Array.from({length:8}, (_,i) => `<th>${i+1}</th>`).join('');
+  const team1EndCells = Array.from({length:8}, (_,i) => slotCell(i, cells1)).join('');
+  const team2EndCells = Array.from({length:8}, (_,i) => slotCell(i, cells2)).join('');
+  const deCell1 = slotCell(8, cells1);
+  const deCell2 = slotCell(8, cells2);
+
+  const hammer = (teamNum) => m.pk === teamNum ? `<span class="pk-hammer">🔨</span>` : '';
+
+  const scoreboardHtml = endsArr.length ? `
+    <table class="scoreboard-table">
+      <colgroup>
+        <col style="width:30%">
+        <col style="width:8%">
+        ${'<col style="width:5.5%">'.repeat(8)}
+        <col style="width:5.5%">
+        <col style="width:8%">
+      </colgroup>
+      <thead><tr><th>Ekipa</th><th>PK</th>${headerEndCells}<th>DE</th><th>Rez.</th></tr></thead>
+      <tbody>
+        <tr class="team1-row"><td>${escapeHtml(m.team1)}</td><td>${hammer(1)}</td>${team1EndCells}${deCell1}<td>${m.score1 !== null ? m.score1.toFixed(0) : '–'}</td></tr>
+        <tr class="team2-row"><td>${escapeHtml(m.team2)}</td><td>${hammer(2)}</td>${team2EndCells}${deCell2}<td>${m.score2 !== null ? m.score2.toFixed(0) : '–'}</td></tr>
+      </tbody>
+    </table>
+  ` : `<div class="empty-state">Nema podataka o rezultatu po endovima.</div>`;
+
+  const CANONICAL_POSITIONS = [
+    { position: 'Četvrti', label: '4' },
+    { position: 'Treći', label: '3' },
+    { position: 'Drugi', label: '2' },
+    { position: 'Prvi', label: '1' },
+    { position: 'Rezerva', label: 'R' },
+  ];
+  const MP_POSITIONS = [
+    { position: 'Prvi', label: 'Ž' },
+    { position: 'Drugi', label: 'M' },
+  ];
+
+  function fmtCm(n){
+    return n.toFixed(1).replace('.', ',') + ' cm';
+  }
+
+  function rosterTableHtml(teamName, roster, dis){
+    const total = roster.reduce((s,p) => s + (p.lsd ? p.lsd.distance : 0), 0);
+    const totalDisplay = roster.some(p => p.lsd) ? fmtCm(total) : '';
+    const positions = dis === 'MP' ? MP_POSITIONS : CANONICAL_POSITIONS;
+    const rows = positions.map(slot => {
+      const p = roster.find(x => x.position === slot.position);
+      if(!p){
+        return `<tr><td><span class="order-circle">${slot.label}</span></td><td class="rot"></td><td>-</td><td class="rot"></td><td class="num"></td></tr>`;
+      }
+      const roleShort = p.role === 'Skip' ? 'S' : (p.role === 'Vice-skip' ? 'V' : '');
+      const rotIcon = p.lsd ? (p.lsd.rotation === 'D' ? '↻' : '↺') : '';
+      const dist = p.lsd ? fmtCm(p.lsd.distance) : '';
+      return `<tr><td><span class="order-circle">${slot.label}</span></td><td class="rot">${roleShort ? `<span class="role-tag">${roleShort}</span>` : ''}</td><td>${escapeHtml(p.name)}</td><td class="rot">${rotIcon}</td><td class="num">${dist}</td></tr>`;
+    }).join('');
+    return `<table class="roster-table"><thead><tr><th colspan="4">${escapeHtml(teamName)}</th><th class="num">${totalDisplay}</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }
+
+  const rosterHtml = `<div class="roster-cols">${rosterTableHtml(m.team1, m.roster1, m.dis)}${rosterTableHtml(m.team2, m.roster2, m.dis)}</div>`;
+
+  const zapisnikHref = zapisnikPath(m);
+  const zapisnikOk = await fileExists(zapisnikHref);
+  const pdfBlockHtml = zapisnikOk ? `
+    <div class="pdf-preview-block">
+      <div class="pdf-preview-label">📄 Zapisnik</div>
+      <div class="pdf-desktop-view">
+        <iframe class="pdf-embed" src="${zapisnikHref}" title="Zapisnik s utakmice"></iframe>
+        <a class="doc-link pdf-fallback-link" href="${zapisnikHref}" target="_blank" rel="noopener">Otvori u novom prozoru / preuzmi</a>
+      </div>
+      <a class="doc-link pdf-mobile-btn" href="${zapisnikHref}" target="_blank" rel="noopener"><span class="ic">📄</span> Otvori zapisnik</a>
+    </div>
+  ` : '';
+
+  body.innerHTML = `
+    <button class="modal-close" onclick="closeModal()">×</button>
+    ${infoHtml}
+    ${scoreboardHtml}
+    ${rosterHtml}
+    ${pdfBlockHtml}
+  `;
+  overlay.classList.add('open');
+}
+
+function closeModal(){
+  document.getElementById('modalOverlay').classList.remove('open');
+  _lightboxPhotos = [];
+  _lightboxCaptions = {};
+  _lightboxVideos = [];
+  _lightboxVideoCaptions = {};
+  const vid = document.querySelector('#modalBody video');
+  if(vid) vid.pause();
+}
+document.getElementById('modalOverlay').addEventListener('click', (e) => {
+  if(e.target.id === 'modalOverlay') closeModal();
+});
+
+// ===================== Detalji kluba / ekipe / igrača =====================
+
+function getEntityTournamentHistory(name, groupByClub, kat, dis, seasonFrom, seasonTo){
+  const rows = [];
+  DATA.tournaments.forEach(t => {
+    if(kat && kat !== 'sve' && t.kat !== kat) return;
+    if(dis && dis !== 'sve' && t.dis !== dis) return;
+    if(seasonFrom != null && (t.season < seasonFrom || t.season > seasonTo)) return;
+    const clubMap = groupByClub ? ((DATA.clubs && DATA.clubs[t.dis]) || {}) : {};
+    t.standings.forEach(s => {
+      const entity = groupByClub ? (clubMap[s.team] || s.team) : s.team;
+      if(entity === name){
+        rows.push({ season: t.season, dis: t.dis, kat: t.kat, place: s.place, teamsCount: t.teamsCount, teamName: s.team, p: t.p });
+      }
+    });
+  });
+  rows.sort((a,b) => b.season - a.season || (a.dis).localeCompare(b.dis));
+  return rows;
+}
+
+function getPlayerTournamentHistory(name, kat, dis, seasonFrom, seasonTo){
+  const rows = [];
+  DATA.tournaments.forEach(t => {
+    if(kat && kat !== 'sve' && t.kat !== kat) return;
+    if(dis && dis !== 'sve' && t.dis !== dis) return;
+    if(seasonFrom != null && (t.season < seasonFrom || t.season > seasonTo)) return;
+    t.standings.forEach(s => {
+      const players = t.rosterPool[s.team] || [];
+      if(players.includes(name)){
+        rows.push({ season: t.season, dis: t.dis, kat: t.kat, place: s.place, team: s.team, p: t.p });
+      }
+    });
+  });
+  rows.sort((a,b) => b.season - a.season || (a.dis).localeCompare(b.dis));
+  return rows;
+}
+
+const MEDAL_ICONS = {1:'🥇',2:'🥈',3:'🥉'};
+
+function achvTableHtml(history, teamColLabel){
+  if(history.length === 0) return '<div class="empty-mini">Nema podataka o nastupima.</div>';
+  let h = `<table class="achv-table"><thead><tr><th>Sezona</th><th>Disciplina</th><th>Kategorija</th>${teamColLabel ? `<th>${teamColLabel}</th>` : ''}<th class="num">Mjesto</th></tr></thead><tbody>`;
+  history.forEach(r => {
+    const medal = MEDAL_ICONS[r.place] || '';
+    const placeCell = r.place != null
+      ? `<span class="place-cell"><span class="place-num">${r.place}.</span><span class="place-medal">${medal}</span></span>`
+      : '–';
+    h += `<tr><td>${seasonLabel(r.season)}</td><td>${DIS_LABELS[r.dis]||r.dis}</td><td>${KAT_LABELS[r.kat]||r.kat}</td>${teamColLabel ? `<td>${escapeHtml(r.team||r.teamName)}</td>` : ''}<td class="num">${placeCell}</td></tr>`;
+  });
+  h += '</tbody></table>';
+  return h;
+}
+
+function medalSummaryText(history){
+  const golds = history.filter(r => r.place===1).length;
+  const silvers = history.filter(r => r.place===2).length;
+  const bronzes = history.filter(r => r.place===3).length;
+  const total = golds + silvers + bronzes;
+  if(total === 0) return `${total}`;
+  const parts = [];
+  if(golds) parts.push(`🥇${golds}`);
+  if(silvers) parts.push(`🥈${silvers}`);
+  if(bronzes) parts.push(`🥉${bronzes}`);
+  return `${total} (${parts.join(' ')})`;
+}
+
+function openEntityModal(name, groupByClub, kat, dis, seasonFrom, seasonTo){
+  const overlay = document.getElementById('modalOverlay');
+  const body = document.getElementById('modalBody');
+  body.classList.remove('modal-wide');
+
+  const history = getEntityTournamentHistory(name, groupByClub, kat, dis, seasonFrom, seasonTo);
+  const prvenstava = history.length;
+
+  const summaryHtml = `
+    <div class="info-block">
+      <div>Ukupno prvenstava: <span>${prvenstava}</span></div>
+      <div>Osvojenih medalja: <span>${medalSummaryText(history)}</span></div>
+    </div>
+  `;
+
+  body.innerHTML = `
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <h2 class="entity-title">${escapeHtml(name)}</h2>
+    ${summaryHtml}
+    <h3 class="group-h" style="margin-top:0;">Postignuća kroz sezone</h3>
+    ${achvTableHtml(history, null)}
+  `;
+  overlay.classList.add('open');
+}
+
+function openPlayerModal(name, kat, dis, seasonFrom, seasonTo){
+  const overlay = document.getElementById('modalOverlay');
+  const body = document.getElementById('modalBody');
+  body.classList.remove('modal-wide');
+
+  const history = getPlayerTournamentHistory(name, kat, dis, seasonFrom, seasonTo);
+  const prvenstava = history.length;
+
+  const summaryHtml = `
+    <div class="info-block">
+      <div>Ukupno prvenstava: <span>${prvenstava}</span></div>
+      <div>Osvojenih medalja: <span>${medalSummaryText(history)}</span></div>
+    </div>
+  `;
+
+  body.innerHTML = `
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <h2 class="entity-title">${escapeHtml(name)}</h2>
+    ${summaryHtml}
+    <h3 class="group-h" style="margin-top:0;">Postignuća kroz sezone</h3>
+    ${achvTableHtml(history, 'Ekipa')}
+  `;
+  overlay.classList.add('open');
+}
+
+function openH2hMatchListModal(entityA, entityB, groupByClub, dis, kat){
+  const overlay = document.getElementById('modalOverlay');
+  const body = document.getElementById('modalBody');
+  body.classList.remove('modal-wide');
+
+  const disList = dis === 'sve' ? DIS_ORDER : [dis];
+  const clubMapAll = {};
+  disList.forEach(d => Object.assign(clubMapAll, (DATA.clubs && DATA.clubs[d]) || {}));
+  const entityName = (team) => groupByClub ? (clubMapAll[team] || team) : team;
+
+  const matches = DATA.matches.filter(m => (kat==='sve'||m.kat===kat) && disList.includes(m.dis) && (m.winner===1||m.winner===2||m.played))
+    .filter(m => {
+      const e1 = entityName(m.team1), e2 = entityName(m.team2);
+      return (e1===entityA && e2===entityB) || (e1===entityB && e2===entityA);
+    })
+    .sort((a,b) => (b.date||'').localeCompare(a.date||''));
+
+  let rowsHtml = matches.map(m => {
+    const score = (m.score1!=null && m.score2!=null) ? `${m.score1.toFixed(0)}:${m.score2.toFixed(0)}` : '–';
+    return `<tr class="clickable-cell" data-match-id="${m.id}"><td>${formatDate(m.date)}</td><td>${DIS_LABELS[m.dis]||m.dis}</td><td>${escapeHtml(m.team1)} - ${escapeHtml(m.team2)}</td><td class="num-cell">${score}</td></tr>`;
+  }).join('');
+  if(!rowsHtml) rowsHtml = '<tr><td colspan="4" class="empty-mini">Nema pronađenih utakmica.</td></tr>';
+
+  body.innerHTML = `
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <h2 class="entity-title">${escapeHtml(entityA)} — ${escapeHtml(entityB)}</h2>
+    <table class="achv-table"><thead><tr><th>Datum</th><th>Disciplina</th><th>Utakmica</th><th class="num">Rezultat</th></tr></thead><tbody>${rowsHtml}</tbody></table>
+  `;
+  body.querySelectorAll('[data-match-id]').forEach(row => {
+    row.addEventListener('click', () => openMatchModal(row.dataset.matchId));
+  });
+  overlay.classList.add('open');
+}
+
+// ===================== Page switcher (Prvenstva / Statistika) =====================
+document.querySelectorAll('.page-nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.page-nav-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+    document.getElementById('page-' + btn.dataset.page).classList.add('active');
+  });
+});
+
+// ===================== Prvenstva (pregled pojedinog prvenstva) =====================
+
+function getUzrast(){
+  const active = document.querySelector('#uzrastRow .radio-btn.active');
+  return active ? active.dataset.kat : null;
+}
+function getDis(){
+  const active = document.querySelector('#disRow .radio-btn.active');
+  return active ? active.dataset.dis : null;
+}
 
 function initFilters(){
-  const uzrastSel = document.getElementById('uzrastSel');
-  const disSel = document.getElementById('disSel');
   const seasonSel = document.getElementById('seasonSel');
-
-  uzrastSel.addEventListener('change', () => {
-    updateDisOptions();
-    updateSeasonOptions();
-    render();
-  });
-  disSel.addEventListener('change', () => {
-    updateSeasonOptions();
-    render();
-  });
   seasonSel.addEventListener('change', render);
 
   updateKatOptions();
@@ -215,28 +1858,43 @@ function initFilters(){
 }
 
 function updateKatOptions(){
-  const kats = [...new Set(DATA.tournaments.map(t => t.kat))].sort();
-  const uzrastSel = document.getElementById('uzrastSel');
-  const prev = uzrastSel.value;
-  uzrastSel.innerHTML = kats.map(k => `<option value="${k}">${KAT_LABELS[k] || k}</option>`).join('');
-  if(kats.includes(prev)) uzrastSel.value = prev;
-  else uzrastSel.value = kats.includes('S') ? 'S' : kats[0];
+  const kats = [...new Set(DATA.tournaments.map(t => t.kat))].sort((a,b) => KAT_ORDER.indexOf(a) - KAT_ORDER.indexOf(b));
+  const row = document.getElementById('uzrastRow');
+  const prev = getUzrast();
+  const selected = kats.includes(prev) ? prev : (kats.includes('S') ? 'S' : kats[0]);
+  row.innerHTML = kats.map(k => `<button class="radio-btn${k===selected?' active':''}" data-kat="${k}">${KAT_LABELS[k] || k}</button>`).join('');
+  row.querySelectorAll('.radio-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      row.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      updateDisOptions();
+      updateSeasonOptions();
+      render();
+    });
+  });
 }
 
 function updateDisOptions(){
-  const kat = document.getElementById('uzrastSel').value;
+  const kat = getUzrast();
   const available = new Set(DATA.tournaments.filter(t => t.kat === kat).map(t => t.dis));
   const disList = DIS_ORDER.filter(d => available.has(d));
-  const disSel = document.getElementById('disSel');
-  const prev = disSel.value;
-  disSel.innerHTML = disList.map(d => `<option value="${d}">${DIS_LABELS[d] || d}</option>`).join('');
-  if(disList.includes(prev)) disSel.value = prev;
-  else disSel.value = disList.includes('M') ? 'M' : disList[0];
+  const row = document.getElementById('disRow');
+  const prev = getDis();
+  const selected = disList.includes(prev) ? prev : (disList.includes('M') ? 'M' : disList[0]);
+  row.innerHTML = disList.map(d => `<button class="radio-btn${d===selected?' active':''}" data-dis="${d}">${DIS_LABELS[d] || d}</button>`).join('');
+  row.querySelectorAll('.radio-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      row.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      updateSeasonOptions();
+      render();
+    });
+  });
 }
 
 function updateSeasonOptions(){
-  const kat = document.getElementById('uzrastSel').value;
-  const dis = document.getElementById('disSel').value;
+  const kat = getUzrast();
+  const dis = getDis();
   const seasons = [...new Set(DATA.tournaments.filter(t => t.dis === dis && t.kat === kat).map(t => t.season))].sort((a,b) => b-a);
   const seasonSel = document.getElementById('seasonSel');
   const prev = Number(seasonSel.value);
@@ -244,10 +1902,10 @@ function updateSeasonOptions(){
   seasonSel.value = seasons.includes(prev) ? prev : seasons[0];
 }
 
-function render(){
-  const kat = document.getElementById('uzrastSel').value;
+async function render(){
+  const kat = getUzrast();
   const season = Number(document.getElementById('seasonSel').value);
-  const dis = document.getElementById('disSel').value;
+  const dis = getDis();
   const tourn = DATA.tournaments.find(t => t.season === season && t.dis === dis && t.kat === kat);
   const content = document.getElementById('content');
 
@@ -262,7 +1920,7 @@ function render(){
   const groups = hasExplicitGroups ? [...new Set(matches.map(m => m.group).filter(g => g !== null))].sort() : ['__single__'];
 
   let html = '';
-  html += `<div class="tourn-title">PHC ${seasonLabel(season)} — ${DIS_LABELS[dis] || dis}</div>`;
+  html += `<div class="tourn-title">Sezona ${seasonLabel(season)}, ${tourn.p}. PHC ${DIS_LABELS[dis] || dis} (${(KAT_LABELS[kat] || kat).toLowerCase()})</div>`;
   html += `<div class="tourn-meta">${tourn.teamsCount || '?'} ekipa &middot; ${matches.length} utakmica</div>`;
 
   // final standings — shown first
@@ -271,7 +1929,7 @@ function render(){
   html += `<table class="standings"><thead><tr><th>Ekipa</th><th></th></tr></thead><tbody>`;
   tourn.standings.forEach(s => {
     const medal = MEDALS[s.place] || '';
-    html += `<tr><td><span class="rank">${s.place}</span>${escapeHtml(s.team)}</td><td class="medal-cell">${medal}</td></tr>`;
+    html += `<tr class="clickable-row" data-team="${escapeHtml(s.team)}"><td><span class="rank">${s.place}</span>${escapeHtml(s.team)}</td><td class="medal-cell">${medal}</td></tr>`;
   });
   html += `</tbody></table></section>`;
 
@@ -327,24 +1985,69 @@ function render(){
   // documents
   let html2 = '';
   const seasonTag = `${season-1}-${season}`;
-  const docBase = `zapisnici/${seasonTag}/PHC-${seasonTag}-${dis}-${kat}`;
-  html2 += `<section class="block"><h2 class="section-h">Dokumenti</h2>`;
-  html2 += `<div class="doc-row">
-    <a class="doc-link" href="${docBase}-Sustav.pdf" target="_blank" rel="noopener"><span class="ic">📄</span> Sustav i raspored prvenstva</a>
-    <a class="doc-link" href="${docBase}-Izvještaj.pdf" target="_blank" rel="noopener"><span class="ic">📄</span> Izvještaj s prvenstva</a>
-  </div>
-  </section>`;
+  const tournFolder = `podaci/${seasonTag}/${dis}-${kat}`;
+  const sustavHref = `${tournFolder}/PHC-${seasonTag}-${dis}-${kat}-Sustav.pdf`;
+  const sustavOk = await fileExists(sustavHref);
+  if(sustavOk){
+    html2 += `<section class="block"><h2 class="section-h">Dokumenti</h2>`;
+    html2 += `<div class="doc-row">
+      <a class="doc-link" href="${sustavHref}" target="_blank" rel="noopener"><span class="ic">📄</span> Sustav i raspored prvenstva</a>
+    </div>
+    </section>`;
+  }
 
-  // photos
-  html2 += `<section class="block"><h2 class="section-h">Fotografije</h2>
-  <div class="empty-state">Za ovo prvenstvo trenutno nema učitanih fotografija.</div>
-  </section>`;
+  // photos — numerirane 1.jpg, 2.jpg... u istoj mapi; provjeravamo redom dok ne
+  // naiđemo na prvi broj koji ne postoji
+  const photos = [];
+  for(let i = 1; i <= 60; i++){
+    const path = `${tournFolder}/${i}.jpg`;
+    if(await fileExists(path)) photos.push(path);
+    else break;
+  }
+  let photoCaptions = {};
+  if(photos.length){
+    photoCaptions = await loadCaptions(`${tournFolder}/foto.txt`);
+    html2 += `<section class="block"><h2 class="section-h">Fotografije</h2>`;
+    html2 += `<div class="photo-grid">`;
+    photos.forEach((p, i) => {
+      html2 += `<div class="photo-thumb" data-photo-index="${i}"><img src="${p}" alt="Fotografija ${i+1}" loading="lazy"></div>`;
+    });
+    html2 += `</div></section>`;
+  }
+
+  // videi — numerirani 1.mp4, 2.mp4... isti princip kao fotografije
+  const videos = [];
+  for(let i = 1; i <= 60; i++){
+    const path = `${tournFolder}/${i}.mp4`;
+    if(await fileExists(path)) videos.push(path);
+    else break;
+  }
+  let videoCaptions = {};
+  if(videos.length){
+    videoCaptions = await loadCaptions(`${tournFolder}/video.txt`);
+    html2 += `<section class="block"><h2 class="section-h">Videozapisi</h2>`;
+    html2 += `<div class="photo-grid">`;
+    videos.forEach((v, i) => {
+      html2 += `<div class="video-thumb" data-video-index="${i}"><video src="${v}#t=0.5" preload="metadata" muted playsinline></video><span class="video-play-icon">▶</span></div>`;
+    });
+    html2 += `</div></section>`;
+  }
 
   content.innerHTML = html + html2;
 
   // attach click handlers
   content.querySelectorAll('.match-row').forEach(row => {
     row.addEventListener('click', () => openMatchModal(row.dataset.id));
+  });
+  content.querySelectorAll('[data-team]').forEach(el => {
+    el.addEventListener('click', () => openTeamRosterModal(el.dataset.team, tourn, season, dis, kat));
+  });
+  content.querySelectorAll('[data-photo-index]').forEach(el => {
+    el.addEventListener('click', () => openPhotoLightbox(photos, Number(el.dataset.photoIndex), photoCaptions));
+  });
+  content.querySelectorAll('[data-video-index]').forEach(el => {
+    const idx = Number(el.dataset.videoIndex);
+    el.addEventListener('click', () => openVideoModal(videos, idx, videoCaptions));
   });
 }
 
@@ -430,181 +2133,128 @@ function standingsTableHtml(rows){
   return h;
 }
 
-const ZAPISNICI_BASE = 'zapisnici'; // prilagodite ako su PDF zapisnici u drugoj mapi na siteu
 
-function rawFaza(phase){
-  const prefix = { group: 'K', playoff: 'D', placement: 'P' }[phase.type] || '?';
-  return `${prefix}${phase.num}`;
-}
 
-function zapisnikPath(m){
-  const seasonTag = `${m.season - 1}-${m.season}`;
-  const group = m.group || 'A';
-  const filename = `PHC-${seasonTag}-${m.dis}-${m.kat}-${group}-${rawFaza(m.phase)}-${m.matchNum}.pdf`;
-  return `${ZAPISNICI_BASE}/${seasonTag}/${filename}`;
-}
 
-function openMatchModal(id){
-  const m = DATA.matches.find(x => x.id === id);
-  if(!m) return;
+
+
+
+
+function openTeamRosterModal(team, tourn, season, dis, kat){
   const overlay = document.getElementById('modalOverlay');
   const body = document.getElementById('modalBody');
+  body.classList.remove('modal-wide');
+  const players = tourn.rosterPool[team] || [];
 
-  // --- info blok ---
-  const utakmicaLine = m.group ? `Skupina ${m.group}, ${m.phase.label}` : m.phase.label;
-  const timeShort = m.time ? m.time.slice(0,5) : '';
-  const mjestoParts = [m.city, m.venue, m.rink ? `staza ${m.rink}` : null].filter(Boolean);
-
-  const infoHtml = `
-    <div class="info-block">
-      <div>Sezona: <span>${seasonLabel(m.season)}</span></div>
-      <div>Disciplina: <span>${m.disLabel} (${m.katLabel})</span></div>
-      <div>Utakmica: <span>${utakmicaLine}</span></div>
-      <div>Vrijeme: <span>${m.date ? formatDate(m.date) : '—'} ${timeShort}h</span></div>
-      <div>Mjesto: <span>${escapeHtml(mjestoParts.join(', ') || '—')}</span></div>
-    </div>
-  `;
-
-  // --- scoreboard tablica (uvijek 8 endova + DE + Rez.) ---
-  // Prati posjed hammera kroz utakmicu: pobjednik enda gubi hammer sljedeći
-  // end; kod neriješenog (0) enda hammer ostaje istoj ekipi, a "0" se upisuje
-  // ekipi koja ga TRENUTNO nema (odnosno koja je zadnja osvojila poen).
-  const endsArr = m.ends || [];
-  const TOTAL_SLOTS = 9; // 8 redovnih + 1 DE
-  const cells1 = new Array(TOTAL_SLOTS).fill('');
-  const cells2 = new Array(TOTAL_SLOTS).fill('');
-  let hammerTeam = m.pk || null;
-  const playedCount = Math.min(endsArr.length, TOTAL_SLOTS);
-  for (let i = 0; i < playedCount; i++){
-    const e = endsArr[i];
-    if(e > 0){ cells1[i] = String(e); hammerTeam = 2; }
-    else if(e < 0){ cells2[i] = String(Math.abs(e)); hammerTeam = 1; }
-    else if(hammerTeam === 1){ cells2[i] = '0'; }
-    else if(hammerTeam === 2){ cells1[i] = '0'; }
-  }
-  const firstUnplayedIdx = playedCount < TOTAL_SLOTS ? playedCount : null;
-
-  function slotCell(i, cellsArr){
-    if(i === firstUnplayedIdx) return `<td class="na">X</td>`;
-    return `<td>${cellsArr[i]}</td>`;
-  }
-
-  const headerEndCells = Array.from({length:8}, (_,i) => `<th>${i+1}</th>`).join('');
-  const team1EndCells = Array.from({length:8}, (_,i) => slotCell(i, cells1)).join('');
-  const team2EndCells = Array.from({length:8}, (_,i) => slotCell(i, cells2)).join('');
-  const deCell1 = slotCell(8, cells1);
-  const deCell2 = slotCell(8, cells2);
-
-  const hammer = (teamNum) => m.pk === teamNum ? `<span class="pk-hammer">🔨</span>` : '';
-
-  const scoreboardHtml = endsArr.length ? `
-    <table class="scoreboard-table">
-      <colgroup>
-        <col style="width:30%">
-        <col style="width:8%">
-        ${'<col style="width:5.5%">'.repeat(8)}
-        <col style="width:5.5%">
-        <col style="width:8%">
-      </colgroup>
-      <thead><tr><th>Ekipa</th><th>PK</th>${headerEndCells}<th>DE</th><th>Rez.</th></tr></thead>
-      <tbody>
-        <tr class="team1-row"><td>${escapeHtml(m.team1)}</td><td>${hammer(1)}</td>${team1EndCells}${deCell1}<td>${m.score1 !== null ? m.score1.toFixed(0) : '–'}</td></tr>
-        <tr class="team2-row"><td>${escapeHtml(m.team2)}</td><td>${hammer(2)}</td>${team2EndCells}${deCell2}<td>${m.score2 !== null ? m.score2.toFixed(0) : '–'}</td></tr>
-      </tbody>
-    </table>
-  ` : `<div class="empty-state">Nema podataka o rezultatu po endovima.</div>`;
-
-  // --- sastavi ekipa (uvijek 5 pozicija: 1,2,3,4,R) ---
-  const CANONICAL_POSITIONS = [
-    { position: 'Četvrti', label: '4' },
-    { position: 'Treći', label: '3' },
-    { position: 'Drugi', label: '2' },
-    { position: 'Prvi', label: '1' },
-    { position: 'Rezerva', label: 'R' },
-  ];
-  // U mješovitim parovima (MP) igraju samo dva igrača po ekipi — "Prvi" je
-  // uvijek igračica (Ž), "Drugi" je uvijek igrač (M).
-  const MP_POSITIONS = [
-    { position: 'Prvi', label: 'Ž' },
-    { position: 'Drugi', label: 'M' },
-  ];
-
-  function fmtCm(n){
-    return n.toFixed(1).replace('.', ',') + ' cm';
-  }
-
-  function rosterTableHtml(teamName, roster, dis){
-    const total = roster.reduce((s,p) => s + (p.lsd ? p.lsd.distance : 0), 0);
-    const totalDisplay = roster.some(p => p.lsd) ? fmtCm(total) : '';
-    const positions = dis === 'MP' ? MP_POSITIONS : CANONICAL_POSITIONS;
-    const rows = positions.map(slot => {
-      const p = roster.find(x => x.position === slot.position);
-      if(!p){
-        return `
-          <tr>
-            <td><span class="order-circle">${slot.label}</span></td>
-            <td class="rot"></td>
-            <td>-</td>
-            <td class="rot"></td>
-            <td class="num"></td>
-          </tr>
-        `;
-      }
-      const roleShort = p.role === 'Skip' ? 'S' : (p.role === 'Vice-skip' ? 'V' : '');
-      const rotIcon = p.lsd ? (p.lsd.rotation === 'D' ? '↻' : '↺') : '';
-      const dist = p.lsd ? fmtCm(p.lsd.distance) : '';
-      return `
-        <tr>
-          <td><span class="order-circle">${slot.label}</span></td>
-          <td class="rot">${roleShort ? `<span class="role-tag">${roleShort}</span>` : ''}</td>
-          <td>${escapeHtml(p.name)}</td>
-          <td class="rot">${rotIcon}</td>
-          <td class="num">${dist}</td>
-        </tr>
-      `;
-    }).join('');
-    return `
-      <table class="roster-table">
-        <thead><tr><th colspan="4">${escapeHtml(teamName)}</th><th class="num">${totalDisplay}</th></tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
-    `;
-  }
-
-  const rosterHtml = `
-    <div class="roster-cols">
-      ${rosterTableHtml(m.team1, m.roster1, m.dis)}
-      ${rosterTableHtml(m.team2, m.roster2, m.dis)}
-    </div>
-  `;
-
-  const zapisnikHref = zapisnikPath(m);
+  const rosterHtml = players.length
+    ? `<ol class="standing-list">${players.map(p => `<li><span class="team-name">${escapeHtml(p)}</span></li>`).join('')}</ol>`
+    : '<div class="empty-state">Nema podataka o sastavu.</div>';
 
   body.innerHTML = `
     <button class="modal-close" onclick="closeModal()">×</button>
-    ${infoHtml}
-    ${scoreboardHtml}
-    ${rosterHtml}
-    <div class="pdf-preview-block">
-      <div class="pdf-preview-label">📄 Zapisnik</div>
-      <iframe class="pdf-embed" src="${zapisnikHref}" title="Zapisnik s utakmice"></iframe>
-      <a class="doc-link pdf-fallback-link" href="${zapisnikHref}" target="_blank" rel="noopener">Otvori u novom prozoru / preuzmi</a>
+    <h2 class="entity-title">${escapeHtml(team)}</h2>
+    <div class="info-block">
+      <div>Sezona: <span>${seasonLabel(season)}</span></div>
+      <div>Prvenstvo: <span>${DIS_LABELS[dis]||dis} (${KAT_LABELS[kat]||kat})</span></div>
     </div>
+    <h3 class="group-h" style="margin-top:0;">Sastav ekipe</h3>
+    ${rosterHtml}
   `;
   overlay.classList.add('open');
 }
 
-function closeModal(){
-  document.getElementById('modalOverlay').classList.remove('open');
+// ===================== Fotografije (lightbox s navigacijom lijevo/desno) =====================
+let _lightboxPhotos = [];
+let _lightboxIndex = 0;
+let _lightboxCaptions = {};
+
+function openPhotoLightbox(photos, index, captions){
+  _lightboxPhotos = photos;
+  _lightboxIndex = index;
+  _lightboxCaptions = captions || {};
+  renderLightbox();
+  document.getElementById('modalOverlay').classList.add('open');
 }
-document.getElementById('modalOverlay').addEventListener('click', (e) => {
-  if(e.target.id === 'modalOverlay') closeModal();
+
+function renderLightbox(){
+  const body = document.getElementById('modalBody');
+  body.classList.remove('modal-wide');
+  const n = _lightboxPhotos.length;
+  const src = _lightboxPhotos[_lightboxIndex];
+  const caption = _lightboxCaptions[_lightboxIndex + 1];
+
+  body.innerHTML = `
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div class="lightbox">
+      <button class="lightbox-nav lightbox-prev" onclick="lightboxNav(-1)" ${n<=1?'disabled':''}>‹</button>
+      <img class="lightbox-image" src="${src}" alt="Fotografija ${_lightboxIndex+1}">
+      <button class="lightbox-nav lightbox-next" onclick="lightboxNav(1)" ${n<=1?'disabled':''}>›</button>
+    </div>
+    <div class="lightbox-footer">
+      <div class="lightbox-caption">${caption ? escapeHtml(caption) : ''}</div>
+      <div class="lightbox-counter">${_lightboxIndex+1}/${n}</div>
+    </div>
+  `;
+}
+
+function lightboxNav(delta){
+  const n = _lightboxPhotos.length;
+  _lightboxIndex = (_lightboxIndex + delta + n) % n;
+  renderLightbox();
+}
+
+// ===================== Videozapisi (ista navigacija lijevo/desno) =====================
+let _lightboxVideos = [];
+let _lightboxVideoIndex = 0;
+let _lightboxVideoCaptions = {};
+
+function openVideoModal(videos, index, captions){
+  _lightboxVideos = videos;
+  _lightboxVideoIndex = index;
+  _lightboxVideoCaptions = captions || {};
+  renderVideoModal();
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function renderVideoModal(){
+  const body = document.getElementById('modalBody');
+  body.classList.remove('modal-wide');
+  const n = _lightboxVideos.length;
+  const src = _lightboxVideos[_lightboxVideoIndex];
+  const caption = _lightboxVideoCaptions[_lightboxVideoIndex + 1];
+
+  body.innerHTML = `
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div class="lightbox">
+      <button class="lightbox-nav lightbox-prev" onclick="videoNav(-1)" ${n<=1?'disabled':''}>‹</button>
+      <video class="video-modal-player" src="${src}" controls autoplay playsinline></video>
+      <button class="lightbox-nav lightbox-next" onclick="videoNav(1)" ${n<=1?'disabled':''}>›</button>
+    </div>
+    <div class="lightbox-footer">
+      <div class="lightbox-caption">${caption ? escapeHtml(caption) : ''}</div>
+      <div class="lightbox-counter">${_lightboxVideoIndex+1}/${n}</div>
+    </div>
+  `;
+}
+
+function videoNav(delta){
+  const n = _lightboxVideos.length;
+  _lightboxVideoIndex = (_lightboxVideoIndex + delta + n) % n;
+  renderVideoModal();
+}
+
+document.addEventListener('keydown', (e) => {
+  if(!document.getElementById('modalOverlay').classList.contains('open')) return;
+  if(e.key === 'Escape'){ closeModal(); return; }
+  if(_lightboxPhotos.length){
+    if(e.key === 'ArrowLeft') lightboxNav(-1);
+    else if(e.key === 'ArrowRight') lightboxNav(1);
+  } else if(_lightboxVideos.length){
+    if(e.key === 'ArrowLeft') videoNav(-1);
+    else if(e.key === 'ArrowRight') videoNav(1);
+  }
 });
 
-function escapeHtml(s){
-  if(s == null) return '';
-  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
 </script>
 
 </body>
