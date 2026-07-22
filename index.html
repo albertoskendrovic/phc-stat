@@ -220,12 +220,14 @@
   li.clickable-row:hover{background:#f6f9fb;}
 
   /* postignuća kroz vrijeme (klub/ekipa/igrač detalj) */
+  .achv-table-scroll{overflow-x:auto;}
   .achv-table{width:100%; border-collapse:collapse; font-size:12.5px; margin-top:6px;}
   .achv-table th, .achv-table td{padding:6px 8px; text-align:left; border-bottom:1px solid var(--ice-2);}
   .achv-table th{font-family:'IBM Plex Mono', monospace; font-size:10.5px; text-transform:uppercase; color:var(--text-muted); background:var(--ice-2);}
   .achv-table td.num, .achv-table th.num{text-align:right; font-family:'IBM Plex Mono', monospace;}
 
   .badge-icon{display:inline-block; flex-shrink:0;}
+  .lbl-short{display:none;}
   .badge-grid{display:grid; grid-template-columns:repeat(10, 1fr); gap:14px; margin-bottom:28px;}
   .badge-item{display:flex; flex-direction:column; align-items:center; gap:8px; cursor:pointer; background:none; border:none; padding:6px; border-radius:10px;}
   .badge-item:hover{background:var(--surface-1, var(--ice-2));}
@@ -374,6 +376,17 @@
     .match-row{grid-template-columns: 60px 1fr auto 1fr 16px; font-size:12.5px;}
     .pdf-desktop-view{display:none;}
     .pdf-mobile-btn{display:inline-flex;}
+    .badge-grid{grid-template-columns:repeat(4, 1fr); gap:10px;}
+    .badge-item .badge-icon{width:48px; height:48px;}
+    .badge-tier-cols{flex-direction:column; gap:18px;}
+    .lbl-full{display:none;}
+    .lbl-short{display:inline;}
+    header .wrap{display:flex; flex-direction:column;}
+    .header-top{display:contents;}
+    header .eyebrow{order:1;}
+    header h1{order:2;}
+    header p.lead{order:3;}
+    .page-nav{order:4; align-self:flex-end; margin-top:10px;}
   }
 
 </style>
@@ -389,14 +402,14 @@
   </svg>
   <div class="wrap">
     <div class="header-top">
-      <p class="eyebrow">Hrvatski curling savez &mdash; arhiva prvenstava</p>
+      <p class="eyebrow">Hrvatski curling savez</p>
       <div class="page-nav">
         <button class="page-nav-btn active" data-page="prvenstva">🏆 Prvenstva</button>
         <button class="page-nav-btn" data-page="statistika">📊 Statistika</button>
       </div>
     </div>
-    <h1>Prvenstva i statistika</h1>
-    <p class="lead">Rezultati po skupinama i kolima, poretci kroz sezone, agregatna statistika, međusobni susreti i još.</p>
+    <h1>Prvenstva Hrvatske u curlingu</h1>
+    <p class="lead">Rezultati i statistički podaci kroz sezone</p>
   </div>
 </header>
 
@@ -643,7 +656,7 @@ function initUniversalFilters(){
   const kats = availableKats();
   const katRow = document.getElementById('globalKatRow');
   katRow.innerHTML = '<button class="radio-btn sve-btn active" data-kat="sve">Sve</button>' +
-    kats.map(k => `<button class="radio-btn" data-kat="${k}">${KAT_LABELS[k]||k}</button>`).join('');
+    kats.map(k => `<button class="radio-btn" data-kat="${k}"><span class="lbl-full">${KAT_LABELS[k]||k}</span><span class="lbl-short">${k}</span></button>`).join('');
   katRow.querySelectorAll('.radio-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       katRow.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('active'));
@@ -656,7 +669,7 @@ function initUniversalFilters(){
   // Disciplina
   const disRow = document.getElementById('globalDisRow');
   disRow.innerHTML = '<button class="radio-btn sve-btn active" data-dis="sve">Sve</button>' +
-    DIS_ORDER.map(d => `<button class="radio-btn" data-dis="${d}">${DIS_LABELS[d]}</button>`).join('');
+    DIS_ORDER.map(d => `<button class="radio-btn" data-dis="${d}"><span class="lbl-full">${DIS_LABELS[d]}</span><span class="lbl-short">${d}</span></button>`).join('');
   disRow.querySelectorAll('.radio-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       if(btn.disabled) return;
@@ -1035,7 +1048,7 @@ function openNhcBreakdownModal(name, groupByClub, kat, dis, isPlayer, anchorSeas
   if(rows.length === 0){
     tableHtml = '<div class="empty-mini">Nema prvenstava u zadnjih 5 sezona koja bi ulazila u izračun.</div>';
   } else {
-    tableHtml = `<table class="achv-table"><thead><tr>
+    tableHtml = `<div class="achv-table-scroll"><table class="achv-table"><thead><tr>
       <th>Sezona</th><th>Disciplina</th><th>Kategorija</th><th class="num">Mjesto</th>
       <th class="num">Broj ekipa</th><th class="num">Bodovi</th><th class="num">Težina sezone</th><th class="num">NHC bodova</th>
     </tr></thead><tbody>`;
@@ -1052,7 +1065,7 @@ function openNhcBreakdownModal(name, groupByClub, kat, dis, isPlayer, anchorSeas
       </tr>`;
     });
     tableHtml += `<tr><td colspan="7" style="text-align:right; font-weight:700;">Ukupno (zaokruženo)</td><td class="num" style="font-weight:700;">${Math.round(total)}</td></tr>`;
-    tableHtml += '</tbody></table>';
+    tableHtml += '</tbody></table></div>';
   }
 
   body.innerHTML = `
@@ -1905,7 +1918,7 @@ function updateKatOptions(){
   const row = document.getElementById('uzrastRow');
   const prev = getUzrast();
   const selected = kats.includes(prev) ? prev : (kats.includes('S') ? 'S' : kats[0]);
-  row.innerHTML = kats.map(k => `<button class="radio-btn${k===selected?' active':''}" data-kat="${k}">${KAT_LABELS[k] || k}</button>`).join('');
+  row.innerHTML = kats.map(k => `<button class="radio-btn${k===selected?' active':''}" data-kat="${k}"><span class="lbl-full">${KAT_LABELS[k] || k}</span><span class="lbl-short">${k}</span></button>`).join('');
   row.querySelectorAll('.radio-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       row.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('active'));
@@ -1924,7 +1937,7 @@ function updateDisOptions(){
   const row = document.getElementById('disRow');
   const prev = getDis();
   const selected = disList.includes(prev) ? prev : (disList.includes('M') ? 'M' : disList[0]);
-  row.innerHTML = disList.map(d => `<button class="radio-btn${d===selected?' active':''}" data-dis="${d}">${DIS_LABELS[d] || d}</button>`).join('');
+  row.innerHTML = disList.map(d => `<button class="radio-btn${d===selected?' active':''}" data-dis="${d}"><span class="lbl-full">${DIS_LABELS[d] || d}</span><span class="lbl-short">${d}</span></button>`).join('');
   row.querySelectorAll('.radio-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       row.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('active'));
