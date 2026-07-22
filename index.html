@@ -34,15 +34,15 @@
   body{margin:0; background:var(--ice); color:var(--text); font-family:'Inter', sans-serif; line-height:1.5;}
   
 
-  header{background:var(--navy); color:var(--ice); padding:14px 24px 16px; position:relative; overflow:hidden;}
-  header .wrap{position:relative; z-index:2;}
+  header{background:var(--navy); color:var(--ice); padding:7px 24px 8px; position:relative; overflow:hidden;}
+  header .wrap{position:relative; z-index:2; padding-bottom:0;}
   .header-top{display:flex; align-items:center; justify-content:space-between; gap:12px;}
-  .eyebrow{font-family:'IBM Plex Mono', monospace; font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:#9db3c4; margin:0 0 2px;}
-  h1{font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:clamp(17px,2.4vw,21px); margin:0 0 2px; letter-spacing:-0.01em;}
-  header p.lead{max-width:560px; color:#c3d2dc; font-size:11.5px; margin:0;}
+  .eyebrow{font-family:'IBM Plex Mono', monospace; font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:#9db3c4; margin:0 0 1px;}
+  h1{font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:clamp(15px,2.2vw,18px); margin:0 0 1px; letter-spacing:-0.01em;}
+  header p.lead{max-width:560px; color:#c3d2dc; font-size:10.5px; margin:0; line-height:1.3;}
   .nav-pill{font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--ice); text-decoration:none; border:1px solid rgba(255,255,255,0.3); padding:4px 10px; border-radius:20px; white-space:nowrap;}
   .nav-pill:hover{background:rgba(255,255,255,0.1);}
-  .stone-decor{position:absolute; right:-40px; top:-40px; width:110px; height:110px; opacity:0.15;}
+  .stone-decor{position:absolute; right:-30px; top:-30px; width:80px; height:80px; opacity:0.15;}
 
   .tabs{display:flex; gap:4px; flex-wrap:wrap; border-bottom:1.5px solid var(--sheet-line); margin:28px 0 24px;}
   .tab-btn{font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:14px; background:none; border:none; padding:10px 16px 12px; cursor:pointer; color:var(--text-muted); border-bottom:3px solid transparent; margin-bottom:-1.5px;}
@@ -268,20 +268,20 @@
   body{margin:0; background:var(--ice); color:var(--text); font-family:'Inter', sans-serif; line-height:1.5;}
   #page-prvenstva > .wrap{max-width:980px;}
 
-  header{background:var(--navy); color:var(--ice); padding:14px 24px 16px; position:relative; overflow:hidden;}
-  header .wrap{position:relative; z-index:2;}
-  .eyebrow{font-family:'IBM Plex Mono', monospace; font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:#9db3c4; margin:0 0 2px;}
-  h1{font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:clamp(17px,2.4vw,21px); margin:0 0 2px; letter-spacing:-0.01em;}
-  header p.lead{max-width:560px; color:#c3d2dc; font-size:11.5px; margin:0;}
+  header{background:var(--navy); color:var(--ice); padding:7px 24px 8px; position:relative; overflow:hidden;}
+  header .wrap{position:relative; z-index:2; padding-bottom:0;}
+  .eyebrow{font-family:'IBM Plex Mono', monospace; font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:#9db3c4; margin:0 0 1px;}
+  h1{font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:clamp(15px,2.2vw,18px); margin:0 0 1px; letter-spacing:-0.01em;}
+  header p.lead{max-width:560px; color:#c3d2dc; font-size:10.5px; margin:0; line-height:1.3;}
   .header-top{display:flex; align-items:center; justify-content:space-between; gap:12px;}
   .nav-pill{font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--ice); text-decoration:none; border:1px solid rgba(255,255,255,0.3); padding:4px 10px; border-radius:20px; white-space:nowrap;}
   .nav-pill:hover{background:rgba(255,255,255,0.1);}
-  .stone-decor{position:absolute; right:-40px; top:-40px; width:110px; height:110px; opacity:0.15;}
+  .stone-decor{position:absolute; right:-30px; top:-30px; width:80px; height:80px; opacity:0.15;}
 
   #page-prvenstva .controls{gap:24px; margin:28px 0 8px; align-items:flex-start;}
   #page-prvenstva .controls > div{display:flex; flex-direction:column; gap:6px;}
   .controls label{font-size:12.5px; color:var(--text-muted); font-family:'IBM Plex Mono', monospace; text-transform:uppercase; letter-spacing:0.05em;}
-  #page-prvenstva select{font-size:13px; padding:7px 12px;}
+  #page-prvenstva select{font-size:13px; padding:7px 12px; background:var(--navy); color:var(--ice); border-color:var(--navy);}
   #page-prvenstva .radio-row{display:flex; gap:6px; flex-wrap:wrap;}
   .radio-btn{font-family:'Inter', sans-serif; font-size:13px; padding:7px 14px; border-radius:20px; border:1.5px solid var(--sheet-line); background:var(--white); color:var(--text-muted); cursor:pointer;}
   .radio-btn.active{background:var(--navy); color:var(--ice); border-color:var(--navy);}
@@ -2344,10 +2344,16 @@ function renderBadgeDetail(name){
   const [, bcrit, scrit, gcrit] = meta;
   const tiers = BADGES[name] || {broncani:[], srebrni:[], zlatni:[]};
 
+  function formatBadgeValue(v){
+    if(v == null) return '';
+    if(name === 'Kirurg') return ` (${v.toFixed(1).replace('.', ',')} cm)`;
+    return ` (${v})`;
+  }
+
   function col(tier, crit, label){
     const entries = tiers[tier] || [];
     const items = entries.length
-      ? entries.map(e => `<div class="badge-tier-list-item">${escapeHtml(e[0])}${e[1] != null ? ` (${e[1]})` : ''}</div>`).join('')
+      ? entries.map(e => `<div class="badge-tier-list-item">${escapeHtml(e[0])}${formatBadgeValue(e[1])}</div>`).join('')
       : '<div class="badge-tier-list-item" style="color:var(--text-muted);">-</div>';
     return `<div class="badge-tier-col">
       <div class="badge-tier-col-title"><span class="badge-icon badge-icon-lg">${BADGE_ICONS[name][tier]}</span><div><div>${escapeHtml(name)} - ${label}</div>${crit ? `<div class="badge-tier-crit">${crit}</div>` : ''}</div></div>
