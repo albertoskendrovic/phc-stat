@@ -155,6 +155,7 @@
   .modal .info-block{font-size:13.5px; color:var(--text-muted); margin-bottom:20px; display:flex; flex-direction:column; gap:5px;}
   .modal .info-block div span{color:var(--text); font-weight:500;}
   .modal h2.entity-title{font-family:'Space Grotesk', sans-serif; font-size:19px; margin:0 0 16px; color:var(--navy);}
+  .h2h-modal-record{font-family:'IBM Plex Mono', monospace; font-size:13px; font-weight:400; color:var(--text-muted);}
 
   table.scoreboard-table{width:100%; table-layout:fixed; border-collapse:collapse; margin-bottom:22px; box-shadow:0 0 0 1px #7d8a94; border-radius:8px; overflow:hidden;}
   table.scoreboard-table th, table.scoreboard-table td{padding:7px 4px; text-align:center; font-size:13.5px; border-right:1px solid #7d8a94; border-bottom:1px solid #7d8a94;}
@@ -168,6 +169,8 @@
   table.scoreboard-table tr.team2-row td{background:#f0d878;}
   table.scoreboard-table tr.team1-row td:first-child{color:#111; font-weight:700;}
   table.scoreboard-table tr.team2-row td:first-child{color:#111; font-weight:700;}
+  table.scoreboard-table tr.team1-row td.pw-cell-1{background:#d9483a; color:#fff; font-weight:700;}
+  table.scoreboard-table tr.team2-row td.pw-cell-2{background:#d9a916; color:#111; font-weight:700;}
   table.scoreboard-table td.na{color:#555; font-weight:400;}
   .pk-hammer{font-size:14px;}
 
@@ -210,14 +213,15 @@
   .lightbox-caption{font-family:'Space Grotesk', sans-serif; font-size:14.5px; font-weight:600; color:var(--navy);}
 
   /* klik-link stil za nazive ekipa/klubova/igrača — isti "hover zatamni + ručica" princip kao kod redaka utakmica */
-  .clickable-name{cursor:pointer; border-radius:6px; transition:background 0.1s;}
-  .clickable-name:hover{background:#f6f9fb;}
-  table.ekipe-table td.ekipe-name.clickable-name:hover, table.ekipe-table th.ekipe-name.clickable-name:hover{background:#f6f9fb;}
-  .clickable-cell{cursor:pointer;}
-  .clickable-cell:hover{background:#f6f9fb !important;}
-  tr.clickable-row, li.clickable-row{cursor:pointer;}
-  tr.clickable-row:hover td{background:#f6f9fb;}
-  li.clickable-row:hover{background:#f6f9fb;}
+  .clickable-name{cursor:pointer; border-radius:6px; transition:background 0.12s;}
+  .clickable-name:hover{background:var(--ice-2); box-shadow:inset 3px 0 0 var(--navy);}
+  table.ekipe-table td.ekipe-name.clickable-name:hover, table.ekipe-table th.ekipe-name.clickable-name:hover{background:var(--ice-2); box-shadow:inset 3px 0 0 var(--navy);}
+  .clickable-cell{cursor:pointer; transition:background 0.12s;}
+  .clickable-cell:hover{background:var(--ice-2) !important; box-shadow:inset 3px 0 0 var(--navy);}
+  tr.clickable-row, li.clickable-row{cursor:pointer; transition:background 0.12s;}
+  tr.clickable-row:hover td{background:var(--ice-2) !important;}
+  tr.clickable-row:hover td:first-child{box-shadow:inset 3px 0 0 var(--navy);}
+  li.clickable-row:hover{background:var(--ice-2); box-shadow:inset 3px 0 0 var(--navy); border-radius:6px;}
 
   /* postignuća kroz vrijeme (klub/ekipa/igrač detalj) */
   .achv-table-scroll{overflow-x:auto;}
@@ -289,7 +293,8 @@
   .radio-btn.active{background:var(--navy); color:var(--ice); border-color:var(--navy);}
 
   .tourn-title{font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:22px; margin:28px 0 4px;}
-  .tourn-meta{color:var(--text-muted); font-size:13.5px; margin-bottom:24px;}
+  .tourn-meta{color:var(--text-muted); font-size:13.5px; margin-bottom:4px;}
+  .tourn-meta:last-of-type{margin-bottom:24px;}
 
   section.block{margin-bottom:34px;}
   h2.section-h{font-family:'Space Grotesk', sans-serif; font-size:17px; font-weight:600; margin:0 0 14px; padding-bottom:8px; border-bottom:1.5px solid var(--sheet-line); display:flex; align-items:center; gap:8px;}
@@ -299,7 +304,7 @@
   .match-list{box-shadow:0 0 0 1px var(--sheet-line); border-radius:10px; overflow:hidden; background:var(--white);}
   .match-row{display:grid; grid-template-columns: 78px 1fr auto 1fr 24px; align-items:center; gap:10px; padding:11px 14px; border-bottom:1px solid var(--ice-2); font-size:13.5px; cursor:pointer;}
   .match-row:last-child{border-bottom:none;}
-  .match-row:hover{background:#f6f9fb;}
+  .match-row:hover{background:var(--ice-2); box-shadow:inset 3px 0 0 var(--navy);}
   .match-date{font-family:'IBM Plex Mono', monospace; color:var(--text-muted); font-size:11.5px;}
   .match-team{text-align:right;}
   .match-team.right{text-align:left;}
@@ -331,6 +336,7 @@
   .pdf-fallback-link{margin-top:10px;}
   .pdf-mobile-btn{display:none;}
   .modal h2.entity-title{font-family:'Space Grotesk', sans-serif; font-size:19px; margin:0 0 16px; color:var(--navy);}
+  .h2h-modal-record{font-family:'IBM Plex Mono', monospace; font-size:13px; font-weight:400; color:var(--text-muted);}
 
   .empty-state{text-align:center; padding:36px 20px; color:var(--text-muted); font-size:13.5px; background:var(--white); border-radius:10px; box-shadow:0 0 0 1px var(--sheet-line);}
   .note{font-size:12px; color:var(--text-muted); margin-top:8px; font-style:italic;}
@@ -906,7 +912,9 @@ function recordsTableHtml(rows, valueLabel){
   if(rows.length === 0) return '<div class="empty-mini">Nema podataka.</div>';
   let h = `<table class="stats-table records-table"><thead><tr><th>Disciplina</th><th>Utakmica</th><th>Rezultat</th><th>${valueLabel}</th><th>Datum</th></tr></thead><tbody>`;
   rows.forEach(r => {
-    h += `<tr class="clickable-cell" onclick="openMatchModal('${r.id}')"><td>${escapeHtml(r.dis)}</td><td>${escapeHtml(r.team1)} - ${escapeHtml(r.team2)}</td><td>${r.score1}:${r.score2}</td><td class="num-cell">${r.value}</td><td>${formatDate(r.date)}</td></tr>`;
+    const team1Html = r.winner === 1 ? `<strong>${escapeHtml(r.team1)}</strong>` : escapeHtml(r.team1);
+    const team2Html = r.winner === 2 ? `<strong>${escapeHtml(r.team2)}</strong>` : escapeHtml(r.team2);
+    h += `<tr class="clickable-cell" onclick="openMatchModal('${r.id}')"><td>${escapeHtml(r.dis)}</td><td>${team1Html} - ${team2Html}</td><td>${r.score1}:${r.score2}</td><td class="num-cell">${r.value}</td><td>${formatDate(r.date)}</td></tr>`;
   });
   h += '</tbody></table>';
   return h;
@@ -929,7 +937,7 @@ function renderRekordi(){
   function toRow(m, val){
     return {
       id: m.id, katLabel: m.katLabel, dis: m.dis, team1: m.team1, team2: m.team2,
-      score1: m.score1.toFixed(0), score2: m.score2.toFixed(0), date: m.date, value: val
+      score1: m.score1.toFixed(0), score2: m.score2.toFixed(0), date: m.date, value: val, winner: m.winner
     };
   }
 
@@ -1605,7 +1613,12 @@ async function openMatchModal(id){
   `;
 
   const endsArr = m.ends || [];
-  const TOTAL_SLOTS = 9;
+  const scheduledEnds = m.scheduledEnds || 8;
+  const extraEndAllowed = m.extraEndAllowed !== false;
+  // koliko "redovnih" stupaca prikazati - najmanje koliko je planirano (En), ali nikad manje
+  // od stvarno zabilježenih redovnih endova (rijetki povijesni slučajevi gdje ih ima i više)
+  const regularCount = Math.max(scheduledEnds, endsArr.length - (extraEndAllowed ? 1 : 0));
+  const TOTAL_SLOTS = regularCount + (extraEndAllowed ? 1 : 0);
   const cells1 = new Array(TOTAL_SLOTS).fill('');
   const cells2 = new Array(TOTAL_SLOTS).fill('');
   let hammerTeam = m.pk || null;
@@ -1619,29 +1632,33 @@ async function openMatchModal(id){
   }
   const firstUnplayedIdx = playedCount < TOTAL_SLOTS ? playedCount : null;
 
-  function slotCell(i, cellsArr){
+  function slotCell(i, cellsArr, pwEnd, pwClass){
     if(i === firstUnplayedIdx) return `<td class="na">X</td>`;
-    return `<td>${cellsArr[i]}</td>`;
+    const isPw = pwEnd != null && (i+1) === pwEnd;
+    return `<td${isPw ? ` class="${pwClass}" title="Power play"` : ''}>${cellsArr[i]}</td>`;
   }
 
-  const headerEndCells = Array.from({length:8}, (_,i) => `<th>${i+1}</th>`).join('');
-  const team1EndCells = Array.from({length:8}, (_,i) => slotCell(i, cells1)).join('');
-  const team2EndCells = Array.from({length:8}, (_,i) => slotCell(i, cells2)).join('');
-  const deCell1 = slotCell(8, cells1);
-  const deCell2 = slotCell(8, cells2);
+  const headerEndCells = Array.from({length:regularCount}, (_,i) => `<th>${i+1}</th>`).join('');
+  const team1EndCells = Array.from({length:regularCount}, (_,i) => slotCell(i, cells1, m.powerPlay1, 'pw-cell-1')).join('');
+  const team2EndCells = Array.from({length:regularCount}, (_,i) => slotCell(i, cells2, m.powerPlay2, 'pw-cell-2')).join('');
+  const deCell1 = extraEndAllowed ? slotCell(regularCount, cells1, m.powerPlay1, 'pw-cell-1') : '';
+  const deCell2 = extraEndAllowed ? slotCell(regularCount, cells2, m.powerPlay2, 'pw-cell-2') : '';
+  const deHeaderCell = extraEndAllowed ? '<th>DE</th>' : '';
 
   const hammer = (teamNum) => m.pk === teamNum ? `<span class="pk-hammer">🔨</span>` : '';
 
+  const endSlotCount = regularCount + (extraEndAllowed ? 1 : 0);
+  const endColWidthPct = (58 / endSlotCount).toFixed(2);
   const scoreboardHtml = endsArr.length ? `
     <table class="scoreboard-table">
       <colgroup>
-        <col style="width:30%">
-        <col style="width:8%">
-        ${'<col style="width:5.5%">'.repeat(8)}
-        <col style="width:5.5%">
-        <col style="width:8%">
+        <col style="width:26%">
+        <col style="width:6%">
+        ${`<col style="width:${endColWidthPct}%">`.repeat(regularCount)}
+        ${extraEndAllowed ? `<col style="width:${endColWidthPct}%">` : ''}
+        <col style="width:10%">
       </colgroup>
-      <thead><tr><th>Ekipa</th><th>PK</th>${headerEndCells}<th>DE</th><th>Rez.</th></tr></thead>
+      <thead><tr><th>Ekipa</th><th>PK</th>${headerEndCells}${deHeaderCell}<th>Rez.</th></tr></thead>
       <tbody>
         <tr class="team1-row"><td>${escapeHtml(m.team1)}</td><td>${hammer(1)}</td>${team1EndCells}${deCell1}<td>${m.score1 !== null ? m.score1.toFixed(0) : '–'}</td></tr>
         <tr class="team2-row"><td>${escapeHtml(m.team2)}</td><td>${hammer(2)}</td>${team2EndCells}${deCell2}<td>${m.score2 !== null ? m.score2.toFixed(0) : '–'}</td></tr>
@@ -1656,6 +1673,12 @@ async function openMatchModal(id){
     { position: 'Prvi', label: '1' },
     { position: 'Rezerva', label: 'R' },
   ];
+  const MC_POSITIONS = [
+    { position: 'Četvrti', label: '4' },
+    { position: 'Treći', label: '3' },
+    { position: 'Drugi', label: '2' },
+    { position: 'Prvi', label: '1' },
+  ];
   const MP_POSITIONS = [
     { position: 'Prvi', label: 'Ž' },
     { position: 'Drugi', label: 'M' },
@@ -1668,7 +1691,7 @@ async function openMatchModal(id){
   function rosterTableHtml(teamName, roster, dis){
     const total = roster.reduce((s,p) => s + (p.lsd ? p.lsd.distance : 0), 0);
     const totalDisplay = roster.some(p => p.lsd) ? fmtCm(total) : '';
-    const positions = dis === 'MP' ? MP_POSITIONS : CANONICAL_POSITIONS;
+    const positions = dis === 'MP' ? MP_POSITIONS : (dis === 'MC' ? MC_POSITIONS : CANONICAL_POSITIONS);
     const rows = positions.map(slot => {
       const p = roster.find(x => x.position === slot.position);
       if(!p){
@@ -1868,13 +1891,27 @@ function openH2hMatchListModal(entityA, entityB, groupByClub, dis, kat){
     } else {
       score = '–';
     }
-    return `<tr class="clickable-cell" data-match-id="${m.id}"><td>${formatDate(m.date)}</td><td>${DIS_LABELS[m.dis]||m.dis}</td><td>${escapeHtml(m.team1)} - ${escapeHtml(m.team2)}</td><td class="num">${score}</td></tr>`;
+    const team1Html = m.winner === 1 ? `<strong>${escapeHtml(m.team1)}</strong>` : escapeHtml(m.team1);
+    const team2Html = m.winner === 2 ? `<strong>${escapeHtml(m.team2)}</strong>` : escapeHtml(m.team2);
+    return `<tr class="clickable-cell" data-match-id="${m.id}"><td>${formatDate(m.date)}</td><td>${DIS_LABELS[m.dis]||m.dis}</td><td>${team1Html} - ${team2Html}</td><td class="num">${score}</td></tr>`;
   }).join('');
   if(!rowsHtml) rowsHtml = '<tr><td colspan="4" class="empty-mini">Nema pronađenih utakmica.</td></tr>';
 
+  let winsA = 0, draws = 0, winsB = 0;
+  matches.forEach(m => {
+    const e1 = entityName(m.team1);
+    const aIsTeam1 = e1 === entityA;
+    if(m.winner === 1){ if(aIsTeam1) winsA++; else winsB++; }
+    else if(m.winner === 2){ if(aIsTeam1) winsB++; else winsA++; }
+    else if(m.played){ draws++; }
+  });
+  const totalGames = winsA + draws + winsB;
+  const pct = totalGames > 0 ? Math.round(((winsA*2 + draws) / (totalGames*2)) * 100) : 0;
+  const recordText = totalGames > 0 ? ` <span class="h2h-modal-record">${winsA}-${draws}-${winsB} (${pct}%)</span>` : '';
+
   body.innerHTML = `
     <button class="modal-close" onclick="closeModal()">×</button>
-    <h2 class="entity-title">${escapeHtml(entityA)} — ${escapeHtml(entityB)}</h2>
+    <h2 class="entity-title">${escapeHtml(entityA)} — ${escapeHtml(entityB)}${recordText}</h2>
     <table class="achv-table"><thead><tr><th>Datum</th><th>Disciplina</th><th>Utakmica</th><th class="num">Rezultat</th></tr></thead><tbody>${rowsHtml}</tbody></table>
   `;
   body.querySelectorAll('[data-match-id]').forEach(row => {
@@ -1974,9 +2011,21 @@ async function render(){
   const hasExplicitGroups = matches.some(m => m.phase.type === 'group' && m.group !== null);
   const groupKey = m => hasExplicitGroups ? (m.group || '—') : '__single__';
   const groups = hasExplicitGroups ? [...new Set(matches.map(m => m.group).filter(g => g !== null))].sort() : ['__single__'];
+  const legacyMode = season <= 2013; // do sezone 2012-2013: bodovi -> endovi -> kamenovi (umjesto RPP)
+  // Sezona 2017-2018, Mješoviti parovi: poredak se formira zajedno za svih 9 ekipa, ne po skupinama
+  const combinedTableOverride = (season === 2018 && dis === 'MP');
 
   let html = '';
   html += `<div class="tourn-title">Sezona ${seasonLabel(season)}, ${tourn.p}. PHC ${DIS_LABELS[dis] || dis} (${(KAT_LABELS[kat] || kat).toLowerCase()})</div>`;
+
+  const locMatch = matches.find(m => m.city);
+  const dates = matches.map(m => m.date).filter(Boolean).sort();
+  let locDateParts = [];
+  if(locMatch) locDateParts.push([locMatch.city, locMatch.venue].filter(Boolean).join(', '));
+  if(dates.length) locDateParts.push(`od ${formatDate(dates[0])} do ${formatDate(dates[dates.length-1])}`);
+  if(locDateParts.length) html += `<div class="tourn-meta">${locDateParts.join(', ')}</div>`;
+  if(tourn.sustav) html += `<div class="tourn-meta">Sustav natjecanja: ${escapeHtml(tourn.sustav)}</div>`;
+
   html += `<div class="tourn-meta">${tourn.teamsCount || '?'} ekipa &middot; ${matches.length} utakmica</div>`;
 
   // final standings — shown first
@@ -2012,9 +2061,18 @@ async function render(){
     });
 
     html += `<h3 class="group-h">Tablica</h3>`;
-    html += standingsTableHtml(computeGroupStandings(groupMatches));
+    html += combinedTableOverride
+      ? '<div class="note" style="font-size:12.5px; color:var(--text-muted); margin:4px 0 0;">Vidi zajednički poredak svih ekipa ispod.</div>'
+      : standingsTableHtml(computeGroupStandings(groupMatches, legacyMode), legacyMode);
     html += `</section>`;
   });
+
+  if(combinedTableOverride){
+    const allGroupMatches = matches.filter(m => m.phase.type === 'group');
+    html += `<section class="block"><h2 class="section-h">Zajednički poredak (svih ${new Set(allGroupMatches.flatMap(m => [m.team1, m.team2])).size} ekipa)</h2>`;
+    html += standingsTableHtml(computeGroupStandings(allGroupMatches, legacyMode, true), legacyMode);
+    html += `</section>`;
+  }
 
   // playoff
   const playoffMatches = matches.filter(m => m.phase.type === 'playoff');
@@ -2143,55 +2201,92 @@ function formatRpp(v){
   return v.toFixed(1).replace('.', ',');
 }
 
-function computeGroupStandings(matches){
+function computeGroupStandings(matches, legacyMode, skipH2H){
   const table = {};
   function ensure(team){
-    if(!table[team]) table[team] = {team, played:0, points:0, throws:[]};
+    if(!table[team]) table[team] = {team, played:0, points:0, throws:[], endsWon:0, stonesWon:0};
     return table[team];
   }
+  const winsAgainst = {}; // winsAgainst[pobjednik] = Set poraženih
   matches.forEach(m => {
     if(m.winner !== 1 && m.winner !== 2 && !m.played) return; // stvarno neodigrano — ne broji se
     const t1 = ensure(m.team1), t2 = ensure(m.team2);
     t1.played++; t2.played++;
-    if(m.winner === 1){ t1.points += 2; }
-    else if(m.winner === 2){ t2.points += 2; }
-    else { t1.points += 1; t2.points += 1; } // neriješeno — po 1 bod objema ekipama
+    if(m.winner === 1){
+      t1.points += 2;
+      (winsAgainst[m.team1] = winsAgainst[m.team1] || new Set()).add(m.team2);
+    } else if(m.winner === 2){
+      t2.points += 2;
+      (winsAgainst[m.team2] = winsAgainst[m.team2] || new Set()).add(m.team1);
+    } else { t1.points += 1; t2.points += 1; } // neriješeno — po 1 bod objema ekipama
     if(m.throws1 && m.throws1.length) t1.throws.push(...m.throws1);
     if(m.throws2 && m.throws2.length) t2.throws.push(...m.throws2);
-  });
-
-  // head-to-head lookup for tie-break between two teams
-  const h2h = {};
-  matches.forEach(m => {
-    if(m.winner !== 1 && m.winner !== 2) return;
-    const winner = m.winner === 1 ? m.team1 : m.team2;
-    h2h[m.team1 + '|' + m.team2] = winner;
-    h2h[m.team2 + '|' + m.team1] = winner;
+    if(m.score1 != null) t1.stonesWon += m.score1;
+    if(m.score2 != null) t2.stonesWon += m.score2;
+    (m.ends || []).forEach(e => {
+      if(e > 0) t1.endsWon++;
+      else if(e < 0) t2.endsWon++;
+    });
   });
 
   const teams = Object.values(table);
   teams.forEach(t => { t.rpp = trimmedAverage(t.throws); });
 
-  teams.sort((a, b) => {
-    if(b.points !== a.points) return b.points - a.points;
-    const key = a.team + '|' + b.team;
-    if(h2h[key]){
-      if(h2h[key] === a.team) return -1;
-      if(h2h[key] === b.team) return 1;
+  const byPoints = {};
+  teams.forEach(t => { (byPoints[t.points] = byPoints[t.points] || []).push(t); });
+  const pointTiers = Object.keys(byPoints).map(Number).sort((a, b) => b - a);
+
+  const ranked = [];
+  pointTiers.forEach(pts => {
+    const tier = byPoints[pts];
+    if(tier.length > 1){
+      if(legacyMode){
+        // stare sezone (do 2012-2013): bodovi -> endova -> kamenova, bez međusobnog susreta i bez RPP-a
+        tier.sort((a, b) => {
+          if(b.endsWon !== a.endsWon) return b.endsWon - a.endsWon;
+          if(b.stonesWon !== a.stonesWon) return b.stonesWon - a.stonesWon;
+          return a.team.localeCompare(b.team);
+        });
+      } else if(skipH2H){
+        // kombinirani poredak preko vise skupina - medusobni susret nije pouzdan
+        // jer vecina parova uopce nije igrala jedni protiv drugih. Bodovi -> RPP izravno.
+        tier.sort((a, b) => {
+          const da = a.rpp == null ? Infinity : a.rpp;
+          const db = b.rpp == null ? Infinity : b.rpp;
+          if(da !== db) return da - db;
+          return a.team.localeCompare(b.team);
+        });
+      } else {
+        // Poredaj: 1) bodovi, 2) unutar izjednačenih po bodovima - broj pobjeda MEĐU NJIMA, 3) RPP.
+        // Kad je izjednačenih 3+ ekipa, međusobni susret rješava poredak samo ako nije ciklički
+        // (npr. A>B>C>A) — u tom slučaju broj "pod-pobjeda" ostane izjednačen pa se ide na RPP.
+        tier.forEach(t => {
+          t._subWins = tier.reduce((acc, other) => {
+            if(other === t) return acc;
+            return acc + ((winsAgainst[t.team] && winsAgainst[t.team].has(other.team)) ? 1 : 0);
+          }, 0);
+        });
+        tier.sort((a, b) => {
+          if(b._subWins !== a._subWins) return b._subWins - a._subWins;
+          const da = a.rpp == null ? Infinity : a.rpp;
+          const db = b.rpp == null ? Infinity : b.rpp;
+          if(da !== db) return da - db;
+          return a.team.localeCompare(b.team);
+        });
+      }
     }
-    const da = a.rpp == null ? Infinity : a.rpp;
-    const db = b.rpp == null ? Infinity : b.rpp;
-    if(da !== db) return da - db;
-    return a.team.localeCompare(b.team);
+    ranked.push(...tier);
   });
-  return teams;
+  return ranked;
 }
 
-function standingsTableHtml(rows){
+function standingsTableHtml(rows, legacyMode){
   if(rows.length === 0) return '<div class="empty-state">Nema odigranih utakmica.</div>';
-  let h = `<table class="standings"><thead><tr><th>Ekipa</th><th class="num">Utakmica</th><th class="num">Bodova</th><th class="num">RPP</th></tr></thead><tbody>`;
+  const lastCol = legacyMode ? '<th class="num">Endova</th><th class="num">Kamenova</th>' : '<th class="num">RPP</th>';
+  let h = `<table class="standings"><thead><tr><th>Ekipa</th><th class="num">Utakmica</th><th class="num">Bodova</th>${lastCol}</tr></thead><tbody>`;
   rows.forEach((r,i) => {
-    h += `<tr><td><span class="rank">${i+1}</span>${escapeHtml(r.team)}</td><td class="num">${r.played}</td><td class="num">${r.points}</td><td class="num">${formatRpp(r.rpp)}</td></tr>`;
+    const lastCell = legacyMode ? `<td class="num">${r.endsWon}</td><td class="num">${r.stonesWon}</td>` : `<td class="num">${formatRpp(r.rpp)}</td>`;
+    h += `<tr><td><span class="rank">${i+1}</span>${escapeHtml(r.team)}</td><td class="num">${r.played}</td><td class="num">${r.points}</td>${lastCell}</tr>`;
   });
   h += `</tbody></table>`;
   return h;

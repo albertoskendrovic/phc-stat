@@ -2,11 +2,11 @@
 """
 generate-data.py
 
-Pretvara phc-data.xlsx (izvoz iz baze prvenstava) u phc-data.json koji koristi
+Pretvara Export.xlsx (izvoz iz baze prvenstava) u phc-data.json koji koristi
 web aplikacija (index.html).
 
 Upotreba:
-    python3 generate-data.py phc-data.xlsx phc-data.json
+    python3 generate-data.py Export.xlsx phc-data.json
 
 Ako se drugi argument izostavi, izlaz ide u "phc-data.json" u trenutnoj mapi.
 
@@ -113,6 +113,10 @@ def build(export_path, out_path):
     for _, r in d.iterrows():
         ends = []
         oe = int(r['OE']) if pd.notna(r['OE']) else None
+        scheduled_ends = int(r['En']) if pd.notna(r.get('En')) else 8
+        extra_end_allowed = bool(r['EE']) if pd.notna(r.get('EE')) else True
+        pw1 = int(r['Pw1']) if pd.notna(r.get('Pw1')) and r['Pw1'] > 0 else None
+        pw2 = int(r['Pw2']) if pd.notna(r.get('Pw2')) and r['Pw2'] > 0 else None
         for i in range(1, 12):
             v = r.get(f'E{i}')
             if pd.notna(v):
@@ -160,6 +164,8 @@ def build(export_path, out_path):
             'score2': float(r['Kam2']) if pd.notna(r['Kam2']) else None,
             'winner': int(r['Pob']) if r['Pob'] in (1, 2) else None,
             'ends': ends, 'numEnds': oe,
+            'scheduledEnds': scheduled_ends, 'extraEndAllowed': extra_end_allowed,
+            'powerPlay1': pw1, 'powerPlay2': pw2,
             'roster1': roster(r, '1'), 'roster2': roster(r, '2'),
         })
 
@@ -175,6 +181,7 @@ def build(export_path, out_path):
                 'kat': kat, 'katLabel': KAT_LABELS.get(kat, kat),
                 'p': int(r['Prv']),
                 'teamsCount': int(r['BrEkipa']) if pd.notna(r['BrEkipa']) else None,
+                'sustav': str(r['Sustav']).strip() if pd.notna(r.get('Sustav')) else None,
                 'standings': [], 'rosterPool': {},
             }
         t = tournaments[key]
@@ -207,7 +214,7 @@ def build(export_path, out_path):
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        print("Upotreba: python3 generate-data.py phc-data.xlsx [phc-data.json]")
+        print("Upotreba: python3 generate-data.py Export.xlsx [phc-data.json]")
         sys.exit(1)
     export_path = sys.argv[1]
     out_path = sys.argv[2] if len(sys.argv) > 2 else 'phc-data.json'
