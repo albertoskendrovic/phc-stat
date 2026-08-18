@@ -105,12 +105,12 @@
 
   .record-block{margin-bottom:30px;}
   .record-title{font-family:'Space Grotesk', sans-serif; font-size:15px; font-weight:600; color:var(--navy); margin:0 0 10px;}
-  table.records-table{max-width:560px;}
-  table.records-table th:nth-child(1), table.records-table td:nth-child(1){width:16%;}
-  table.records-table th:nth-child(2), table.records-table td:nth-child(2){width:38%;}
-  table.records-table th:nth-child(3), table.records-table td:nth-child(3){width:16%;}
-  table.records-table th:nth-child(4), table.records-table td:nth-child(4){width:16%;}
-  table.records-table th:nth-child(5), table.records-table td:nth-child(5){width:16%;}
+  table.records-table{max-width:760px;}
+  table.records-table th:nth-child(1), table.records-table td:nth-child(1){width:11%;}
+  table.records-table th:nth-child(2), table.records-table td:nth-child(2){width:47%;}
+  table.records-table th:nth-child(3), table.records-table td:nth-child(3){width:14%;}
+  table.records-table th:nth-child(4), table.records-table td:nth-child(4){width:14%;}
+  table.records-table th:nth-child(5), table.records-table td:nth-child(5){width:14%;}
   table.records-table td, table.records-table th{text-align:left;}
   table.records-table td.num-cell, table.records-table th:nth-child(4){text-align:right; font-family:'IBM Plex Mono', monospace;}
   table.records-table td{font-family:'Inter', sans-serif; font-weight:400; font-size:13px;}
@@ -186,9 +186,10 @@
 
   .pdf-preview-block{margin-top:20px;}
   .pdf-preview-label{font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:14px; color:var(--navy); margin-bottom:8px;}
-  .pdf-embed{width:100%; height:480px; border:1.5px solid var(--sheet-line); border-radius:8px; background:var(--ice-2); display:block;}
+  .zapisnik-static-wrap{width:100%; line-height:0;}
+  .zapisnik-static-wrap canvas{display:block; width:100%; height:auto; box-sizing:border-box; border:1px solid #111;}
+  .zapisnik-loading{display:flex; align-items:center; justify-content:center; height:200px; background:var(--ice-2); color:var(--text-muted); font-size:13px; border-radius:4px;}
   .pdf-fallback-link{margin-top:10px;}
-  .pdf-mobile-btn{display:none;}
   .doc-link{display:inline-flex; align-items:center; gap:8px; padding:9px 14px; background:var(--white); border:1.5px solid var(--sheet-line); border-radius:8px; font-size:13px; color:var(--navy-2); text-decoration:none; font-family:'Inter', sans-serif;}
   .doc-link:hover{border-color:var(--navy-2);}
 
@@ -251,11 +252,6 @@
   .player-badge-row .badge-icon{width:22px; height:22px;}
   .place-cell{display:inline-flex; align-items:center; justify-content:flex-end; gap:4px;}
   .place-medal{display:inline-block; width:16px; text-align:left;}
-
-  @media (max-width:600px){
-    .pdf-desktop-view{display:none;}
-    .pdf-mobile-btn{display:inline-flex;}
-  }
 
 
   :root{
@@ -332,9 +328,10 @@
   .doc-link .ic{font-size:15px;}
   .pdf-preview-block{margin-top:20px;}
   .pdf-preview-label{font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:14px; color:var(--navy); margin-bottom:8px;}
-  .pdf-embed{width:100%; height:480px; border:1.5px solid var(--sheet-line); border-radius:8px; background:var(--ice-2); display:block;}
+  .zapisnik-static-wrap{width:100%; line-height:0;}
+  .zapisnik-static-wrap canvas{display:block; width:100%; height:auto; box-sizing:border-box; border:1px solid #111;}
+  .zapisnik-loading{display:flex; align-items:center; justify-content:center; height:200px; background:var(--ice-2); color:var(--text-muted); font-size:13px; border-radius:4px;}
   .pdf-fallback-link{margin-top:10px;}
-  .pdf-mobile-btn{display:none;}
   .modal h2.entity-title{font-family:'Space Grotesk', sans-serif; font-size:19px; margin:0 0 16px; color:var(--navy);}
   .h2h-modal-record{font-family:'IBM Plex Mono', monospace; font-size:13px; font-weight:400; color:var(--text-muted);}
 
@@ -380,8 +377,6 @@
   footer{text-align:center; padding:30px 24px; color:var(--text-muted); font-size:12.5px;}
   @media (max-width:600px){
     .match-row{grid-template-columns: 60px 1fr auto 1fr 16px; font-size:12.5px;}
-    .pdf-desktop-view{display:none;}
-    .pdf-mobile-btn{display:inline-flex;}
     .badge-grid{grid-template-columns:repeat(4, 1fr); gap:10px;}
     .badge-item .badge-icon{width:48px; height:48px;}
     .badge-tier-cols{flex-direction:column; gap:18px;}
@@ -524,6 +519,7 @@
 </div>
 
 <script src="badges-data.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
 
 const DIS_ORDER = ['M', 'Ž', 'MC', 'MP'];
@@ -920,6 +916,38 @@ function recordsTableHtml(rows, valueLabel){
   return h;
 }
 
+// Za svaku utakmicu koju je "winner" na kraju dobio, prati kumulativni rezultat nakon svakog enda
+// i pronalazi najveći zaostatak koji je pobjednik u nekom trenutku imao.
+// Poredak: primarno po veličini zaostatka; kod izjednačenja veći margin konačne pobjede je bolji;
+// ako je i to isto, prednost ima kasniji trenutak najvećeg zaostatka.
+function computeComebacks(matches, n){
+  const results = [];
+  matches.forEach(m => {
+    const ends = m.ends || [];
+    if(!ends.length) return;
+    if(m.winner !== 1 && m.winner !== 2) return;
+
+    let s1 = 0, s2 = 0;
+    let maxDeficit = 0, maxDeficitEnd = null;
+    ends.forEach((e, idx) => {
+      if(e > 0) s1 += e;
+      else if(e < 0) s2 += -e;
+      const deficit = m.winner === 1 ? (s2 - s1) : (s1 - s2);
+      if(deficit >= maxDeficit){
+        maxDeficit = deficit;
+        maxDeficitEnd = idx + 1;
+      }
+    });
+    if(maxDeficit <= 0) return; // pobjednik nikad nije bio u zaostatku — nije preokret
+
+    const margin = Math.abs(m.score1 - m.score2);
+    results.push({ m, deficit: maxDeficit, deficitEnd: maxDeficitEnd, margin });
+  });
+
+  results.sort((a,b) => b.deficit - a.deficit || b.margin - a.margin || b.deficitEnd - a.deficitEnd || (b.m.date||'').localeCompare(a.m.date||''));
+  return results.slice(0, n);
+}
+
 function renderRekordi(){
   const kat = currentState().kat;
   const dis = currentState().dis;
@@ -948,20 +976,15 @@ function renderRekordi(){
   html += recordsTableHtml(margin.map(x => toRow(x.m, x.val.toFixed(0))), 'Razlika');
   html += `</div>`;
 
-  const mostStones = topN(played, m => m.score1 + m.score2, 5);
-  html += `<div class="record-block"><h3 class="record-title">Utakmice s najviše kamena</h3>`;
-  html += recordsTableHtml(mostStones.map(x => toRow(x.m, x.val.toFixed(0))), 'Ukupno kamena');
-  html += `</div>`;
-
-  let leastStones = played.map(m => ({m, val: m.score1 + m.score2})).sort((a,b) => a.val - b.val || (b.m.date||'').localeCompare(a.m.date||'')).slice(0,5);
-  html += `<div class="record-block"><h3 class="record-title">Utakmice s najmanje kamena</h3>`;
-  html += recordsTableHtml(leastStones.map(x => toRow(x.m, x.val.toFixed(0))), 'Ukupno kamena');
-  html += `</div>`;
-
   const steals = topN(played, m => countSteals(m), 5);
   html += `<div class="record-block"><h3 class="record-title">Utakmice s najviše ukradenih endova</h3>`;
   html += recordsTableHtml(steals.map(x => toRow(x.m, x.val)), 'Ukradenih endova');
   html += `<div class="note" style="font-size:11.5px; color:var(--text-muted); margin-top:6px;">Ukraden end = end koji je osvojila ekipa bez hammera (nije imala posljednji kamen tog enda).</div>`;
+  html += `</div>`;
+
+  const comebacks = computeComebacks(played, 5);
+  html += `<div class="record-block"><h3 class="record-title">Najveći preokreti</h3>`;
+  html += recordsTableHtml(comebacks.map(c => toRow(c.m, c.deficit)), 'Najveći zaostatak');
   html += `</div>`;
 
   const endRecords = [];
@@ -972,6 +995,16 @@ function renderRekordi(){
   let topEnds = endRecords.slice(0,5);
   html += `<div class="record-block"><h3 class="record-title">Najviše kamena u jednom endu</h3>`;
   html += recordsTableHtml(topEnds.map(x => toRow(x.m, x.val)), 'Kamena u endu');
+  html += `</div>`;
+
+  const mostStones = topN(played, m => m.score1 + m.score2, 5);
+  html += `<div class="record-block"><h3 class="record-title">Utakmice s najviše kamena</h3>`;
+  html += recordsTableHtml(mostStones.map(x => toRow(x.m, x.val.toFixed(0))), 'Ukupno kamena');
+  html += `</div>`;
+
+  let leastStones = played.map(m => ({m, val: m.score1 + m.score2})).sort((a,b) => a.val - b.val || (b.m.date||'').localeCompare(a.m.date||'')).slice(0,5);
+  html += `<div class="record-block"><h3 class="record-title">Utakmice s najmanje kamena</h3>`;
+  html += recordsTableHtml(leastStones.map(x => toRow(x.m, x.val.toFixed(0))), 'Ukupno kamena');
   html += `</div>`;
 
   content.innerHTML = html;
@@ -1558,6 +1591,20 @@ async function fileExists(url){
   }
 }
 
+// Provjerava do maxCount numeriranih datoteka ISTOVREMENO (ne jednu za drugom), pa vrati
+// samo one od 1. redom dok ne naiđe na prvu koja ne postoji (npr. 1.jpg, 2.jpg, ... do rupe)
+async function findSequentialFiles(pathFn, maxCount){
+  const checks = await Promise.all(
+    Array.from({length: maxCount}, (_, idx) => fileExists(pathFn(idx + 1)))
+  );
+  const files = [];
+  for(let i = 0; i < maxCount; i++){
+    if(!checks[i]) break;
+    files.push(pathFn(i + 1));
+  }
+  return files;
+}
+
 // Učitava tekstualnu datoteku s natpisima (npr. "foto.txt"), formata:
 //   3: Brončana medalja: Vis
 // Vraća objekt {3: "Brončana medalja: Vis", ...} ili prazan objekt ako datoteka ne postoji.
@@ -1591,6 +1638,48 @@ function zapisnikPath(m){
   return `${DATA_BASE}/${seasonTag}/${m.dis}-${m.kat}/${filename}`;
 }
 
+if (window.pdfjsLib) {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+
+// Renderira prvu stranicu PDF zapisnika kao statičnu sliku (canvas) unutar wrapEl,
+// bez ikakvih PDF kontrola (zum, navigacija stranica i sl.) — širina prati širinu wrapEl-a.
+async function renderZapisnikCanvas(pdfUrl, wrapEl){
+  try {
+    const loadingTask = pdfjsLib.getDocument(pdfUrl);
+    const pdf = await loadingTask.promise;
+    const page = await pdf.getPage(1);
+
+    const cssWidth = wrapEl.clientWidth;
+    const baseViewport = page.getViewport({ scale: 1 });
+    const scale = cssWidth / baseViewport.width;
+    const outputScale = window.devicePixelRatio || 1;
+    const viewport = page.getViewport({ scale: scale * outputScale });
+
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.floor(viewport.width);
+    canvas.height = Math.floor(viewport.height);
+
+    const ctx = canvas.getContext('2d');
+    await page.render({ canvasContext: ctx, viewport }).promise;
+
+    wrapEl.innerHTML = '';
+    wrapEl.appendChild(canvas);
+  } catch(e){
+    wrapEl.innerHTML = '<div class="zapisnik-loading">Zapisnik se trenutno ne može prikazati.</div>';
+    console.error('Greška pri renderiranju zapisnika:', e);
+  }
+}
+
+// Prvenstvo ima "prave" skupine samo ako postoji barem jedna utakmica s oznakom
+// različitom od "A" (ili prazno) — samo "A"/prazno posvuda znači da skupina zapravo nema
+function tournamentHasExplicitGroups(m){
+  return DATA.matches.some(x =>
+    x.season === m.season && x.dis === m.dis && x.kat === m.kat && x.p === m.p &&
+    x.phase.type === 'group' && x.group !== null && x.group !== 'A'
+  );
+}
+
 async function openMatchModal(id){
   const m = DATA.matches.find(x => x.id === id);
   if(!m) return;
@@ -1598,7 +1687,7 @@ async function openMatchModal(id){
   const body = document.getElementById('modalBody');
   body.classList.remove('modal-wide');
 
-  const utakmicaLine = m.group ? `Skupina ${m.group}, ${m.phase.label}` : m.phase.label;
+  const utakmicaLine = (m.group && tournamentHasExplicitGroups(m)) ? `Skupina ${m.group}, ${m.phase.label}` : m.phase.label;
   const timeShort = m.time ? m.time.slice(0,5) : '';
   const mjestoParts = [m.city, m.venue, m.rink ? `staza ${m.rink}` : null].filter(Boolean);
 
@@ -1649,7 +1738,14 @@ async function openMatchModal(id){
 
   const endSlotCount = regularCount + (extraEndAllowed ? 1 : 0);
   const endColWidthPct = (58 / endSlotCount).toFixed(2);
-  const scoreboardHtml = endsArr.length ? `
+  let scoreboardHtml;
+  if(endsArr.length){
+    const noFinalScore = m.score1 === null || m.score2 === null;
+    const isForfeit = noFinalScore && (m.winner === 1 || m.winner === 2);
+    const rezCell1 = m.score1 !== null ? m.score1.toFixed(0) : (isForfeit ? (m.winner === 1 ? 'W' : 'L') : '–');
+    const rezCell2 = m.score2 !== null ? m.score2.toFixed(0) : (isForfeit ? (m.winner === 2 ? 'W' : 'L') : '–');
+    const forfeitNote = isForfeit ? `<div class="note" style="font-size:11.5px; color:var(--text-muted); margin-top:6px;">Utakmica prekinuta nakon ${endsArr.length}. enda i odlučena predajom (istek vremena) — konačan rezultat po kamenovima se ne evidentira.</div>` : '';
+    scoreboardHtml = `
     <table class="scoreboard-table">
       <colgroup>
         <col style="width:26%">
@@ -1660,11 +1756,31 @@ async function openMatchModal(id){
       </colgroup>
       <thead><tr><th>Ekipa</th><th>PK</th>${headerEndCells}${deHeaderCell}<th>Rez.</th></tr></thead>
       <tbody>
-        <tr class="team1-row"><td>${escapeHtml(m.team1)}</td><td>${hammer(1)}</td>${team1EndCells}${deCell1}<td>${m.score1 !== null ? m.score1.toFixed(0) : '–'}</td></tr>
-        <tr class="team2-row"><td>${escapeHtml(m.team2)}</td><td>${hammer(2)}</td>${team2EndCells}${deCell2}<td>${m.score2 !== null ? m.score2.toFixed(0) : '–'}</td></tr>
+        <tr class="team1-row"><td>${escapeHtml(m.team1)}</td><td>${hammer(1)}</td>${team1EndCells}${deCell1}<td>${rezCell1}</td></tr>
+        <tr class="team2-row"><td>${escapeHtml(m.team2)}</td><td>${hammer(2)}</td>${team2EndCells}${deCell2}<td>${rezCell2}</td></tr>
       </tbody>
     </table>
-  ` : `<div class="empty-state">Nema podataka o rezultatu po endovima.</div>`;
+    ${forfeitNote}
+  `;
+  } else if(m.played && (m.winner === 1 || m.winner === 2)){
+    // odigrana utakmica prekinuta prije kraja (npr. istek vremena) — rezultat po endovima/kamenovima
+    // se ne evidentira, prikazuje se samo konačna odluka W/L
+    const s1 = m.winner === 1 ? 'W' : 'L';
+    const s2 = m.winner === 2 ? 'W' : 'L';
+    const endsNote = m.numEnds ? ` nakon ${m.numEnds}. enda` : '';
+    scoreboardHtml = `
+    <table class="scoreboard-table">
+      <thead><tr><th>Ekipa</th><th>Rez.</th></tr></thead>
+      <tbody>
+        <tr class="team1-row"><td>${escapeHtml(m.team1)}</td><td>${s1}</td></tr>
+        <tr class="team2-row"><td>${escapeHtml(m.team2)}</td><td>${s2}</td></tr>
+      </tbody>
+    </table>
+    <div class="note" style="font-size:11.5px; color:var(--text-muted); margin-top:6px;">Utakmica prekinuta${endsNote} i odlučena predajom (istek vremena) — rezultat po endovima i kamenovima se ne evidentira.</div>
+  `;
+  } else {
+    scoreboardHtml = `<div class="empty-state">Nema podataka o rezultatu po endovima.</div>`;
+  }
 
   const CANONICAL_POSITIONS = [
     { position: 'Četvrti', label: '4' },
@@ -1711,12 +1827,9 @@ async function openMatchModal(id){
   const zapisnikOk = await fileExists(zapisnikHref);
   const pdfBlockHtml = zapisnikOk ? `
     <div class="pdf-preview-block">
-      <div class="pdf-preview-label">📄 Zapisnik</div>
-      <div class="pdf-desktop-view">
-        <iframe class="pdf-embed" src="${zapisnikHref}" title="Zapisnik s utakmice"></iframe>
-        <a class="doc-link pdf-fallback-link" href="${zapisnikHref}" target="_blank" rel="noopener">Otvori u novom prozoru / preuzmi</a>
-      </div>
-      <a class="doc-link pdf-mobile-btn" href="${zapisnikHref}" target="_blank" rel="noopener"><span class="ic">📄</span> Otvori zapisnik</a>
+      <div class="pdf-preview-label">📄 Skenirani zapisnik s utakmice</div>
+      <div class="zapisnik-static-wrap" id="zapisnikWrap"><div class="zapisnik-loading">Učitavanje zapisnika…</div></div>
+      <a class="doc-link pdf-fallback-link" href="${zapisnikHref}" target="_blank" rel="noopener">Otvori u novom prozoru</a>
     </div>
   ` : '';
 
@@ -1728,6 +1841,11 @@ async function openMatchModal(id){
     ${pdfBlockHtml}
   `;
   overlay.classList.add('open');
+
+  if(zapisnikOk){
+    const wrapEl = document.getElementById('zapisnikWrap');
+    if(wrapEl) renderZapisnikCanvas(zapisnikHref, wrapEl);
+  }
 }
 
 function closeModal(){
@@ -1886,7 +2004,7 @@ function openH2hMatchListModal(entityA, entityB, groupByClub, dis, kat){
     let score;
     if(m.score1 != null && m.score2 != null){
       score = `${m.score1.toFixed(0)}:${m.score2.toFixed(0)}`;
-    } else if(!m.played && (m.winner === 1 || m.winner === 2)){
+    } else if(m.winner === 1 || m.winner === 2){
       score = m.winner === 1 ? 'W:L' : 'L:W';
     } else {
       score = '–';
@@ -2008,7 +2126,7 @@ async function render(){
   }
 
   const matches = DATA.matches.filter(m => m.season === season && m.dis === dis && m.p === tourn.p && m.kat === kat);
-  const hasExplicitGroups = matches.some(m => m.phase.type === 'group' && m.group !== null);
+  const hasExplicitGroups = matches.some(m => m.phase.type === 'group' && m.group !== null && m.group !== 'A');
   const groupKey = m => hasExplicitGroups ? (m.group || '—') : '__single__';
   const groups = hasExplicitGroups ? [...new Set(matches.map(m => m.group).filter(g => g !== null))].sort() : ['__single__'];
   const legacyMode = season <= 2013; // do sezone 2012-2013: bodovi -> endovi -> kamenovi (umjesto RPP)
@@ -2110,14 +2228,9 @@ async function render(){
     </section>`;
   }
 
-  // photos — numerirane 1.jpg, 2.jpg... u istoj mapi; provjeravamo redom dok ne
-  // naiđemo na prvi broj koji ne postoji
-  const photos = [];
-  for(let i = 1; i <= 60; i++){
-    const path = `${tournFolder}/${i}.jpg`;
-    if(await fileExists(path)) photos.push(path);
-    else break;
-  }
+  // photos — numerirane 1.jpg, 2.jpg... u istoj mapi; sve provjere idu istovremeno pa
+  // uzimamo redom od 1. dok ne naiđemo na prvu rupu
+  const photos = await findSequentialFiles(i => `${tournFolder}/${i}.jpg`, 50);
   let photoCaptions = {};
   if(photos.length){
     photoCaptions = await loadCaptions(`${tournFolder}/foto.txt`);
@@ -2130,12 +2243,7 @@ async function render(){
   }
 
   // videi — numerirani 1.mp4, 2.mp4... isti princip kao fotografije
-  const videos = [];
-  for(let i = 1; i <= 60; i++){
-    const path = `${tournFolder}/${i}.mp4`;
-    if(await fileExists(path)) videos.push(path);
-    else break;
-  }
+  const videos = await findSequentialFiles(i => `${tournFolder}/${i}.mp4`, 50);
   let videoCaptions = {};
   if(videos.length){
     videoCaptions = await loadCaptions(`${tournFolder}/video.txt`);
@@ -2169,8 +2277,9 @@ function matchRowHtml(m){
   let scoreHtml;
   if(m.played && m.score1 !== null){
     scoreHtml = `<div class="match-score">${m.score1.toFixed(0)} : ${m.score2.toFixed(0)}</div>`;
-  } else if(!m.played && (m.winner === 1 || m.winner === 2)){
-    // registrirana, ali neodigrana utakmica s poznatim pobjednikom (npr. predaja) — pobjednik ipak dobiva 2 boda
+  } else if(m.winner === 1 || m.winner === 2){
+    // poznat pobjednik bez rezultata po kamenovima — bilo neodigrana utakmica s predajom prije početka,
+    // bilo prekinuta usred utakmice (npr. istek vremena) — u oba slučaja pobjednik dobiva 2 boda
     const s1 = m.winner === 1 ? 'W' : 'L';
     const s2 = m.winner === 2 ? 'W' : 'L';
     scoreHtml = `<div class="match-score">${s1} : ${s2}</div>`;
