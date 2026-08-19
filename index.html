@@ -116,6 +116,10 @@
   table.records-table td{font-family:'Inter', sans-serif; font-weight:400; font-size:13px;}
 
   .h2h-wrap{overflow-x:auto; overflow-y:hidden; border-radius:10px;}
+  /* Samo za glavne tablice (Klubovi/Ekipe/Igrači) - omotač dobiva vlastitu ograničenu visinu
+     i vlastiti scroll (i vodoravno i okomito), čime sticky zaglavlje ispravno ostaje prikovano
+     za vrh dok se scrolla unutar te "kutije", umjesto da nestane pri scrollanju cijele stranice. */
+  .h2h-wrap.scroll-limited{overflow:auto; max-height:70vh;}
   table.h2h-table{width:100%; table-layout:fixed; border-collapse:collapse; background:var(--white); border-radius:10px; overflow:hidden; box-shadow:0 0 0 1px var(--sheet-line); font-size:11.5px;}
   table.h2h-table th, table.h2h-table td{padding:6px 4px; text-align:center; border:1px solid var(--ice-2); overflow-wrap:break-word;}
   table.h2h-table th:first-child, table.h2h-table td:first-child{width:130px;}
@@ -131,6 +135,7 @@
   table.ekipe-table th{font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:10.5px; background:var(--ice-2); color:var(--navy); text-align:center; white-space:normal; max-width:80px;}
   table.ekipe-table td.ekipe-rank, table.ekipe-table th.ekipe-rank{text-align:center; color:var(--text-muted); font-family:'IBM Plex Mono', monospace; position:sticky; left:0; background:var(--white); z-index:2; width:44px; min-width:44px; max-width:44px;}
   table.ekipe-table td.ekipe-name, table.ekipe-table th.ekipe-name{text-align:left; font-family:'Space Grotesk', sans-serif; font-weight:600; color:var(--navy); position:sticky; left:44px; background:var(--white); z-index:1; box-shadow:2px 0 4px -2px rgba(0,0,0,0.15);}
+  table.ekipe-table thead th{position:sticky; top:0; z-index:2;}
   table.ekipe-table thead th.ekipe-rank, table.ekipe-table thead th.ekipe-name{background:var(--ice-2); z-index:3;}
   .top-scrollbar{overflow-x:auto; overflow-y:hidden; height:14px;}
   .top-scrollbar-spacer{height:1px;}
@@ -250,6 +255,23 @@
   .badge-tier-list-item{padding:3px 0; font-size:12.5px;}
   .player-badge-row{display:flex; align-items:center; gap:4px; flex-wrap:wrap; margin-bottom:14px;}
   .player-badge-row .badge-icon{width:22px; height:22px;}
+  .badge-icon[data-tip]{position:relative; cursor:pointer;}
+  .badge-icon[data-tip]::after{
+    content: attr(data-tip);
+    position:absolute; bottom:calc(100% + 7px); left:50%; transform:translateX(-50%);
+    background:var(--navy); color:#fff; font-size:11px; font-family:'Inter', sans-serif; font-weight:500;
+    padding:5px 9px; border-radius:6px; white-space:nowrap; pointer-events:none;
+    opacity:0; visibility:hidden; transition:opacity 0.15s ease; z-index:60;
+  }
+  .badge-icon[data-tip]::before{
+    content:''; position:absolute; bottom:calc(100% + 2px); left:50%; transform:translateX(-50%);
+    border:5px solid transparent; border-top-color:var(--navy);
+    opacity:0; visibility:hidden; transition:opacity 0.15s ease; z-index:60;
+  }
+  .badge-icon[data-tip]:hover::after, .badge-icon[data-tip]:hover::before,
+  .badge-icon[data-tip].tip-active::after, .badge-icon[data-tip].tip-active::before{
+    opacity:1; visibility:visible;
+  }
   .place-cell{display:inline-flex; align-items:center; justify-content:flex-end; gap:4px;}
   .place-medal{display:inline-block; width:16px; text-align:left;}
 
@@ -1091,7 +1113,7 @@ function openNhcBreakdownModal(name, groupByClub, kat, dis, isPlayer, anchorSeas
   } else {
     tableHtml = `<div class="achv-table-scroll"><table class="achv-table"><thead><tr>
       <th>Sezona</th><th>Disciplina</th><th>Kategorija</th><th class="num">Mjesto</th>
-      <th class="num">Broj ekipa</th><th class="num">Bodovi</th><th class="num">Težina sezone</th><th class="num">NHC bodova</th>
+      <th class="num">Broj ekipa</th><th class="num">Bodovi</th><th class="num">Težinski faktor sezone</th><th class="num">NHC bodova</th>
     </tr></thead><tbody>`;
     rows.forEach(r => {
       tableHtml += `<tr>
@@ -1301,7 +1323,7 @@ function renderEkipeOrKlubovi(groupByClub, contentElId){
   const placementKeys = new Set(['p4','p5','p6','p7','p8','p9']);
   cols = cols.filter(c => !placementKeys.has(c.k) || rows.some(r => r[c.k]));
 
-  let html = '<div class="h2h-wrap"><table class="ekipe-table"><thead><tr><th class="ekipe-rank"></th><th class="ekipe-name">Naziv</th>';
+  let html = '<div class="h2h-wrap scroll-limited"><table class="ekipe-table"><thead><tr><th class="ekipe-rank"></th><th class="ekipe-name">Naziv</th>';
   html += cols.map(c => `<th>${c.label}</th>`).join('');
   html += '<th>Tamni / Svijetli</th><th>PK (posl. kamen 1. enda)</th><th>Precizno polaganje prosjek (cm)</th>';
   html += '</tr></thead><tbody>';
@@ -1476,7 +1498,7 @@ function renderIgraci(){
     cols = cols.filter(c => !mpExclude.has(c.k));
   }
 
-  let html = '<div class="h2h-wrap"><table class="ekipe-table"><thead><tr><th class="ekipe-rank"></th><th class="ekipe-name">Ime i prezime</th>';
+  let html = '<div class="h2h-wrap scroll-limited"><table class="ekipe-table"><thead><tr><th class="ekipe-rank"></th><th class="ekipe-name">Ime i prezime</th>';
   html += cols.map(c => `<th>${c.label}</th>`).join('');
   html += '</tr></thead><tbody>';
 
@@ -1816,7 +1838,7 @@ async function openMatchModal(id){
       const roleShort = p.role === 'Skip' ? 'S' : (p.role === 'Vice-skip' ? 'V' : '');
       const rotIcon = p.lsd ? (p.lsd.rotation === 'D' ? '↻' : '↺') : '';
       const dist = p.lsd ? fmtCm(p.lsd.distance) : '';
-      return `<tr><td><span class="order-circle">${slot.label}</span></td><td class="rot">${roleShort ? `<span class="role-tag">${roleShort}</span>` : ''}</td><td>${escapeHtml(p.name)}</td><td class="rot">${rotIcon}</td><td class="num">${dist}</td></tr>`;
+      return `<tr><td><span class="order-circle">${slot.label}</span></td><td class="rot">${roleShort ? `<span class="role-tag">${roleShort}</span>` : ''}</td><td class="clickable-cell" data-player-name="${escapeHtml(p.name)}">${escapeHtml(p.name)}</td><td class="rot">${rotIcon}</td><td class="num">${dist}</td></tr>`;
     }).join('');
     return `<table class="roster-table"><thead><tr><th colspan="4">${escapeHtml(teamName)}</th><th class="num">${totalDisplay}</th></tr></thead><tbody>${rows}</tbody></table>`;
   }
@@ -1842,13 +1864,32 @@ async function openMatchModal(id){
   `;
   overlay.classList.add('open');
 
+  body.querySelectorAll('[data-player-name]').forEach(el => {
+    el.addEventListener('click', () => {
+      _modalStack.push(() => openMatchModal(id));
+      // puni raspon (sve sezone/discipline/kategorije) — utakmica nema svoj vlastiti filter
+      // pa igračev prozor prikazuje cjelokupnu karijeru, neovisno o filteru stranice s koje se došlo
+      openPlayerModal(el.dataset.playerName, 'sve', 'sve', MIN_SEASON, MAX_SEASON);
+    });
+  });
+
   if(zapisnikOk){
     const wrapEl = document.getElementById('zapisnikWrap');
     if(wrapEl) renderZapisnikCanvas(zapisnikHref, wrapEl);
   }
 }
 
+// Jednostavan "stack" za ugniježđene modale: kad se iz jednog modala otvori drugi (npr. sastav
+// ekipe iz popisa postignuća), prethodni prikaz se sprema ovdje. closeModal() prvo pokuša vratiti
+// na prethodni prikaz umjesto potpunog zatvaranja — potpuno se zatvara tek kad je stog prazan.
+let _modalStack = [];
+
 function closeModal(){
+  if(_modalStack.length > 0){
+    const restorePrevious = _modalStack.pop();
+    restorePrevious();
+    return;
+  }
   document.getElementById('modalOverlay').classList.remove('open');
   _lightboxPhotos = [];
   _lightboxCaptions = {};
@@ -1859,6 +1900,17 @@ function closeModal(){
 }
 document.getElementById('modalOverlay').addEventListener('click', (e) => {
   if(e.target.id === 'modalOverlay') closeModal();
+});
+
+// Tooltip bedža: na desktopu se prikazuje na hover (CSS :hover), a na dodir/klik (mobitel bez miša)
+// prebacuje se klasa .tip-active koja isto pokazuje tooltip. Jedan delegirani listener na cijelom
+// dokumentu — radi i za bedževe koji se tek naknadno pojave (npr. otvaranjem prozora igrača).
+document.addEventListener('click', (e) => {
+  const badge = e.target.closest('.badge-icon[data-tip]');
+  document.querySelectorAll('.badge-icon.tip-active').forEach(el => {
+    if(el !== badge) el.classList.remove('tip-active');
+  });
+  if(badge) badge.classList.toggle('tip-active');
 });
 
 // ===================== Detalji kluba / ekipe / igrača =====================
@@ -1900,7 +1952,7 @@ function getPlayerTournamentHistory(name, kat, dis, seasonFrom, seasonTo){
 
 const MEDAL_ICONS = {1:'🥇',2:'🥈',3:'🥉'};
 
-function achvTableHtml(history, teamColLabel){
+function achvTableHtml(history, teamColLabel, clickableRoster){
   if(history.length === 0) return '<div class="empty-mini">Nema podataka o nastupima.</div>';
   let h = `<table class="achv-table"><thead><tr><th>Sezona</th><th>Disciplina</th><th>Kategorija</th>${teamColLabel ? `<th>${teamColLabel}</th>` : ''}<th class="num">Mjesto</th></tr></thead><tbody>`;
   history.forEach(r => {
@@ -1908,7 +1960,11 @@ function achvTableHtml(history, teamColLabel){
     const placeCell = r.place != null
       ? `<span class="place-cell"><span class="place-num">${r.place}.</span><span class="place-medal">${medal}</span></span>`
       : '–';
-    h += `<tr><td>${seasonLabel(r.season)}</td><td>${DIS_LABELS[r.dis]||r.dis}</td><td>${KAT_LABELS[r.kat]||r.kat}</td>${teamColLabel ? `<td>${escapeHtml(r.team||r.teamName)}</td>` : ''}<td class="num">${placeCell}</td></tr>`;
+    const teamName = r.team || r.teamName;
+    const rowAttrs = clickableRoster
+      ? ` class="clickable-cell" data-roster-season="${r.season}" data-roster-dis="${escapeHtml(r.dis)}" data-roster-kat="${escapeHtml(r.kat)}" data-roster-p="${r.p}" data-roster-team="${escapeHtml(teamName)}"`
+      : '';
+    h += `<tr${rowAttrs}><td>${seasonLabel(r.season)}</td><td>${DIS_LABELS[r.dis]||r.dis}</td><td>${KAT_LABELS[r.kat]||r.kat}</td>${teamColLabel ? `<td>${escapeHtml(teamName)}</td>` : ''}<td class="num">${placeCell}</td></tr>`;
   });
   h += '</tbody></table>';
   return h;
@@ -1947,10 +2003,25 @@ function openEntityModal(name, groupByClub, kat, dis, seasonFrom, seasonTo){
     <h2 class="entity-title">${escapeHtml(name)}</h2>
     ${summaryHtml}
     <h3 class="group-h" style="margin-top:0;">Postignuća kroz sezone</h3>
-    ${achvTableHtml(history, null)}
+    ${achvTableHtml(history, null, true)}
   `;
   overlay.classList.add('open');
+
+  body.querySelectorAll('[data-roster-team]').forEach(el => {
+    el.addEventListener('click', () => {
+      const s = Number(el.dataset.rosterSeason);
+      const d = el.dataset.rosterDis;
+      const k = el.dataset.rosterKat;
+      const p = Number(el.dataset.rosterP);
+      const tourn = DATA.tournaments.find(t => t.season === s && t.dis === d && t.kat === k && t.p === p);
+      if(!tourn) return;
+      _modalStack.push(() => openEntityModal(name, groupByClub, kat, dis, seasonFrom, seasonTo));
+      openTeamRosterModal(el.dataset.rosterTeam, tourn, s, d, k);
+    });
+  });
 }
+
+const BADGE_TIER_LABELS = {zlatni: 'Zlatna značka', srebrni: 'Srebrna značka', broncani: 'Brončana značka'};
 
 function openPlayerModal(name, kat, dis, seasonFrom, seasonTo){
   const overlay = document.getElementById('modalOverlay');
@@ -1962,7 +2033,7 @@ function openPlayerModal(name, kat, dis, seasonFrom, seasonTo){
 
   const earnedBadges = playerBadges(name);
   const badgesHtml = earnedBadges.length
-    ? earnedBadges.map(e => `<span class="badge-icon" title="${escapeHtml(e.badge)} (${e.tier})">${BADGE_ICONS[e.badge][e.tier]}</span>`).join('')
+    ? earnedBadges.map(e => `<span class="badge-icon" data-tip="${escapeHtml(e.badge)} - ${BADGE_TIER_LABELS[e.tier]}">${BADGE_ICONS[e.badge][e.tier]}</span>`).join('')
     : '';
 
   const summaryHtml = `
@@ -1978,9 +2049,22 @@ function openPlayerModal(name, kat, dis, seasonFrom, seasonTo){
     ${badgesHtml ? `<div class="player-badge-row">${badgesHtml}</div>` : ''}
     ${summaryHtml}
     <h3 class="group-h" style="margin-top:0;">Postignuća kroz sezone</h3>
-    ${achvTableHtml(history, 'Ekipa')}
+    ${achvTableHtml(history, 'Ekipa', true)}
   `;
   overlay.classList.add('open');
+
+  body.querySelectorAll('[data-roster-team]').forEach(el => {
+    el.addEventListener('click', () => {
+      const s = Number(el.dataset.rosterSeason);
+      const d = el.dataset.rosterDis;
+      const k = el.dataset.rosterKat;
+      const p = Number(el.dataset.rosterP);
+      const tourn = DATA.tournaments.find(t => t.season === s && t.dis === d && t.kat === k && t.p === p);
+      if(!tourn) return;
+      _modalStack.push(() => openPlayerModal(name, kat, dis, seasonFrom, seasonTo));
+      openTeamRosterModal(el.dataset.rosterTeam, tourn, s, d, k);
+    });
+  });
 }
 
 function openH2hMatchListModal(entityA, entityB, groupByClub, dis, kat){
@@ -2033,7 +2117,10 @@ function openH2hMatchListModal(entityA, entityB, groupByClub, dis, kat){
     <table class="achv-table"><thead><tr><th>Datum</th><th>Disciplina</th><th>Utakmica</th><th class="num">Rezultat</th></tr></thead><tbody>${rowsHtml}</tbody></table>
   `;
   body.querySelectorAll('[data-match-id]').forEach(row => {
-    row.addEventListener('click', () => openMatchModal(row.dataset.matchId));
+    row.addEventListener('click', () => {
+      _modalStack.push(() => openH2hMatchListModal(entityA, entityB, groupByClub, dis, kat));
+      openMatchModal(row.dataset.matchId);
+    });
   });
   overlay.classList.add('open');
 }
@@ -2415,7 +2502,7 @@ function openTeamRosterModal(team, tourn, season, dis, kat){
   const players = tourn.rosterPool[team] || [];
 
   const rosterHtml = players.length
-    ? `<ol class="standing-list">${players.map(p => `<li><span class="team-name">${escapeHtml(p)}</span></li>`).join('')}</ol>`
+    ? `<ol class="standing-list">${players.map(p => `<li class="clickable-cell" data-player-name="${escapeHtml(p)}"><span class="team-name">${escapeHtml(p)}</span></li>`).join('')}</ol>`
     : '<div class="empty-state">Nema podataka o sastavu.</div>';
 
   body.innerHTML = `
@@ -2429,6 +2516,15 @@ function openTeamRosterModal(team, tourn, season, dis, kat){
     ${rosterHtml}
   `;
   overlay.classList.add('open');
+
+  body.querySelectorAll('[data-player-name]').forEach(li => {
+    li.addEventListener('click', () => {
+      _modalStack.push(() => openTeamRosterModal(team, tourn, season, dis, kat));
+      // puni raspon (sve sezone/discipline/kategorije) — sastav ekipe nema svoj vlastiti filter
+      // pa igračev prozor prikazuje cjelokupnu karijeru, neovisno o filteru stranice s koje se došlo
+      openPlayerModal(li.dataset.playerName, 'sve', 'sve', MIN_SEASON, MAX_SEASON);
+    });
+  });
 }
 
 // ===================== Fotografije (lightbox s navigacijom lijevo/desno) =====================
