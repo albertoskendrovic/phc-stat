@@ -116,10 +116,33 @@
   table.records-table td{font-family:'Inter', sans-serif; font-weight:400; font-size:13px;}
 
   .h2h-wrap{overflow-x:auto; overflow-y:hidden; border-radius:10px;}
+
+  /* ---------- Igrači međusobno: kombo-izbornici s filtriranjem ---------- */
+  .ph2h-picker-row{display:flex; gap:16px; flex-wrap:wrap; align-items:flex-start; margin-bottom:20px;}
+  .ph2h-col{flex:1; min-width:220px;}
+  .ph2h-label{font-size:11px; color:var(--text-muted); display:block; margin-bottom:5px; font-family:'Space Grotesk', sans-serif; font-weight:600;}
+  .ph2h-combo-wrap{position:relative;}
+  .ph2h-input{width:100%; padding:9px 32px 9px 12px; font-size:14px; font-family:'Inter', sans-serif; border:1.5px solid var(--sheet-line); border-radius:8px; background:var(--white); color:var(--navy);}
+  .ph2h-input:disabled{background:var(--ice-2); color:var(--text-muted); cursor:not-allowed;}
+  .ph2h-input:focus{outline:none; border-color:var(--navy-2);}
+  .ph2h-clear{position:absolute; right:5px; top:50%; transform:translateY(-50%); width:24px; height:24px; border:none; background:none; color:var(--text-muted); font-size:16px; line-height:1; cursor:pointer; border-radius:50%; display:flex; align-items:center; justify-content:center;}
+  .ph2h-clear:hover{background:var(--ice-2); color:var(--navy);}
+  .ph2h-list{position:absolute; top:100%; left:0; right:0; background:var(--white); border:1.5px solid var(--sheet-line); border-top:none; border-radius:0 0 8px 8px; max-height:260px; overflow-y:auto; z-index:20; box-shadow:0 8px 20px rgba(0,0,0,0.12); display:none;}
+  .ph2h-list.open{display:block;}
+  .ph2h-item{padding:8px 12px; font-size:13.5px; cursor:pointer;}
+  .ph2h-item:hover{background:var(--ice-2);}
+  .ph2h-empty{padding:10px 12px; font-size:12.5px; color:var(--text-muted); font-style:italic;}
+  .ph2h-count{font-size:11px; color:var(--text-muted); margin-top:4px;}
+  .ph2h-vs{align-self:flex-start; font-family:'Space Grotesk', sans-serif; font-weight:700; color:var(--sheet-line); font-size:13px; padding-top:34px; flex:0 0 auto;}
+  .ph2h-summary{background:var(--white); border-radius:10px; box-shadow:0 0 0 1px var(--sheet-line); padding:16px 18px; margin-bottom:14px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;}
+  .ph2h-names{font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:15px; color:var(--navy);}
+  .ph2h-names .vs{color:var(--text-muted); font-weight:400; margin:0 8px; font-size:13px;}
+  .ph2h-score{font-family:'IBM Plex Mono', monospace; font-size:19px; font-weight:600; color:var(--navy);}
+  .ph2h-pct{font-size:12px; color:var(--text-muted); margin-left:8px;}
   /* Samo za glavne tablice (Klubovi/Ekipe/Igrači) - omotač dobiva vlastitu ograničenu visinu
      i vlastiti scroll (i vodoravno i okomito), čime sticky zaglavlje ispravno ostaje prikovano
      za vrh dok se scrolla unutar te "kutije", umjesto da nestane pri scrollanju cijele stranice. */
-  .h2h-wrap.scroll-limited{overflow:auto; max-height:70vh;}
+  .h2h-wrap.scroll-limited{overflow:auto; max-height:90vh;}
   table.h2h-table{width:100%; table-layout:fixed; border-collapse:collapse; background:var(--white); border-radius:10px; overflow:hidden; box-shadow:0 0 0 1px var(--sheet-line); font-size:11.5px;}
   table.h2h-table th, table.h2h-table td{padding:6px 4px; text-align:center; border:1px solid var(--ice-2); overflow-wrap:break-word;}
   table.h2h-table th:first-child, table.h2h-table td:first-child{width:130px;}
@@ -239,6 +262,7 @@
   .badge-icon{display:inline-block; flex-shrink:0;}
   .lbl-short{display:none;}
   .badge-grid{display:grid; grid-template-columns:repeat(10, 1fr); gap:14px; margin-bottom:28px;}
+  #page-postignuca .wrap{padding-top:28px;}
   .badge-item{display:flex; flex-direction:column; align-items:center; gap:8px; cursor:pointer; background:none; border:none; padding:6px; border-radius:10px;}
   .badge-item:hover{background:var(--surface-1, var(--ice-2));}
   .badge-item.active{background:var(--ice-2); box-shadow:0 0 0 2px var(--navy) inset;}
@@ -429,6 +453,7 @@
       <div class="page-nav">
         <button class="page-nav-btn active" data-page="prvenstva">🏆 Prvenstva</button>
         <button class="page-nav-btn" data-page="statistika">📊 Statistika</button>
+        <button class="page-nav-btn" data-page="postignuca">🏅 Postignuća</button>
       </div>
     </div>
     <h1>Prvenstva Hrvatske u curlingu</h1>
@@ -465,10 +490,10 @@
     <button class="tab-btn" data-tab="rekordi">Rekordi</button>
     <button class="tab-btn" data-tab="klubovi">Klubovi</button>
     <button class="tab-btn" data-tab="ekipe">Ekipe</button>
+    <button class="tab-btn" data-tab="igraci">Igrači</button>
     <button class="tab-btn" data-tab="klubovih2h">Klubovi međusobno</button>
     <button class="tab-btn" data-tab="ekipeh2h">Ekipe međusobno</button>
-    <button class="tab-btn" data-tab="igraci">Igrači</button>
-    <button class="tab-btn" data-tab="postignuca">Postignuća</button>
+    <button class="tab-btn" data-tab="igracih2h">Igrači međusobno</button>
   </div>
 
   <div class="filter-bar">
@@ -516,6 +541,10 @@
     <div id="ekipeContent"></div>
   </div>
 
+  <div class="panel" id="panel-igraci">
+    <div id="igraciContent"></div>
+  </div>
+
   <div class="panel" id="panel-klubovih2h">
     <div id="klubovih2hContent"></div>
   </div>
@@ -524,13 +553,15 @@
     <div id="ekipeh2hContent"></div>
   </div>
 
-  <div class="panel" id="panel-igraci">
-    <div id="igraciContent"></div>
+  <div class="panel" id="panel-igracih2h">
+    <div id="igracih2hContent"></div>
   </div>
+</div>
+</div>
 
-  <div class="panel" id="panel-postignuca">
-    <div id="postignucaContent"></div>
-  </div>
+<div id="page-postignuca" class="page-section">
+<div class="wrap">
+  <div id="postignucaContent"></div>
 </div>
 </div>
 
@@ -551,7 +582,7 @@ const KAT_LABELS = {'S':'Seniori','J':'Juniori','V':'Veterani'};
 // Tabovi za koje "Disciplina" filter NIJE primjenjiv (prikazuju sve discipline u stupcima)
 const NO_DIS_TABS = new Set([]);
 
-const TAB_IDS = ['poretci','statistika','rekordi','klubovi','ekipe','klubovih2h','ekipeh2h','igraci','postignuca'];
+const TAB_IDS = ['poretci','statistika','rekordi','klubovi','ekipe','igraci','klubovih2h','ekipeh2h','igracih2h'];
 const TAB_STATE = {};
 TAB_IDS.forEach(t => { TAB_STATE[t] = { kat: 'sve', dis: 'sve', seasonMode: 'sve', seasonFrom: null, seasonTo: null }; });
 
@@ -576,6 +607,9 @@ fetch('phc-data.json')
     // --- Prvenstva ---
     initFilters();
     render();
+
+    // --- Postignuća (zasebna stranica, bez filtera) ---
+    renderPostignuca();
   })
   .catch(err => {
     document.querySelectorAll('.panel > div').forEach(p => {
@@ -643,7 +677,7 @@ function updateFilterVisibility(){
   const disGroup = document.getElementById('globalDisGroup');
   disGroup.classList.toggle('is-inactive', NO_DIS_TABS.has(tab));
   disGroup.querySelectorAll('button').forEach(b => b.disabled = NO_DIS_TABS.has(tab));
-  document.querySelector('#page-statistika .filter-bar').style.display = (tab === 'postignuca') ? 'none' : '';
+  document.querySelector('#page-statistika .filter-bar').style.display = '';
 }
 
 // Odražava spremljeno stanje AKTIVNOG taba na kontrolama filtera (bez okidanja re-rendera)
@@ -664,10 +698,10 @@ function renderActiveTab(){
   else if(tab === 'rekordi') renderRekordi();
   else if(tab === 'klubovi') renderKlubovi();
   else if(tab === 'ekipe') renderEkipe();
+  else if(tab === 'igraci') renderIgraci();
   else if(tab === 'klubovih2h') renderKluboviH2h();
   else if(tab === 'ekipeh2h') renderEkipeH2h();
-  else if(tab === 'igraci') renderIgraci();
-  else if(tab === 'postignuca') renderPostignuca();
+  else if(tab === 'igracih2h') renderIgraciH2h();
 }
 
 // ---------- univerzalni filteri (izgled dijeljen, stanje po tabu) ----------
@@ -1136,7 +1170,7 @@ function openNhcBreakdownModal(name, groupByClub, kat, dis, isPlayer, anchorSeas
     <h2 class="entity-title">NHC bodovi — ${escapeHtml(name)}</h2>
     <div class="info-block">
       <div>Formula za izračun NHC bodova: <span>100 × (1 − (mjesto−1)/broj&nbsp;ekipa)<sup>2</sup></span></div>
-      <div>Gleda se zadnjih 5 sezona od ${seasonLabel(anchorSeason)} unazad, s težinom 100% / 80% / 60% / 40% / 20% (najnovija prema najstarijoj)</div>
+      <div>Računa se zadnjih 5 sezona od ${seasonLabel(anchorSeason)} unazad, s težinskim faktorima 100% / 80% / 60% / 40% / 20% (najnovija sezona prema najstarijoj)</div>
     </div>
     ${tableHtml}
   `;
@@ -1601,6 +1635,200 @@ function renderH2h(groupByClub, contentElId){
     el.addEventListener('click', () => openH2hMatchListModal(el.dataset.pairA, el.dataset.pairB, groupByClub, dis, kat));
   });
 }
+// ===================== Igrači međusobno (traži par, ne puna matrica) =====================
+// Puna N×N matrica ovdje ne bi bila čitljiva (previše igrača, većina parova nikad nije igrala
+// jedni protiv drugih), pa umjesto toga nudimo dva kombo-izbornika: prvi ponudi sve igrače u
+// okviru filtera, drugi (nakon odabira prvog) ponudi samo stvarne protivnike tog igrača.
+function playerNamesFromRoster(roster){
+  return (roster || []).map(p => p.name).filter(Boolean);
+}
+
+function renderIgraciH2h(){
+  const kat = currentState().kat;
+  const dis = currentState().dis;
+  const disList = dis === 'sve' ? DIS_ORDER : [dis];
+  const [from, to] = getSeasonRange();
+  const content = document.getElementById('igracih2hContent');
+
+  const matches = DATA.matches.filter(m => (kat==='sve'||m.kat===kat) && disList.includes(m.dis) && m.season >= from && m.season <= to && (m.winner === 1 || m.winner === 2 || m.played));
+
+  content.innerHTML = `
+    <div class="note" style="margin-bottom:16px; font-size:12.5px; color:var(--text-muted);">Odaberi dva igrača da vidiš njihov međusobni omjer i popis susreta, u okviru gore odabranog filtera.</div>
+    <div class="ph2h-picker-row">
+      <div class="ph2h-col">
+        <label class="ph2h-label">Igrač</label>
+        <div class="ph2h-combo-wrap">
+          <input class="ph2h-input" id="ph2hInputA" placeholder="Upiši ime…" autocomplete="off">
+          <button class="ph2h-clear" id="ph2hClearA" type="button" aria-label="Obriši">×</button>
+          <div class="ph2h-list" id="ph2hListA"></div>
+        </div>
+        <div class="ph2h-count" id="ph2hCountA"></div>
+      </div>
+      <div class="ph2h-vs"></div>
+      <div class="ph2h-col">
+        <label class="ph2h-label">protiv igrača</label>
+        <div class="ph2h-combo-wrap">
+          <input class="ph2h-input" id="ph2hInputB" placeholder="Prvo odaberi igrača…" autocomplete="off" disabled>
+          <button class="ph2h-clear" id="ph2hClearB" type="button" aria-label="Obriši">×</button>
+          <div class="ph2h-list" id="ph2hListB"></div>
+        </div>
+        <div class="ph2h-count" id="ph2hCountB"></div>
+      </div>
+    </div>
+    <div id="ph2hResult"></div>
+  `;
+
+  function allPlayers(){
+    const set = new Set();
+    matches.forEach(m => {
+      playerNamesFromRoster(m.roster1).forEach(p => set.add(p));
+      playerNamesFromRoster(m.roster2).forEach(p => set.add(p));
+    });
+    return [...set].sort((a,b) => a.localeCompare(b, 'hr'));
+  }
+
+  function opponentsOf(player){
+    const set = new Set();
+    matches.forEach(m => {
+      const r1 = playerNamesFromRoster(m.roster1), r2 = playerNamesFromRoster(m.roster2);
+      if(r1.includes(player)) r2.forEach(p => set.add(p));
+      else if(r2.includes(player)) r1.forEach(p => set.add(p));
+    });
+    return [...set].sort((a,b) => a.localeCompare(b, 'hr'));
+  }
+
+  let playerA = null, playerB = null;
+
+  const inputA = document.getElementById('ph2hInputA');
+  const listA = document.getElementById('ph2hListA');
+  const countA = document.getElementById('ph2hCountA');
+  const clearA = document.getElementById('ph2hClearA');
+  const inputB = document.getElementById('ph2hInputB');
+  const listB = document.getElementById('ph2hListB');
+  const countB = document.getElementById('ph2hCountB');
+  const clearB = document.getElementById('ph2hClearB');
+  const resultEl = document.getElementById('ph2hResult');
+
+  function setupCombo(inputEl, listEl, countEl, clearEl, getOptions, onSelect, onClear){
+    function render(query){
+      const options = getOptions();
+      const q = (query || '').trim().toLowerCase();
+      const filtered = q ? options.filter(o => o.toLowerCase().includes(q)) : options;
+      countEl.textContent = `${options.length} igrača dostupno`;
+      listEl.innerHTML = filtered.length
+        ? filtered.map(o => `<div class="ph2h-item" data-val="${escapeHtml(o)}">${escapeHtml(o)}</div>`).join('')
+        : '<div class="ph2h-empty">Nema rezultata.</div>';
+      listEl.classList.add('open');
+    }
+    inputEl.addEventListener('focus', () => render(inputEl.value));
+    inputEl.addEventListener('input', () => render(inputEl.value));
+    inputEl.addEventListener('blur', () => setTimeout(() => listEl.classList.remove('open'), 150));
+    listEl.addEventListener('mousedown', (e) => {
+      const item = e.target.closest('[data-val]');
+      if(!item) return;
+      inputEl.value = item.dataset.val;
+      listEl.classList.remove('open');
+      onSelect(item.dataset.val);
+    });
+    clearEl.addEventListener('click', () => {
+      inputEl.value = '';
+      listEl.classList.remove('open');
+      onClear();
+      inputEl.focus();
+    });
+    return { refresh: () => { countEl.textContent = `${getOptions().length} igrača dostupno`; } };
+  }
+
+  const comboB = setupCombo(inputB, listB, countB, clearB, () => playerA ? opponentsOf(playerA) : [], (val) => {
+    playerB = val;
+    renderResult();
+  }, () => {
+    playerB = null;
+    renderResult();
+  });
+
+  setupCombo(inputA, listA, countA, clearA, allPlayers, (val) => {
+    playerA = val;
+    playerB = null;
+    inputB.value = '';
+    inputB.disabled = false;
+    inputB.placeholder = 'Upiši ime…';
+    comboB.refresh();
+    renderResult();
+  }, () => {
+    playerA = null; playerB = null;
+    inputB.value = '';
+    inputB.disabled = true;
+    inputB.placeholder = 'Prvo odaberi igrača…';
+    renderResult();
+  });
+
+  function renderResult(){
+    if(!playerA || !playerB){ resultEl.innerHTML = ''; return; }
+
+    const relevant = matches.filter(m => {
+      const r1 = playerNamesFromRoster(m.roster1), r2 = playerNamesFromRoster(m.roster2);
+      return (r1.includes(playerA) && r2.includes(playerB)) || (r2.includes(playerA) && r1.includes(playerB));
+    });
+
+    if(relevant.length === 0){
+      resultEl.innerHTML = '<div class="empty-state">Nisu igrali jedan protiv drugoga u odabranom filteru.</div>';
+      return;
+    }
+
+    let w=0,d=0,l=0;
+    const rows = relevant.map(m => {
+      const r1 = playerNamesFromRoster(m.roster1);
+      const aInR1 = r1.includes(playerA);
+      const aTeamNum = aInR1 ? 1 : 2;
+      if(m.winner === aTeamNum) w++;
+      else if(m.winner && m.winner !== aTeamNum) l++;
+      else d++;
+      return { m, aInR1 };
+    });
+    rows.sort((a,b) => (b.m.date||'').localeCompare(a.m.date||''));
+
+    const total = w+d+l;
+    const pct = total>0 ? Math.round(((w*2+d)/(total*2))*100) : 0;
+
+    let html = `
+      <div class="ph2h-summary">
+        <div class="ph2h-names">${escapeHtml(playerA)}<span class="vs">protiv</span>${escapeHtml(playerB)}</div>
+        <div><span class="ph2h-score">${w}-${d}-${l}</span><span class="ph2h-pct">${pct}%</span></div>
+      </div>
+      <div class="achv-table-scroll">
+      <table class="achv-table">
+        <thead><tr><th>Datum</th><th>Disciplina</th><th>Kategorija</th><th>Utakmica</th><th class="num">Rezultat</th></tr></thead>
+        <tbody>
+    `;
+    rows.forEach(r => {
+      const m = r.m;
+      const teamA = r.aInR1 ? m.team1 : m.team2;
+      const teamB = r.aInR1 ? m.team2 : m.team1;
+      const winningTeamName = m.winner === 1 ? m.team1 : (m.winner === 2 ? m.team2 : null);
+      const teamAHtml = (winningTeamName && teamA === winningTeamName) ? `<strong>${escapeHtml(teamA)}</strong>` : escapeHtml(teamA);
+      const teamBHtml = (winningTeamName && teamB === winningTeamName) ? `<strong>${escapeHtml(teamB)}</strong>` : escapeHtml(teamB);
+      let score;
+      if(m.score1 != null && m.score2 != null){
+        score = r.aInR1 ? `${m.score1.toFixed(0)}:${m.score2.toFixed(0)}` : `${m.score2.toFixed(0)}:${m.score1.toFixed(0)}`;
+      } else if(m.winner === (r.aInR1 ? 1 : 2)){
+        score = 'W:L';
+      } else if(m.winner){
+        score = 'L:W';
+      } else {
+        score = '–';
+      }
+      html += `<tr class="clickable-cell" data-match-id="${m.id}"><td>${formatDate(m.date)}</td><td>${escapeHtml(m.disLabel)}</td><td>${escapeHtml(m.katLabel)}</td><td>${teamAHtml} - ${teamBHtml}</td><td class="num">${score}</td></tr>`;
+    });
+    html += '</tbody></table></div>';
+    resultEl.innerHTML = html;
+
+    resultEl.querySelectorAll('[data-match-id]').forEach(row => {
+      row.addEventListener('click', () => openMatchModal(row.dataset.matchId));
+    });
+  }
+}
+
 // ===================== Prozor s detaljima utakmice =====================
 // (isti dizajn/logika kao na pregledu prvenstava — kopirano da bude dostupno i ovdje)
 
@@ -2095,9 +2323,9 @@ function openH2hMatchListModal(entityA, entityB, groupByClub, dis, kat){
     }
     const team1Html = m.winner === 1 ? `<strong>${escapeHtml(m.team1)}</strong>` : escapeHtml(m.team1);
     const team2Html = m.winner === 2 ? `<strong>${escapeHtml(m.team2)}</strong>` : escapeHtml(m.team2);
-    return `<tr class="clickable-cell" data-match-id="${m.id}"><td>${formatDate(m.date)}</td><td>${DIS_LABELS[m.dis]||m.dis}</td><td>${team1Html} - ${team2Html}</td><td class="num">${score}</td></tr>`;
+    return `<tr class="clickable-cell" data-match-id="${m.id}"><td>${formatDate(m.date)}</td><td>${DIS_LABELS[m.dis]||m.dis}</td><td>${KAT_LABELS[m.kat]||m.kat}</td><td>${team1Html} - ${team2Html}</td><td class="num">${score}</td></tr>`;
   }).join('');
-  if(!rowsHtml) rowsHtml = '<tr><td colspan="4" class="empty-mini">Nema pronađenih utakmica.</td></tr>';
+  if(!rowsHtml) rowsHtml = '<tr><td colspan="5" class="empty-mini">Nema pronađenih utakmica.</td></tr>';
 
   let winsA = 0, draws = 0, winsB = 0;
   matches.forEach(m => {
@@ -2114,7 +2342,7 @@ function openH2hMatchListModal(entityA, entityB, groupByClub, dis, kat){
   body.innerHTML = `
     <button class="modal-close" onclick="closeModal()">×</button>
     <h2 class="entity-title">${escapeHtml(entityA)} — ${escapeHtml(entityB)}${recordText}</h2>
-    <table class="achv-table"><thead><tr><th>Datum</th><th>Disciplina</th><th>Utakmica</th><th class="num">Rezultat</th></tr></thead><tbody>${rowsHtml}</tbody></table>
+    <table class="achv-table"><thead><tr><th>Datum</th><th>Disciplina</th><th>Kategorija</th><th>Utakmica</th><th class="num">Rezultat</th></tr></thead><tbody>${rowsHtml}</tbody></table>
   `;
   body.querySelectorAll('[data-match-id]').forEach(row => {
     row.addEventListener('click', () => {
@@ -2317,7 +2545,7 @@ async function render(){
 
   // photos — numerirane 1.jpg, 2.jpg... u istoj mapi; sve provjere idu istovremeno pa
   // uzimamo redom od 1. dok ne naiđemo na prvu rupu
-  const photos = await findSequentialFiles(i => `${tournFolder}/${i}.jpg`, 50);
+  const photos = await findSequentialFiles(i => `${tournFolder}/${i}.jpg`, 20);
   let photoCaptions = {};
   if(photos.length){
     photoCaptions = await loadCaptions(`${tournFolder}/foto.txt`);
@@ -2330,7 +2558,7 @@ async function render(){
   }
 
   // videi — numerirani 1.mp4, 2.mp4... isti princip kao fotografije
-  const videos = await findSequentialFiles(i => `${tournFolder}/${i}.mp4`, 50);
+  const videos = await findSequentialFiles(i => `${tournFolder}/${i}.mp4`, 10);
   let videoCaptions = {};
   if(videos.length){
     videoCaptions = await loadCaptions(`${tournFolder}/video.txt`);
