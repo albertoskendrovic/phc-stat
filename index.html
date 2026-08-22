@@ -73,7 +73,7 @@
   .season-dd select{padding:6px 8px; font-size:13px;}
   .season-controls.season-is-range .season-dd select{background:var(--navy); color:var(--ice); border-color:var(--navy);}
 
-  .season-block{margin-bottom:36px; max-width:820px;}
+  .season-block{margin-bottom:36px; max-width:1000px;}
   .season-title{font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:18px; margin:0 0 12px; padding-bottom:8px; border-bottom:1.5px solid var(--sheet-line);}
   .dis-grid{display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; align-items:start;}
   .dis-col{background:var(--white); border-radius:10px; box-shadow:0 0 0 1px var(--sheet-line); overflow:hidden;}
@@ -105,14 +105,15 @@
 
   .record-block{margin-bottom:30px;}
   .record-title{font-family:'Space Grotesk', sans-serif; font-size:15px; font-weight:600; color:var(--navy); margin:0 0 10px;}
-  table.records-table{max-width:760px;}
-  table.records-table th:nth-child(1), table.records-table td:nth-child(1){width:11%;}
-  table.records-table th:nth-child(2), table.records-table td:nth-child(2){width:47%;}
-  table.records-table th:nth-child(3), table.records-table td:nth-child(3){width:14%;}
-  table.records-table th:nth-child(4), table.records-table td:nth-child(4){width:14%;}
-  table.records-table th:nth-child(5), table.records-table td:nth-child(5){width:14%;}
+  table.records-table{max-width:920px;}
+  table.records-table th:nth-child(1), table.records-table td:nth-child(1){width:10%;}
+  table.records-table th:nth-child(2), table.records-table td:nth-child(2){width:11%;}
+  table.records-table th:nth-child(3), table.records-table td:nth-child(3){width:9%;}
+  table.records-table th:nth-child(4), table.records-table td:nth-child(4){width:48%; white-space:nowrap;}
+  table.records-table th:nth-child(5), table.records-table td:nth-child(5){width:10%;}
+  table.records-table th:nth-child(6), table.records-table td:nth-child(6){width:12%;}
   table.records-table td, table.records-table th{text-align:left;}
-  table.records-table td.num-cell, table.records-table th:nth-child(4){text-align:right; font-family:'IBM Plex Mono', monospace;}
+  table.records-table td.num-cell, table.records-table th:nth-child(6){text-align:right; font-family:'IBM Plex Mono', monospace;}
   table.records-table td{font-family:'Inter', sans-serif; font-weight:400; font-size:13px;}
 
   .h2h-wrap{overflow-x:auto; overflow-y:hidden; border-radius:10px;}
@@ -145,7 +146,9 @@
   .h2h-wrap.scroll-limited{overflow:auto; max-height:90vh;}
   table.h2h-table{width:100%; table-layout:fixed; border-collapse:collapse; background:var(--white); border-radius:10px; overflow:hidden; box-shadow:0 0 0 1px var(--sheet-line); font-size:11.5px;}
   table.h2h-table th, table.h2h-table td{padding:6px 4px; text-align:center; border:1px solid var(--ice-2); overflow-wrap:break-word;}
-  table.h2h-table th:first-child, table.h2h-table td:first-child{width:130px;}
+  table.h2h-table th:first-child, table.h2h-table td:first-child{width:175px;}
+  table.h2h-table th:first-child{text-align:left;}
+  table.h2h-table th:first-child .club-logo{margin-right:4px; vertical-align:middle;}
   table.h2h-table thead th{font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:10.5px; background:var(--ice-2); color:var(--navy); line-height:1.2;}
   table.h2h-table tbody th{font-family:'Space Grotesk', sans-serif; font-weight:600; text-align:left; background:var(--ice-2); color:var(--navy);}
   table.h2h-table td.diag{background:repeating-linear-gradient(45deg, #2a3b4a, #2a3b4a 4px, #1c2b39 4px, #1c2b39 8px);}
@@ -157,9 +160,11 @@
   table.ekipe-table th, table.ekipe-table td{padding:7px 9px; text-align:right; border:1px solid var(--ice-2);}
   table.ekipe-table th{font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:10.5px; background:var(--ice-2); color:var(--navy); text-align:center; white-space:normal; max-width:80px;}
   table.ekipe-table td.ekipe-rank, table.ekipe-table th.ekipe-rank{text-align:center; color:var(--text-muted); font-family:'IBM Plex Mono', monospace; position:sticky; left:0; background:var(--white); z-index:2; width:44px; min-width:44px; max-width:44px;}
+  table.ekipe-table td.ekipe-logo, table.ekipe-table th.ekipe-logo{text-align:center; position:sticky; left:44px; background:var(--white); z-index:2; width:34px; min-width:34px; max-width:34px; padding:6px 4px;}
   table.ekipe-table td.ekipe-name, table.ekipe-table th.ekipe-name{text-align:left; font-family:'Space Grotesk', sans-serif; font-weight:600; color:var(--navy); position:sticky; left:44px; background:var(--white); z-index:1; box-shadow:2px 0 4px -2px rgba(0,0,0,0.15);}
+  table.ekipe-table.has-logo-col td.ekipe-name, table.ekipe-table.has-logo-col th.ekipe-name{left:78px;}
   table.ekipe-table thead th{position:sticky; top:0; z-index:2;}
-  table.ekipe-table thead th.ekipe-rank, table.ekipe-table thead th.ekipe-name{background:var(--ice-2); z-index:3;}
+  table.ekipe-table thead th.ekipe-rank, table.ekipe-table thead th.ekipe-logo, table.ekipe-table thead th.ekipe-name{background:var(--ice-2); z-index:3;}
   .top-scrollbar{overflow-x:auto; overflow-y:hidden; height:14px;}
   .top-scrollbar-spacer{height:1px;}
   table.ekipe-table td.cell-best{background:#d7ecd9; font-weight:700;}
@@ -348,8 +353,13 @@
   .match-row:last-child{border-bottom:none;}
   .match-row:hover{background:var(--ice-2); box-shadow:inset 3px 0 0 var(--navy);}
   .match-date{font-family:'IBM Plex Mono', monospace; color:var(--text-muted); font-size:11.5px;}
-  .match-team{text-align:right;}
-  .match-team.right{text-align:left;}
+  .match-team{display:flex; align-items:center; gap:6px; justify-content:flex-end; overflow:hidden; min-width:0;}
+  .match-team.right{justify-content:flex-start;}
+  .match-team .team-name-txt{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .club-logo{width:18px; height:18px; object-fit:contain; flex-shrink:0;}
+  .standing-list .club-logo, table.standings .club-logo{margin:0 6px 0 4px; vertical-align:middle;}
+  table.roster-table thead th .club-logo{margin-right:6px; vertical-align:middle;}
+  table.records-table td .club-logo{margin-right:5px; vertical-align:middle;}
   .match-score{font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:14px; text-align:center; padding:3px 9px; border-radius:6px; background:var(--ice-2); white-space:nowrap;}
   .match-score.notplayed{background:none; color:var(--text-muted); font-weight:400; font-size:12px;}
   .winner{color:var(--navy);}
@@ -572,6 +582,7 @@
 </div>
 
 <script src="badges-data.js"></script>
+<script src="logo-data.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
 
@@ -779,6 +790,26 @@ function getSeasonRange(){
   return [st.seasonFrom, st.seasonTo];
 }
 
+// Logotipi klubova (logo-data.js, CLUB_LOGOS) — ključ je naziv KLUBA, ne ekipe (više ekipa
+// može pripadati istom klubu kroz sezone). Ako klub nema logo (ili tim/klub nije prepoznat),
+// vraća se null i logo se jednostavno ne prikazuje - bez greške.
+function clubLogoDataUri(team, dis){
+  if(!team || !dis || typeof CLUB_LOGOS === 'undefined') return null;
+  const disCandidates = dis === 'sve' ? DIS_ORDER : [dis];
+  for(const d of disCandidates){
+    const clubMap = (DATA.clubs && DATA.clubs[d]) || {};
+    const club = clubMap[team] || team;
+    if(CLUB_LOGOS[club]) return CLUB_LOGOS[club];
+  }
+  return null;
+}
+
+function clubLogoImgHtml(team, dis, cls){
+  const uri = clubLogoDataUri(team, dis);
+  if(!uri) return '';
+  return `<img class="club-logo${cls ? ' ' + cls : ''}" src="${uri}" alt="" loading="lazy">`;
+}
+
 
 const KAT_ORDER = ['S', 'J', 'V'];
 
@@ -794,7 +825,7 @@ function renderDisGridHtml(season, katForBlock, disList, gridStyle, MEDALS){
     if(tourn.standings.length){
       html += '<ol class="standing-list">' + tourn.standings.map(s => {
         const medal = MEDALS[s.place] || '';
-        return `<li class="clickable-row" data-roster-team="${escapeHtml(s.team)}" data-roster-season="${season}" data-roster-dis="${d}" data-roster-kat="${katForBlock}"><span class="rank-num">${s.place}</span><span class="team-name">${escapeHtml(s.team)}</span><span class="medal-slot">${medal}</span></li>`;
+        return `<li class="clickable-row" data-roster-team="${escapeHtml(s.team)}" data-roster-season="${season}" data-roster-dis="${d}" data-roster-kat="${katForBlock}"><span class="rank-num">${s.place}</span>${clubLogoImgHtml(s.team, d)}<span class="team-name">${escapeHtml(s.team)}</span><span class="medal-slot">${medal}</span></li>`;
       }).join('') + '</ol>';
     } else {
       html += '<div class="empty-mini">—</div>';
@@ -819,7 +850,7 @@ function renderPoretci(){
   }
 
   const MEDALS = {1:'🥇', 2:'🥈', 3:'🥉'};
-  const gridStyle = disList.length === 1 ? ' style="grid-template-columns:minmax(0,340px);"' : '';
+  const gridStyle = disList.length === 1 ? ' style="grid-template-columns:minmax(0,420px);"' : '';
 
   let html = '';
   seasons.forEach(season => {
@@ -924,7 +955,7 @@ function renderStatistika(){
   html += row('Endova', d => colVal(d,'endova'));
   html += row('Po utakmici', d => ratio(colVal(d,'endova'), colVal(d,'utakmica')), {sub:true});
 
-  html += row('Kamena', d => colVal(d,'poena'));
+  html += row('Kamenova', d => colVal(d,'poena'));
   html += row('Po utakmici', d => ratio(colVal(d,'poena'), colVal(d,'utakmica')), {sub:true});
   html += row('Po endu', d => ratio(colVal(d,'poena'), colVal(d,'endova')), {sub:true});
 
@@ -962,11 +993,11 @@ function formatDate(iso){
 
 function recordsTableHtml(rows, valueLabel){
   if(rows.length === 0) return '<div class="empty-mini">Nema podataka.</div>';
-  let h = `<table class="stats-table records-table"><thead><tr><th>Disciplina</th><th>Utakmica</th><th>Rezultat</th><th>${valueLabel}</th><th>Datum</th></tr></thead><tbody>`;
+  let h = `<table class="stats-table records-table"><thead><tr><th>Datum</th><th>Disciplina</th><th>Kategorija</th><th>Utakmica</th><th>Rezultat</th><th>${valueLabel}</th></tr></thead><tbody>`;
   rows.forEach(r => {
-    const team1Html = r.winner === 1 ? `<strong>${escapeHtml(r.team1)}</strong>` : escapeHtml(r.team1);
-    const team2Html = r.winner === 2 ? `<strong>${escapeHtml(r.team2)}</strong>` : escapeHtml(r.team2);
-    h += `<tr class="clickable-cell" onclick="openMatchModal('${r.id}')"><td>${escapeHtml(r.dis)}</td><td>${team1Html} - ${team2Html}</td><td>${r.score1}:${r.score2}</td><td class="num-cell">${r.value}</td><td>${formatDate(r.date)}</td></tr>`;
+    const team1Html = `${clubLogoImgHtml(r.team1, r.disRaw)}${r.winner === 1 ? `<strong>${escapeHtml(r.team1)}</strong>` : escapeHtml(r.team1)}`;
+    const team2Html = `${clubLogoImgHtml(r.team2, r.disRaw)}${r.winner === 2 ? `<strong>${escapeHtml(r.team2)}</strong>` : escapeHtml(r.team2)}`;
+    h += `<tr class="clickable-cell" onclick="openMatchModal('${r.id}')"><td>${formatDate(r.date)}</td><td>${escapeHtml(r.dis)}</td><td>${escapeHtml(r.katLabel)}</td><td>${team1Html} - ${team2Html}</td><td>${r.score1}:${r.score2}</td><td class="num-cell">${r.value}</td></tr>`;
   });
   h += '</tbody></table>';
   return h;
@@ -1020,7 +1051,7 @@ function renderRekordi(){
 
   function toRow(m, val){
     return {
-      id: m.id, katLabel: m.katLabel, dis: m.dis, team1: m.team1, team2: m.team2,
+      id: m.id, katLabel: m.katLabel, dis: m.disLabel, disRaw: m.dis, team1: m.team1, team2: m.team2,
       score1: m.score1.toFixed(0), score2: m.score2.toFixed(0), date: m.date, value: val, winner: m.winner
     };
   }
@@ -1035,7 +1066,6 @@ function renderRekordi(){
   const steals = topN(played, m => countSteals(m), 5);
   html += `<div class="record-block"><h3 class="record-title">Utakmice s najviše ukradenih endova</h3>`;
   html += recordsTableHtml(steals.map(x => toRow(x.m, x.val)), 'Ukradenih endova');
-  html += `<div class="note" style="font-size:11.5px; color:var(--text-muted); margin-top:6px;">Ukraden end = end koji je osvojila ekipa bez hammera (nije imala posljednji kamen tog enda).</div>`;
   html += `</div>`;
 
   const comebacks = computeComebacks(played, 5);
@@ -1146,7 +1176,7 @@ function openNhcBreakdownModal(name, groupByClub, kat, dis, isPlayer, anchorSeas
     tableHtml = '<div class="empty-mini">Nema prvenstava u zadnjih 5 sezona koja bi ulazila u izračun.</div>';
   } else {
     tableHtml = `<div class="achv-table-scroll"><table class="achv-table"><thead><tr>
-      <th>Sezona</th><th>Disciplina</th><th>Kategorija</th><th class="num">Mjesto</th>
+      <th>Sezona</th><th>Disciplina</th><th>Kategorija</th><th>Ekipa</th><th class="num">Mjesto</th>
       <th class="num">Broj ekipa</th><th class="num">Bodovi</th><th class="num">Težinski faktor sezone</th><th class="num">NHC bodova</th>
     </tr></thead><tbody>`;
     rows.forEach(r => {
@@ -1154,6 +1184,7 @@ function openNhcBreakdownModal(name, groupByClub, kat, dis, isPlayer, anchorSeas
         <td>${seasonLabel(r.season)}</td>
         <td>${DIS_LABELS[r.dis]||r.dis}</td>
         <td>${KAT_LABELS[r.kat]||r.kat}</td>
+        <td>${escapeHtml(r.team)}</td>
         <td class="num">${r.place}.</td>
         <td class="num">${r.teamsCount}</td>
         <td class="num">${r.basePoints.toFixed(1).replace('.', ',')}</td>
@@ -1161,7 +1192,7 @@ function openNhcBreakdownModal(name, groupByClub, kat, dis, isPlayer, anchorSeas
         <td class="num">${r.weighted.toFixed(1).replace('.', ',')}</td>
       </tr>`;
     });
-    tableHtml += `<tr><td colspan="7" style="text-align:right; font-weight:700;">Ukupno (zaokruženo)</td><td class="num" style="font-weight:700;">${Math.round(total)}</td></tr>`;
+    tableHtml += `<tr><td colspan="8" style="text-align:right; font-weight:700;">Ukupno (zaokruženo)</td><td class="num" style="font-weight:700;">${Math.round(total)}</td></tr>`;
     tableHtml += '</tbody></table></div>';
   }
 
@@ -1335,9 +1366,9 @@ function renderEkipeOrKlubovi(groupByClub, contentElId){
     {k:'nhc', label:'NHC bodovi', dec:true},
     {k:'medalPoints', label:'Bodova za medalje'},
     {k:'medalsTotal', label:'Ukupno medalja'},
-    {k:'gold', label:'Zlatnih'},
-    {k:'silver', label:'Srebrnih'},
-    {k:'bronze', label:'Brončanih'},
+    {k:'gold', label:'Zlatnih medalja'},
+    {k:'silver', label:'Srebrnih medalja'},
+    {k:'bronze', label:'Brončanih medalja'},
     {k:'p4', label:'4. mjesto'}, {k:'p5', label:'5. mjesto'}, {k:'p6', label:'6. mjesto'},
     {k:'p7', label:'7. mjesto'}, {k:'p8', label:'8. mjesto'}, {k:'p9', label:'9. mjesto'},
     {k:'prvenstava', label:'Odigrano prvenstava'},
@@ -1357,13 +1388,13 @@ function renderEkipeOrKlubovi(groupByClub, contentElId){
   const placementKeys = new Set(['p4','p5','p6','p7','p8','p9']);
   cols = cols.filter(c => !placementKeys.has(c.k) || rows.some(r => r[c.k]));
 
-  let html = '<div class="h2h-wrap scroll-limited"><table class="ekipe-table"><thead><tr><th class="ekipe-rank"></th><th class="ekipe-name">Naziv</th>';
+  let html = '<div class="h2h-wrap scroll-limited"><table class="ekipe-table has-logo-col"><thead><tr><th class="ekipe-rank"></th><th class="ekipe-logo"></th><th class="ekipe-name">Naziv</th>';
   html += cols.map(c => `<th>${c.label}</th>`).join('');
-  html += '<th>Tamni / Svijetli</th><th>PK (posl. kamen 1. enda)</th><th>Precizno polaganje prosjek (cm)</th>';
+  html += '<th>Tamni/Svijetli kamenovi</th><th>Posljednji kamen prvog enda</th><th>Prosjek preciznih polaganja (cm)</th>';
   html += '</tr></thead><tbody>';
 
   rows.forEach((r, i) => {
-    html += `<tr><td class="ekipe-rank">${i+1}.</td><td class="ekipe-name clickable-name" data-entity="${escapeHtml(r.name)}">${escapeHtml(r.name)}</td>`;
+    html += `<tr><td class="ekipe-rank">${i+1}.</td><td class="ekipe-logo">${clubLogoImgHtml(r.name, dis)}</td><td class="ekipe-name clickable-name" data-entity="${escapeHtml(r.name)}">${escapeHtml(r.name)}</td>`;
     cols.forEach(c => {
       let v = r[c.k];
       let display = v == null || v === 0 ? '' : v;
@@ -1383,7 +1414,6 @@ function renderEkipeOrKlubovi(groupByClub, contentElId){
     html += '</tr>';
   });
   html += '</tbody></table></div>';
-  html += '<div class="note" style="margin-top:10px; font-size:12px; color:var(--text-muted);">Tamni/Svijetli = broj utakmica gdje je ekipa bila prva (tamni kamen) / druga (svijetli kamen) navedena. PK = koliko je puta ekipa imala posljednji kamen 1. enda, od ukupno utakmica s preciznim polaganjem.</div>';
   content.innerHTML = html;
   const wrapEl = content.querySelector(".h2h-wrap");
   if(wrapEl) addTopScrollbar(content, wrapEl);
@@ -1512,9 +1542,9 @@ function renderIgraci(){
     {k:'nhc', label:'NHC bodovi', dec:true},
     {k:'medalPoints', label:'Bodova za medalje'},
     {k:'medalsTotal', label:'Ukupno medalja'},
-    {k:'gold', label:'Zlatnih'},
-    {k:'silver', label:'Srebrnih'},
-    {k:'bronze', label:'Brončanih'},
+    {k:'gold', label:'Zlatnih medalja'},
+    {k:'silver', label:'Srebrnih medalja'},
+    {k:'bronze', label:'Brončanih medalja'},
     {k:'prvenstava', label:'Odigrano prvenstava'},
     {k:'utakmica', label:'Odigrano utakmica'},
     {k:'endova', label:'Odigrano endova'},
@@ -1522,7 +1552,7 @@ function renderIgraci(){
     {k:'points', label:'Osvojeno bodova'},
     {k:'uspjeh', label:'Uspješnost', pct:true},
     {k:'lsdCount', label:'Preciznih polaganja'},
-    {k:'lsdAvg', label:'Prosjek PP (cm)', avg:true},
+    {k:'lsdAvg', label:'Prosjek preciznih polaganja (cm)', avg:true},
     {k:'skip', label:'Skip'}, {k:'vice', label:'Vice-skip'},
     {k:'p1', label:'Prvi'}, {k:'p2', label:'Drugi'}, {k:'p3', label:'Treći'}, {k:'p4', label:'Četvrti'}, {k:'pr', label:'Rezerva'},
   ];
@@ -1604,7 +1634,7 @@ function renderH2h(groupByClub, contentElId){
   html += entities.map(e => `<th class="clickable-name" data-entity="${escapeHtml(e)}">${escapeHtml(e)}</th>`).join('');
   html += '</tr></thead><tbody>';
   entities.forEach(rowE => {
-    html += `<tr><th class="clickable-name" data-entity="${escapeHtml(rowE)}">${escapeHtml(rowE)}</th>`;
+    html += `<tr><th class="clickable-name" data-entity="${escapeHtml(rowE)}">${clubLogoImgHtml(rowE, dis)}${escapeHtml(rowE)}</th>`;
     entities.forEach(colE => {
       if(rowE === colE){
         html += '<td class="diag"></td>';
@@ -2068,7 +2098,7 @@ async function openMatchModal(id){
       const dist = p.lsd ? fmtCm(p.lsd.distance) : '';
       return `<tr><td><span class="order-circle">${slot.label}</span></td><td class="rot">${roleShort ? `<span class="role-tag">${roleShort}</span>` : ''}</td><td class="clickable-cell" data-player-name="${escapeHtml(p.name)}">${escapeHtml(p.name)}</td><td class="rot">${rotIcon}</td><td class="num">${dist}</td></tr>`;
     }).join('');
-    return `<table class="roster-table"><thead><tr><th colspan="4">${escapeHtml(teamName)}</th><th class="num">${totalDisplay}</th></tr></thead><tbody>${rows}</tbody></table>`;
+    return `<table class="roster-table"><thead><tr><th colspan="4">${clubLogoImgHtml(teamName, dis)}${escapeHtml(teamName)}</th><th class="num">${totalDisplay}</th></tr></thead><tbody>${rows}</tbody></table>`;
   }
 
   const rosterHtml = `<div class="roster-cols">${rosterTableHtml(m.team1, m.roster1, m.dis)}${rosterTableHtml(m.team2, m.roster2, m.dis)}</div>`;
@@ -2231,7 +2261,7 @@ function openEntityModal(name, groupByClub, kat, dis, seasonFrom, seasonTo){
     <h2 class="entity-title">${escapeHtml(name)}</h2>
     ${summaryHtml}
     <h3 class="group-h" style="margin-top:0;">Postignuća kroz sezone</h3>
-    ${achvTableHtml(history, null, true)}
+    ${achvTableHtml(history, 'Ekipa', true)}
   `;
   overlay.classList.add('open');
 
@@ -2467,7 +2497,7 @@ async function render(){
   html += `<table class="standings"><thead><tr><th>Ekipa</th><th></th></tr></thead><tbody>`;
   tourn.standings.forEach(s => {
     const medal = MEDALS[s.place] || '';
-    html += `<tr class="clickable-row" data-team="${escapeHtml(s.team)}"><td><span class="rank">${s.place}</span>${escapeHtml(s.team)}</td><td class="medal-cell">${medal}</td></tr>`;
+    html += `<tr class="clickable-row" data-team="${escapeHtml(s.team)}"><td><span class="rank">${s.place}</span>${clubLogoImgHtml(s.team, tourn.dis)}${escapeHtml(s.team)}</td><td class="medal-cell">${medal}</td></tr>`;
   });
   html += `</tbody></table></section>`;
 
@@ -2496,14 +2526,14 @@ async function render(){
     html += `<h3 class="group-h">Tablica</h3>`;
     html += combinedTableOverride
       ? '<div class="note" style="font-size:12.5px; color:var(--text-muted); margin:4px 0 0;">Vidi zajednički poredak svih ekipa ispod.</div>'
-      : standingsTableHtml(computeGroupStandings(groupMatches, legacyMode), legacyMode);
+      : standingsTableHtml(computeGroupStandings(groupMatches, legacyMode), legacyMode, tourn.dis);
     html += `</section>`;
   });
 
   if(combinedTableOverride){
     const allGroupMatches = matches.filter(m => m.phase.type === 'group');
     html += `<section class="block"><h2 class="section-h">Zajednički poredak (svih ${new Set(allGroupMatches.flatMap(m => [m.team1, m.team2])).size} ekipa)</h2>`;
-    html += standingsTableHtml(computeGroupStandings(allGroupMatches, legacyMode, true), legacyMode);
+    html += standingsTableHtml(computeGroupStandings(allGroupMatches, legacyMode, true), legacyMode, tourn.dis);
     html += `</section>`;
   }
 
@@ -2604,9 +2634,9 @@ function matchRowHtml(m){
   return `
     <div class="match-row" data-id="${m.id}">
       <div class="match-date">${formatDate(m.date)}</div>
-      <div class="match-team ${m.winner===1?'winner':'loser'}">${escapeHtml(m.team1)}</div>
+      <div class="match-team ${m.winner===1?'winner':'loser'}"><span class="team-name-txt">${escapeHtml(m.team1)}</span>${clubLogoImgHtml(m.team1, m.dis)}</div>
       ${scoreHtml}
-      <div class="match-team right ${m.winner===2?'winner':'loser'}">${escapeHtml(m.team2)}</div>
+      <div class="match-team right ${m.winner===2?'winner':'loser'}">${clubLogoImgHtml(m.team2, m.dis)}<span class="team-name-txt">${escapeHtml(m.team2)}</span></div>
       <div class="chevron">›</div>
     </div>
   `;
@@ -2704,13 +2734,13 @@ function computeGroupStandings(matches, legacyMode, skipH2H){
   return ranked;
 }
 
-function standingsTableHtml(rows, legacyMode){
+function standingsTableHtml(rows, legacyMode, dis){
   if(rows.length === 0) return '<div class="empty-state">Nema odigranih utakmica.</div>';
   const lastCol = legacyMode ? '<th class="num">Endova</th><th class="num">Kamenova</th>' : '<th class="num">RPP</th>';
   let h = `<table class="standings"><thead><tr><th>Ekipa</th><th class="num">Utakmica</th><th class="num">Bodova</th>${lastCol}</tr></thead><tbody>`;
   rows.forEach((r,i) => {
     const lastCell = legacyMode ? `<td class="num">${r.endsWon}</td><td class="num">${r.stonesWon}</td>` : `<td class="num">${formatRpp(r.rpp)}</td>`;
-    h += `<tr><td><span class="rank">${i+1}</span>${escapeHtml(r.team)}</td><td class="num">${r.played}</td><td class="num">${r.points}</td>${lastCell}</tr>`;
+    h += `<tr><td><span class="rank">${i+1}</span>${clubLogoImgHtml(r.team, dis)}${escapeHtml(r.team)}</td><td class="num">${r.played}</td><td class="num">${r.points}</td>${lastCell}</tr>`;
   });
   h += `</tbody></table>`;
   return h;
