@@ -160,11 +160,10 @@
   table.ekipe-table th, table.ekipe-table td{padding:7px 9px; text-align:right; border:1px solid var(--ice-2);}
   table.ekipe-table th{font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:10.5px; background:var(--ice-2); color:var(--navy); text-align:center; white-space:normal; max-width:80px;}
   table.ekipe-table td.ekipe-rank, table.ekipe-table th.ekipe-rank{text-align:center; color:var(--text-muted); font-family:'IBM Plex Mono', monospace; position:sticky; left:0; background:var(--white); z-index:2; width:44px; min-width:44px; max-width:44px;}
-  table.ekipe-table td.ekipe-logo, table.ekipe-table th.ekipe-logo{text-align:center; position:sticky; left:44px; background:var(--white); z-index:2; width:34px; min-width:34px; max-width:34px; padding:6px 4px;}
   table.ekipe-table td.ekipe-name, table.ekipe-table th.ekipe-name{text-align:left; font-family:'Space Grotesk', sans-serif; font-weight:600; color:var(--navy); position:sticky; left:44px; background:var(--white); z-index:1; box-shadow:2px 0 4px -2px rgba(0,0,0,0.15);}
-  table.ekipe-table.has-logo-col td.ekipe-name, table.ekipe-table.has-logo-col th.ekipe-name{left:78px;}
+  table.ekipe-table td.ekipe-name .club-logo, table.ekipe-table th.ekipe-name .club-logo{margin-right:6px; vertical-align:middle;}
   table.ekipe-table thead th{position:sticky; top:0; z-index:2;}
-  table.ekipe-table thead th.ekipe-rank, table.ekipe-table thead th.ekipe-logo, table.ekipe-table thead th.ekipe-name{background:var(--ice-2); z-index:3;}
+  table.ekipe-table thead th.ekipe-rank, table.ekipe-table thead th.ekipe-name{background:var(--ice-2); z-index:3;}
   .top-scrollbar{overflow-x:auto; overflow-y:hidden; height:14px;}
   .top-scrollbar-spacer{height:1px;}
   table.ekipe-table td.cell-best{background:#d7ecd9; font-weight:700;}
@@ -188,6 +187,9 @@
   .modal .info-block{font-size:13.5px; color:var(--text-muted); margin-bottom:20px; display:flex; flex-direction:column; gap:5px;}
   .modal .info-block div span{color:var(--text); font-weight:500;}
   .modal h2.entity-title{font-family:'Space Grotesk', sans-serif; font-size:19px; margin:0 0 16px; color:var(--navy);}
+  .roster-header{display:flex; align-items:flex-start; gap:14px;}
+  .roster-header .club-logo-lg{width:100px; height:100px; object-fit:contain; flex-shrink:0; margin-top:2px;}
+  .roster-header .entity-title{margin-bottom:10px;}
   .h2h-modal-record{font-family:'IBM Plex Mono', monospace; font-size:13px; font-weight:400; color:var(--text-muted);}
 
   table.scoreboard-table{width:100%; table-layout:fixed; border-collapse:collapse; margin-bottom:22px; box-shadow:0 0 0 1px #7d8a94; border-radius:8px; overflow:hidden;}
@@ -810,6 +812,29 @@ function clubLogoImgHtml(team, dis, cls){
   return `<img class="club-logo${cls ? ' ' + cls : ''}" src="${uri}" alt="" loading="lazy">`;
 }
 
+// Veća verzija (CLUB_LOGOS_LG, logo-data.js) — koristi se u zaglavljima modala (sastav ekipe,
+// postignuća kluba/ekipe) gdje je logo istaknutiji. Ista logika pronalaska kluba kao gore.
+function clubLogoLgDataUri(team, dis){
+  if(!team || !dis || typeof CLUB_LOGOS_LG === 'undefined') return null;
+  const disCandidates = dis === 'sve' ? DIS_ORDER : [dis];
+  for(const d of disCandidates){
+    const clubMap = (DATA.clubs && DATA.clubs[d]) || {};
+    const club = clubMap[team] || team;
+    if(CLUB_LOGOS_LG[club]) return CLUB_LOGOS_LG[club];
+  }
+  return null;
+}
+
+// Zaglavlje modala s velikim logom lijevo (naslov + dodatni sadržaj desno). Ako klub/ekipa
+// nema logo, jednostavno se prikaže samo naslov i sadržaj, bez praznog prostora.
+function entityHeaderHtml(name, dis, innerHtml){
+  const uri = clubLogoLgDataUri(name, dis);
+  if(!uri){
+    return `<h2 class="entity-title">${escapeHtml(name)}</h2>${innerHtml}`;
+  }
+  return `<div class="roster-header"><img class="club-logo-lg" src="${uri}" alt=""><div><h2 class="entity-title">${escapeHtml(name)}</h2>${innerHtml}</div></div>`;
+}
+
 
 const KAT_ORDER = ['S', 'J', 'V'];
 
@@ -1388,13 +1413,13 @@ function renderEkipeOrKlubovi(groupByClub, contentElId){
   const placementKeys = new Set(['p4','p5','p6','p7','p8','p9']);
   cols = cols.filter(c => !placementKeys.has(c.k) || rows.some(r => r[c.k]));
 
-  let html = '<div class="h2h-wrap scroll-limited"><table class="ekipe-table has-logo-col"><thead><tr><th class="ekipe-rank"></th><th class="ekipe-logo"></th><th class="ekipe-name">Naziv</th>';
+  let html = '<div class="h2h-wrap scroll-limited"><table class="ekipe-table"><thead><tr><th class="ekipe-rank"></th><th class="ekipe-name">Naziv</th>';
   html += cols.map(c => `<th>${c.label}</th>`).join('');
   html += '<th>Tamni/Svijetli kamenovi</th><th>Posljednji kamen prvog enda</th><th>Prosjek preciznih polaganja (cm)</th>';
   html += '</tr></thead><tbody>';
 
   rows.forEach((r, i) => {
-    html += `<tr><td class="ekipe-rank">${i+1}.</td><td class="ekipe-logo">${clubLogoImgHtml(r.name, dis)}</td><td class="ekipe-name clickable-name" data-entity="${escapeHtml(r.name)}">${escapeHtml(r.name)}</td>`;
+    html += `<tr><td class="ekipe-rank">${i+1}.</td><td class="ekipe-name clickable-name" data-entity="${escapeHtml(r.name)}">${clubLogoImgHtml(r.name, dis)}${escapeHtml(r.name)}</td>`;
     cols.forEach(c => {
       let v = r[c.k];
       let display = v == null || v === 0 ? '' : v;
@@ -2256,10 +2281,11 @@ function openEntityModal(name, groupByClub, kat, dis, seasonFrom, seasonTo){
     </div>
   `;
 
+  const headerHtml = entityHeaderHtml(name, dis, summaryHtml);
+
   body.innerHTML = `
     <button class="modal-close" onclick="closeModal()">×</button>
-    <h2 class="entity-title">${escapeHtml(name)}</h2>
-    ${summaryHtml}
+    ${headerHtml}
     <h3 class="group-h" style="margin-top:0;">Postignuća kroz sezone</h3>
     ${achvTableHtml(history, 'Ekipa', true)}
   `;
@@ -2763,13 +2789,16 @@ function openTeamRosterModal(team, tourn, season, dis, kat){
     ? `<ol class="standing-list">${players.map(p => `<li class="clickable-cell" data-player-name="${escapeHtml(p)}"><span class="team-name">${escapeHtml(p)}</span></li>`).join('')}</ol>`
     : '<div class="empty-state">Nema podataka o sastavu.</div>';
 
-  body.innerHTML = `
-    <button class="modal-close" onclick="closeModal()">×</button>
-    <h2 class="entity-title">${escapeHtml(team)}</h2>
+  const headerHtml = entityHeaderHtml(team, dis, `
     <div class="info-block">
       <div>Sezona: <span>${seasonLabel(season)}</span></div>
       <div>Prvenstvo: <span>${DIS_LABELS[dis]||dis} (${KAT_LABELS[kat]||kat})</span></div>
     </div>
+  `);
+
+  body.innerHTML = `
+    <button class="modal-close" onclick="closeModal()">×</button>
+    ${headerHtml}
     <h3 class="group-h" style="margin-top:0;">Sastav ekipe</h3>
     ${rosterHtml}
   `;
