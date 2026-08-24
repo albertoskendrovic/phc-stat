@@ -105,11 +105,12 @@
 
   .record-block{margin-bottom:30px;}
   .record-title{font-family:'Space Grotesk', sans-serif; font-size:15px; font-weight:600; color:var(--navy); margin:0 0 10px;}
-  table.records-table{max-width:920px;}
+  table.records-table{max-width:920px; min-width:680px;}
+  .table-scroll-x{overflow-x:auto; -webkit-overflow-scrolling:touch;}
   table.records-table th:nth-child(1), table.records-table td:nth-child(1){width:10%;}
-  table.records-table th:nth-child(2), table.records-table td:nth-child(2){width:11%;}
+  table.records-table th:nth-child(2), table.records-table td:nth-child(2){width:14%;}
   table.records-table th:nth-child(3), table.records-table td:nth-child(3){width:9%;}
-  table.records-table th:nth-child(4), table.records-table td:nth-child(4){width:48%; white-space:nowrap;}
+  table.records-table th:nth-child(4), table.records-table td:nth-child(4){width:45%; white-space:nowrap;}
   table.records-table th:nth-child(5), table.records-table td:nth-child(5){width:10%;}
   table.records-table th:nth-child(6), table.records-table td:nth-child(6){width:12%;}
   table.records-table td, table.records-table th{text-align:left;}
@@ -147,10 +148,10 @@
   table.h2h-table{width:100%; table-layout:fixed; border-collapse:collapse; background:var(--white); border-radius:10px; overflow:hidden; box-shadow:0 0 0 1px var(--sheet-line); font-size:11.5px;}
   table.h2h-table th, table.h2h-table td{padding:6px 4px; text-align:center; border:1px solid var(--ice-2); overflow-wrap:break-word;}
   table.h2h-table th:first-child, table.h2h-table td:first-child{width:175px;}
-  table.h2h-table th:first-child{text-align:left;}
-  table.h2h-table th:first-child .club-logo{margin-right:4px; vertical-align:middle;}
+  table.h2h-table th:first-child{text-align:left; padding-left:9px;}
+  table.h2h-table th:first-child .club-logo{margin-right:7px; vertical-align:middle;}
   table.h2h-table thead th{font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:10.5px; background:var(--ice-2); color:var(--navy); line-height:1.2;}
-  table.h2h-table tbody th{font-family:'Space Grotesk', sans-serif; font-weight:600; text-align:left; background:var(--ice-2); color:var(--navy);}
+  table.h2h-table tbody th{font-family:'Space Grotesk', sans-serif; font-weight:600; text-align:left; background:var(--white); color:var(--navy);}
   table.h2h-table td.diag{background:repeating-linear-gradient(45deg, #2a3b4a, #2a3b4a 4px, #1c2b39 4px, #1c2b39 8px);}
   table.h2h-table td.h2h-cell{font-family:'IBM Plex Mono', monospace; line-height:1.5;}
   table.h2h-table .h2h-pct{font-size:10px; color:var(--text-muted); font-weight:400;}
@@ -970,7 +971,7 @@ function renderStatistika(){
   }
 
   let html = `<table class="stats-table"><colgroup><col class="label-col">${cols.map(()=>'<col class="data-col">').join('')}</colgroup>`;
-  html += `<thead><tr><th></th>${disList.map(d => `<th>${DIS_LABELS[d]}</th>`).join('')}${showTotal ? '<th class="total-col">Ukupno</th>' : ''}</tr></thead><tbody>`;
+  html += `<thead><tr><th></th>${disList.map(d => `<th><span class="lbl-full">${DIS_LABELS[d]}</span><span class="lbl-short">${d}</span></th>`).join('')}${showTotal ? '<th class="total-col">Ukupno</th>' : ''}</tr></thead><tbody>`;
 
   html += row('Prvenstava', d => colVal(d,'prvenstava'));
 
@@ -1018,13 +1019,13 @@ function formatDate(iso){
 
 function recordsTableHtml(rows, valueLabel){
   if(rows.length === 0) return '<div class="empty-mini">Nema podataka.</div>';
-  let h = `<table class="stats-table records-table"><thead><tr><th>Datum</th><th>Disciplina</th><th>Kategorija</th><th>Utakmica</th><th>Rezultat</th><th>${valueLabel}</th></tr></thead><tbody>`;
+  let h = `<div class="table-scroll-x"><table class="stats-table records-table"><thead><tr><th>Datum</th><th>Disciplina</th><th>Kategorija</th><th>Utakmica</th><th>Rezultat</th><th>${valueLabel}</th></tr></thead><tbody>`;
   rows.forEach(r => {
     const team1Html = `${clubLogoImgHtml(r.team1, r.disRaw)}${r.winner === 1 ? `<strong>${escapeHtml(r.team1)}</strong>` : escapeHtml(r.team1)}`;
     const team2Html = `${clubLogoImgHtml(r.team2, r.disRaw)}${r.winner === 2 ? `<strong>${escapeHtml(r.team2)}</strong>` : escapeHtml(r.team2)}`;
     h += `<tr class="clickable-cell" onclick="openMatchModal('${r.id}')"><td>${formatDate(r.date)}</td><td>${escapeHtml(r.dis)}</td><td>${escapeHtml(r.katLabel)}</td><td>${team1Html} - ${team2Html}</td><td>${r.score1}:${r.score2}</td><td class="num-cell">${r.value}</td></tr>`;
   });
-  h += '</tbody></table>';
+  h += '</tbody></table></div>';
   return h;
 }
 
@@ -1413,7 +1414,7 @@ function renderEkipeOrKlubovi(groupByClub, contentElId){
   const placementKeys = new Set(['p4','p5','p6','p7','p8','p9']);
   cols = cols.filter(c => !placementKeys.has(c.k) || rows.some(r => r[c.k]));
 
-  let html = '<div class="h2h-wrap scroll-limited"><table class="ekipe-table"><thead><tr><th class="ekipe-rank"></th><th class="ekipe-name">Naziv</th>';
+  let html = `<div class="h2h-wrap scroll-limited"><table class="ekipe-table"><thead><tr><th class="ekipe-rank"></th><th class="ekipe-name">${groupByClub ? 'Klub' : 'Ekipa'}</th>`;
   html += cols.map(c => `<th>${c.label}</th>`).join('');
   html += '<th>Tamni/Svijetli kamenovi</th><th>Posljednji kamen prvog enda</th><th>Prosjek preciznih polaganja (cm)</th>';
   html += '</tr></thead><tbody>';
@@ -1655,7 +1656,7 @@ function renderH2h(groupByClub, contentElId){
     else if(m.played){ record[e1][e2].d++; record[e2][e1].d++; }
   });
 
-  let html = '<div class="h2h-wrap"><table class="h2h-table"><thead><tr><th></th>';
+  let html = `<div class="h2h-wrap"><table class="h2h-table"><thead><tr><th>${groupByClub ? 'Klub' : 'Ekipa'}</th>`;
   html += entities.map(e => `<th class="clickable-name" data-entity="${escapeHtml(e)}">${escapeHtml(e)}</th>`).join('');
   html += '</tr></thead><tbody>';
   entities.forEach(rowE => {
@@ -1853,7 +1854,7 @@ function renderIgraciH2h(){
       </div>
       <div class="achv-table-scroll">
       <table class="achv-table">
-        <thead><tr><th>Datum</th><th>Disciplina</th><th>Kategorija</th><th>Utakmica</th><th class="num">Rezultat</th></tr></thead>
+        <thead><tr><th>Datum</th><th><span class="lbl-full">Disciplina</span><span class="lbl-short">Dis.</span></th><th><span class="lbl-full">Kategorija</span><span class="lbl-short">Kat.</span></th><th>Utakmica</th><th class="num">Rezultat</th></tr></thead>
         <tbody>
     `;
     rows.forEach(r => {
@@ -1873,7 +1874,7 @@ function renderIgraciH2h(){
       } else {
         score = '–';
       }
-      html += `<tr class="clickable-cell" data-match-id="${m.id}"><td>${formatDate(m.date)}</td><td>${escapeHtml(m.disLabel)}</td><td>${escapeHtml(m.katLabel)}</td><td>${teamAHtml} - ${teamBHtml}</td><td class="num">${score}</td></tr>`;
+      html += `<tr class="clickable-cell" data-match-id="${m.id}"><td>${formatDate(m.date)}</td><td><span class="lbl-full">${escapeHtml(m.disLabel)}</span><span class="lbl-short">${escapeHtml(m.dis)}</span></td><td><span class="lbl-full">${escapeHtml(m.katLabel)}</span><span class="lbl-short">${escapeHtml(m.kat)}</span></td><td>${teamAHtml} - ${teamBHtml}</td><td class="num">${score}</td></tr>`;
     });
     html += '</tbody></table></div>';
     resultEl.innerHTML = html;
@@ -2237,7 +2238,7 @@ const MEDAL_ICONS = {1:'🥇',2:'🥈',3:'🥉'};
 
 function achvTableHtml(history, teamColLabel, clickableRoster){
   if(history.length === 0) return '<div class="empty-mini">Nema podataka o nastupima.</div>';
-  let h = `<table class="achv-table"><thead><tr><th>Sezona</th><th>Disciplina</th><th>Kategorija</th>${teamColLabel ? `<th>${teamColLabel}</th>` : ''}<th class="num">Mjesto</th></tr></thead><tbody>`;
+  let h = `<div class="achv-table-scroll"><table class="achv-table"><thead><tr><th>Sezona</th><th><span class="lbl-full">Disciplina</span><span class="lbl-short">Dis.</span></th><th><span class="lbl-full">Kategorija</span><span class="lbl-short">Kat.</span></th>${teamColLabel ? `<th>${teamColLabel}</th>` : ''}<th class="num">Mjesto</th></tr></thead><tbody>`;
   history.forEach(r => {
     const medal = MEDAL_ICONS[r.place] || '';
     const placeCell = r.place != null
@@ -2247,9 +2248,9 @@ function achvTableHtml(history, teamColLabel, clickableRoster){
     const rowAttrs = clickableRoster
       ? ` class="clickable-cell" data-roster-season="${r.season}" data-roster-dis="${escapeHtml(r.dis)}" data-roster-kat="${escapeHtml(r.kat)}" data-roster-p="${r.p}" data-roster-team="${escapeHtml(teamName)}"`
       : '';
-    h += `<tr${rowAttrs}><td>${seasonLabel(r.season)}</td><td>${DIS_LABELS[r.dis]||r.dis}</td><td>${KAT_LABELS[r.kat]||r.kat}</td>${teamColLabel ? `<td>${escapeHtml(teamName)}</td>` : ''}<td class="num">${placeCell}</td></tr>`;
+    h += `<tr${rowAttrs}><td>${seasonLabel(r.season)}</td><td><span class="lbl-full">${DIS_LABELS[r.dis]||r.dis}</span><span class="lbl-short">${r.dis}</span></td><td><span class="lbl-full">${KAT_LABELS[r.kat]||r.kat}</span><span class="lbl-short">${r.kat}</span></td>${teamColLabel ? `<td>${escapeHtml(teamName)}</td>` : ''}<td class="num">${placeCell}</td></tr>`;
   });
-  h += '</tbody></table>';
+  h += '</tbody></table></div>';
   return h;
 }
 
