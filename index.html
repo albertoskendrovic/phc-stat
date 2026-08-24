@@ -61,10 +61,12 @@
   .radio-btn.sve-btn.active{background:var(--stone-yellow); color:#fff; border-color:var(--stone-yellow);}
   .radio-btn:disabled{opacity:0.35; cursor:not-allowed;}
 
-  .filter-bar{display:flex; flex-wrap:wrap; gap:24px; background:var(--white); border-radius:10px; box-shadow:0 0 0 1px var(--sheet-line); padding:16px 20px; margin:24px 0; align-items:flex-start;}
+  .radio-btn.sve-btn.mini{padding:3px 10px; font-size:11.5px;}
+  .filter-bar{display:flex; flex-wrap:wrap; gap:28px; background:var(--white); border-radius:10px; box-shadow:0 0 0 1px var(--sheet-line); padding:14px 20px; margin:24px 0; align-items:flex-start;}
   .filter-bar.disabled-group{opacity:0.4;}
-  .filter-group{display:flex; flex-direction:column; gap:6px;}
-  .filter-group-label{font-family:'IBM Plex Mono', monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted); border-bottom:1px solid var(--ice-2); padding-bottom:4px;}
+  .filter-group{display:flex; flex-direction:column; gap:7px;}
+  .filter-group-label-row{display:flex; align-items:center; gap:8px; border-bottom:1px solid var(--ice-2); padding-bottom:5px;}
+  .filter-group-label{font-family:'IBM Plex Mono', monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted);}
   .filter-group.is-inactive{opacity:0.35;}
   .season-controls{display:flex; align-items:center; gap:8px;}
   .season-dd{display:flex; flex-direction:row; align-items:center; gap:5px; opacity:0.55; transition:opacity 0.15s;}
@@ -117,7 +119,7 @@
   table.records-table td.num-cell, table.records-table th:nth-child(6){text-align:right; font-family:'IBM Plex Mono', monospace;}
   table.records-table td{font-family:'Inter', sans-serif; font-weight:400; font-size:13px;}
 
-  .h2h-wrap{overflow-x:auto; overflow-y:hidden; border-radius:10px;}
+  .h2h-wrap{overflow-x:auto; overflow-y:hidden; border-radius:10px; box-shadow:0 0 0 1px var(--sheet-line);}
 
   /* ---------- Igrači međusobno: kombo-izbornici s filtriranjem ---------- */
   .ph2h-picker-row{display:flex; gap:16px; flex-wrap:wrap; align-items:flex-start; margin-bottom:20px;}
@@ -145,12 +147,13 @@
      i vlastiti scroll (i vodoravno i okomito), čime sticky zaglavlje ispravno ostaje prikovano
      za vrh dok se scrolla unutar te "kutije", umjesto da nestane pri scrollanju cijele stranice. */
   .h2h-wrap.scroll-limited{overflow:auto; max-height:90vh;}
-  table.h2h-table{width:100%; table-layout:fixed; border-collapse:collapse; background:var(--white); border-radius:10px; overflow:hidden; box-shadow:0 0 0 1px var(--sheet-line); font-size:11.5px;}
+  table.h2h-table{table-layout:fixed; border-collapse:separate; border-spacing:0; background:var(--white); font-size:11.5px;}
   table.h2h-table th, table.h2h-table td{padding:6px 4px; text-align:center; border:1px solid var(--ice-2); overflow-wrap:break-word;}
-  table.h2h-table th:first-child, table.h2h-table td:first-child{width:175px;}
-  table.h2h-table th:first-child{text-align:left; padding-left:9px;}
+  table.h2h-table th:first-child{text-align:left; padding-left:9px; position:sticky; left:0; z-index:2; background:var(--white); box-shadow:2px 0 4px -2px rgba(0,0,0,0.15);}
+  table.h2h-table th:first-child.clickable-name:hover{background:var(--ice-2); box-shadow:inset 3px 0 0 var(--navy), 2px 0 4px -2px rgba(0,0,0,0.15);}
   table.h2h-table th:first-child .club-logo{margin-right:7px; vertical-align:middle;}
-  table.h2h-table thead th{font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:10.5px; background:var(--ice-2); color:var(--navy); line-height:1.2;}
+  table.h2h-table thead th{font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:10.5px; background:var(--ice-2); color:var(--navy); line-height:1.2; position:sticky; top:0; z-index:2;}
+  table.h2h-table thead th:first-child{z-index:3; background:var(--ice-2);}
   table.h2h-table tbody th{font-family:'Space Grotesk', sans-serif; font-weight:600; text-align:left; background:var(--white); color:var(--navy);}
   table.h2h-table td.diag{background:repeating-linear-gradient(45deg, #2a3b4a, #2a3b4a 4px, #1c2b39 4px, #1c2b39 8px);}
   table.h2h-table td.h2h-cell{font-family:'IBM Plex Mono', monospace; line-height:1.5;}
@@ -191,7 +194,7 @@
   .roster-header{display:flex; align-items:flex-start; gap:14px;}
   .roster-header .club-logo-lg{width:100px; height:100px; object-fit:contain; flex-shrink:0; margin-top:2px;}
   .roster-header .entity-title{margin-bottom:10px;}
-  .h2h-modal-record{font-family:'IBM Plex Mono', monospace; font-size:13px; font-weight:400; color:var(--text-muted);}
+  .h2h-modal-record{font-family:'IBM Plex Mono', monospace; font-size:13px; font-weight:400; color:var(--text-muted); white-space:nowrap; display:inline-block;}
 
   table.scoreboard-table{width:100%; table-layout:fixed; border-collapse:collapse; margin-bottom:22px; box-shadow:0 0 0 1px #7d8a94; border-radius:8px; overflow:hidden;}
   table.scoreboard-table th, table.scoreboard-table td{padding:7px 4px; text-align:center; font-size:13.5px; border-right:1px solid #7d8a94; border-bottom:1px solid #7d8a94;}
@@ -392,7 +395,7 @@
   .zapisnik-loading{display:flex; align-items:center; justify-content:center; height:200px; background:var(--ice-2); color:var(--text-muted); font-size:13px; border-radius:4px;}
   .pdf-fallback-link{margin-top:10px;}
   .modal h2.entity-title{font-family:'Space Grotesk', sans-serif; font-size:19px; margin:0 0 16px; color:var(--navy);}
-  .h2h-modal-record{font-family:'IBM Plex Mono', monospace; font-size:13px; font-weight:400; color:var(--text-muted);}
+  .h2h-modal-record{font-family:'IBM Plex Mono', monospace; font-size:13px; font-weight:400; color:var(--text-muted); white-space:nowrap; display:inline-block;}
 
   .empty-state{text-align:center; padding:36px 20px; color:var(--text-muted); font-size:13.5px; background:var(--white); border-radius:10px; box-shadow:0 0 0 1px var(--sheet-line);}
   .note{font-size:12px; color:var(--text-muted); margin-top:8px; font-style:italic;}
@@ -441,6 +444,7 @@
     .badge-tier-cols{flex-direction:column; gap:18px;}
     .lbl-full{display:none;}
     .lbl-short{display:inline;}
+    .ph2h-input{font-size:16px;}
     header .wrap{display:flex; flex-direction:column;}
     .header-top{display:contents;}
     header .eyebrow{order:1;}
@@ -511,17 +515,25 @@
 
   <div class="filter-bar">
     <div class="filter-group">
-      <div class="filter-group-label">Kategorija</div>
+      <div class="filter-group-label-row">
+        <span class="filter-group-label">Kategorija</span>
+        <button class="radio-btn sve-btn mini active" id="katSveBtn" data-kat="sve">Sve</button>
+      </div>
       <div class="radio-row" id="globalKatRow"></div>
     </div>
     <div class="filter-group" id="globalDisGroup">
-      <div class="filter-group-label">Disciplina</div>
+      <div class="filter-group-label-row">
+        <span class="filter-group-label">Disciplina</span>
+        <button class="radio-btn sve-btn mini active" id="disSveBtn" data-dis="sve">Sve</button>
+      </div>
       <div class="radio-row" id="globalDisRow"></div>
     </div>
     <div class="filter-group">
-      <div class="filter-group-label">Sezona</div>
+      <div class="filter-group-label-row">
+        <span class="filter-group-label">Sezona</span>
+        <button class="radio-btn sve-btn mini active" id="seasonSveBtn">Sve</button>
+      </div>
       <div class="season-controls">
-        <button class="radio-btn sve-btn active" id="seasonSveBtn">Sve</button>
         <div class="season-dd">
           <span class="season-dd-label">Od</span>
           <select id="globalSeasonFrom"></select>
@@ -655,6 +667,17 @@ function addTopScrollbar(containerEl, scrollWrapEl){
   top.appendChild(spacer);
   containerEl.insertBefore(top, scrollWrapEl);
 
+  // Ako scrollWrapEl ima i okomiti scrollbar (npr. visoke tablice poput "Igrači" gdje se
+  // pojavljuje i vertikalni scroll), taj scrollbar oduzima nekoliko piksela od njegove stvarne
+  // vidljive širine (clientWidth < offsetWidth). Gornja traka (top) nema okomiti scrollbar pa
+  // bez ovoga ima veću vidljivu širinu, a time i manji maksimalni scrollLeft — povlačenjem do
+  // kraja ne bi se otkrio baš zadnji djelić zadnjeg stupca. Eksplicitno joj zato izjednačimo
+  // vidljivu širinu sa stvarnom (usklađenom) širinom donjeg wrap-a.
+  const vScrollbarWidth = scrollWrapEl.offsetWidth - scrollWrapEl.clientWidth;
+  if(vScrollbarWidth > 0){
+    top.style.width = scrollWrapEl.clientWidth + 'px';
+  }
+
   let syncing = false;
   top.addEventListener('scroll', () => {
     if(syncing) return;
@@ -697,7 +720,9 @@ function updateFilterVisibility(){
 // Odražava spremljeno stanje AKTIVNOG taba na kontrolama filtera (bez okidanja re-rendera)
 function syncFilterBarToState(){
   const st = currentState();
+  document.getElementById('katSveBtn').classList.toggle('active', st.kat === 'sve');
   document.querySelectorAll('#globalKatRow .radio-btn').forEach(b => b.classList.toggle('active', b.dataset.kat === st.kat));
+  document.getElementById('disSveBtn').classList.toggle('active', st.dis === 'sve');
   document.querySelectorAll('#globalDisRow .radio-btn').forEach(b => b.classList.toggle('active', b.dataset.dis === st.dis));
   document.getElementById('seasonSveBtn').classList.toggle('active', st.seasonMode === 'sve');
   document.getElementById('globalSeasonFrom').value = st.seasonMode === 'sve' ? MIN_SEASON : (st.seasonFrom ?? MIN_SEASON);
@@ -727,11 +752,18 @@ function initUniversalFilters(){
   // Kategorija
   const kats = availableKats();
   const katRow = document.getElementById('globalKatRow');
-  katRow.innerHTML = '<button class="radio-btn sve-btn active" data-kat="sve">Sve</button>' +
-    kats.map(k => `<button class="radio-btn" data-kat="${k}"><span class="lbl-full">${KAT_LABELS[k]||k}</span><span class="lbl-short">${k}</span></button>`).join('');
+  const katSveBtn = document.getElementById('katSveBtn');
+  katRow.innerHTML = kats.map(k => `<button class="radio-btn" data-kat="${k}"><span class="lbl-full">${KAT_LABELS[k]||k}</span><span class="lbl-short">${k}</span></button>`).join('');
+  katSveBtn.addEventListener('click', () => {
+    katRow.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('active'));
+    katSveBtn.classList.add('active');
+    currentState().kat = 'sve';
+    renderActiveTab();
+  });
   katRow.querySelectorAll('.radio-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       katRow.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('active'));
+      katSveBtn.classList.remove('active');
       btn.classList.add('active');
       currentState().kat = btn.dataset.kat;
       renderActiveTab();
@@ -740,12 +772,20 @@ function initUniversalFilters(){
 
   // Disciplina
   const disRow = document.getElementById('globalDisRow');
-  disRow.innerHTML = '<button class="radio-btn sve-btn active" data-dis="sve">Sve</button>' +
-    DIS_ORDER.map(d => `<button class="radio-btn" data-dis="${d}"><span class="lbl-full">${DIS_LABELS[d]}</span><span class="lbl-short">${d}</span></button>`).join('');
+  const disSveBtn = document.getElementById('disSveBtn');
+  disRow.innerHTML = DIS_ORDER.map(d => `<button class="radio-btn" data-dis="${d}"><span class="lbl-full">${DIS_LABELS[d]}</span><span class="lbl-short">${d}</span></button>`).join('');
+  disSveBtn.addEventListener('click', () => {
+    if(disSveBtn.disabled) return;
+    disRow.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('active'));
+    disSveBtn.classList.add('active');
+    currentState().dis = 'sve';
+    renderActiveTab();
+  });
   disRow.querySelectorAll('.radio-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       if(btn.disabled) return;
       disRow.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('active'));
+      disSveBtn.classList.remove('active');
       btn.classList.add('active');
       currentState().dis = btn.dataset.dis;
       renderActiveTab();
@@ -1638,7 +1678,24 @@ function renderH2h(groupByClub, contentElId){
 
   const entitiesSet = new Set();
   matches.forEach(m => { entitiesSet.add(entityName(m.team1)); entitiesSet.add(entityName(m.team2)); });
-  const entities = [...entitiesSet].sort((a,b) => a.localeCompare(b, 'hr'));
+
+  // Poredak po NHC bodovima (isti izračun kao na "Klubovi"/"Ekipe"), ovisno o trenutnom filteru -
+  // NHC bodovi se ovdje ne prikazuju, samo određuju redoslijed. Kod izjednačenja koriste se isti
+  // dodatni kriteriji kao u glavnoj tablici: bodovi za medalje, pa pobjede, pa porazi.
+  const nhcStatsMap = computeTeamClubStats(kat, dis, groupByClub, from, to);
+  function medalPoints(s){ return s ? (s.medals[1]*3 + s.medals[2]*2 + s.medals[3]*1) : 0; }
+  const entities = [...entitiesSet].sort((a,b) => {
+    const sa = nhcStatsMap[a], sb = nhcStatsMap[b];
+    const nhcA = sa ? sa.nhc : 0, nhcB = sb ? sb.nhc : 0;
+    if(nhcB !== nhcA) return nhcB - nhcA;
+    const mpA = medalPoints(sa), mpB = medalPoints(sb);
+    if(mpB !== mpA) return mpB - mpA;
+    const wA = sa ? sa.w : 0, wB = sb ? sb.w : 0;
+    if(wB !== wA) return wB - wA;
+    const lA = sa ? sa.l : 0, lB = sb ? sb.l : 0;
+    if(lA !== lB) return lA - lB;
+    return a.localeCompare(b, 'hr');
+  });
 
   if(entities.length === 0){
     content.innerHTML = '<div class="empty-state">Nema odigranih utakmica za odabranu disciplinu/kategoriju.</div>';
@@ -1656,7 +1713,11 @@ function renderH2h(groupByClub, contentElId){
     else if(m.played){ record[e1][e2].d++; record[e2][e1].d++; }
   });
 
-  let html = `<div class="h2h-wrap"><table class="h2h-table"><thead><tr><th>${groupByClub ? 'Klub' : 'Ekipa'}</th>`;
+  const h2hColWidth = 70;
+  const h2hFirstColWidth = 175;
+  const h2hTableWidth = h2hFirstColWidth + entities.length * h2hColWidth;
+  const h2hColgroup = `<colgroup><col style="width:${h2hFirstColWidth}px">${`<col style="width:${h2hColWidth}px">`.repeat(entities.length)}</colgroup>`;
+  let html = `<div class="h2h-wrap scroll-limited"><table class="h2h-table" style="width:${h2hTableWidth}px;">${h2hColgroup}<thead><tr><th>${groupByClub ? 'Klub' : 'Ekipa'}</th>`;
   html += entities.map(e => `<th class="clickable-name" data-entity="${escapeHtml(e)}">${escapeHtml(e)}</th>`).join('');
   html += '</tr></thead><tbody>';
   entities.forEach(rowE => {
@@ -1680,7 +1741,6 @@ function renderH2h(groupByClub, contentElId){
     html += '</tr>';
   });
   html += '</tbody></table></div>';
-  html += '<div class="note" style="margin-top:10px; font-size:12px; color:var(--text-muted);">Format ćelije: pobjede-neriješeno-porazi za momčad/klub iz retka, protiv momčadi/kluba iz stupca. Klik na naziv otvara detalje, klik na ćeliju otvara popis međusobnih utakmica.</div>';
   content.innerHTML = html;
   const wrapEl = content.querySelector(".h2h-wrap");
   if(wrapEl) addTopScrollbar(content, wrapEl);
@@ -2380,7 +2440,7 @@ function openH2hMatchListModal(entityA, entityB, groupByClub, dis, kat){
     }
     const team1Html = m.winner === 1 ? `<strong>${escapeHtml(m.team1)}</strong>` : escapeHtml(m.team1);
     const team2Html = m.winner === 2 ? `<strong>${escapeHtml(m.team2)}</strong>` : escapeHtml(m.team2);
-    return `<tr class="clickable-cell" data-match-id="${m.id}"><td>${formatDate(m.date)}</td><td>${DIS_LABELS[m.dis]||m.dis}</td><td>${KAT_LABELS[m.kat]||m.kat}</td><td>${team1Html} - ${team2Html}</td><td class="num">${score}</td></tr>`;
+    return `<tr class="clickable-cell" data-match-id="${m.id}"><td>${formatDate(m.date)}</td><td><span class="lbl-full">${DIS_LABELS[m.dis]||m.dis}</span><span class="lbl-short">${m.dis}</span></td><td><span class="lbl-full">${KAT_LABELS[m.kat]||m.kat}</span><span class="lbl-short">${m.kat}</span></td><td>${team1Html} - ${team2Html}</td><td class="num">${score}</td></tr>`;
   }).join('');
   if(!rowsHtml) rowsHtml = '<tr><td colspan="5" class="empty-mini">Nema pronađenih utakmica.</td></tr>';
 
@@ -2399,7 +2459,9 @@ function openH2hMatchListModal(entityA, entityB, groupByClub, dis, kat){
   body.innerHTML = `
     <button class="modal-close" onclick="closeModal()">×</button>
     <h2 class="entity-title">${escapeHtml(entityA)} — ${escapeHtml(entityB)}${recordText}</h2>
-    <table class="achv-table"><thead><tr><th>Datum</th><th>Disciplina</th><th>Kategorija</th><th>Utakmica</th><th class="num">Rezultat</th></tr></thead><tbody>${rowsHtml}</tbody></table>
+    <div class="achv-table-scroll">
+    <table class="achv-table"><thead><tr><th>Datum</th><th><span class="lbl-full">Disciplina</span><span class="lbl-short">Dis.</span></th><th><span class="lbl-full">Kategorija</span><span class="lbl-short">Kat.</span></th><th>Utakmica</th><th class="num">Rezultat</th></tr></thead><tbody>${rowsHtml}</tbody></table>
+    </div>
   `;
   body.querySelectorAll('[data-match-id]').forEach(row => {
     row.addEventListener('click', () => {
