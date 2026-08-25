@@ -160,6 +160,8 @@ def build(export_path, out_path):
             'throws1': throws1, 'throws2': throws2,
             'pk': pk,
             'team1': tname(dis, r['Ekipa1']), 'team2': tname(dis, r['Ekipa2']),
+            'team1Short': r['Ekipa1'] if pd.notna(r['Ekipa1']) else None,
+            'team2Short': r['Ekipa2'] if pd.notna(r['Ekipa2']) else None,
             'score1': float(r['Kam1']) if pd.notna(r['Kam1']) else None,
             'score2': float(r['Kam2']) if pd.notna(r['Kam2']) else None,
             'winner': int(r['Pob']) if r['Pob'] in (1, 2) else None,

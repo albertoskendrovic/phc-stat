@@ -116,6 +116,7 @@
   table.records-table th:nth-child(5), table.records-table td:nth-child(5){width:10%;}
   table.records-table th:nth-child(6), table.records-table td:nth-child(6){width:12%;}
   table.records-table td, table.records-table th{text-align:left;}
+  table.records-table th, table.records-table td{overflow-wrap:break-word; word-break:break-word;}
   table.records-table td.num-cell, table.records-table th:nth-child(6){text-align:right; font-family:'IBM Plex Mono', monospace;}
   table.records-table td{font-family:'Inter', sans-serif; font-weight:400; font-size:13px;}
 
@@ -1059,11 +1060,11 @@ function formatDate(iso){
 
 function recordsTableHtml(rows, valueLabel){
   if(rows.length === 0) return '<div class="empty-mini">Nema podataka.</div>';
-  let h = `<div class="table-scroll-x"><table class="stats-table records-table"><thead><tr><th>Datum</th><th>Disciplina</th><th>Kategorija</th><th>Utakmica</th><th>Rezultat</th><th>${valueLabel}</th></tr></thead><tbody>`;
+  let h = `<div class="table-scroll-x"><table class="stats-table records-table"><thead><tr><th>Datum</th><th><span class="lbl-full">Disciplina</span><span class="lbl-short">Dis.</span></th><th><span class="lbl-full">Kategorija</span><span class="lbl-short">Kat.</span></th><th>Utakmica</th><th>Rezultat</th><th>${valueLabel}</th></tr></thead><tbody>`;
   rows.forEach(r => {
     const team1Html = `${clubLogoImgHtml(r.team1, r.disRaw)}${r.winner === 1 ? `<strong>${escapeHtml(r.team1)}</strong>` : escapeHtml(r.team1)}`;
     const team2Html = `${clubLogoImgHtml(r.team2, r.disRaw)}${r.winner === 2 ? `<strong>${escapeHtml(r.team2)}</strong>` : escapeHtml(r.team2)}`;
-    h += `<tr class="clickable-cell" onclick="openMatchModal('${r.id}')"><td>${formatDate(r.date)}</td><td>${escapeHtml(r.dis)}</td><td>${escapeHtml(r.katLabel)}</td><td>${team1Html} - ${team2Html}</td><td>${r.score1}:${r.score2}</td><td class="num-cell">${r.value}</td></tr>`;
+    h += `<tr class="clickable-cell" onclick="openMatchModal('${r.id}')"><td>${formatDate(r.date)}</td><td><span class="lbl-full">${escapeHtml(r.dis)}</span><span class="lbl-short">${escapeHtml(r.disRaw)}</span></td><td><span class="lbl-full">${escapeHtml(r.katLabel)}</span><span class="lbl-short">${escapeHtml(r.katRaw)}</span></td><td>${team1Html} - ${team2Html}</td><td>${r.score1}:${r.score2}</td><td class="num-cell">${r.value}</td></tr>`;
   });
   h += '</tbody></table></div>';
   return h;
@@ -1117,7 +1118,7 @@ function renderRekordi(){
 
   function toRow(m, val){
     return {
-      id: m.id, katLabel: m.katLabel, dis: m.disLabel, disRaw: m.dis, team1: m.team1, team2: m.team2,
+      id: m.id, katLabel: m.katLabel, katRaw: m.kat, dis: m.disLabel, disRaw: m.dis, team1: m.team1, team2: m.team2,
       score1: m.score1.toFixed(0), score2: m.score2.toFixed(0), date: m.date, value: val, winner: m.winner
     };
   }
@@ -2308,7 +2309,7 @@ function achvTableHtml(history, teamColLabel, clickableRoster){
     const rowAttrs = clickableRoster
       ? ` class="clickable-cell" data-roster-season="${r.season}" data-roster-dis="${escapeHtml(r.dis)}" data-roster-kat="${escapeHtml(r.kat)}" data-roster-p="${r.p}" data-roster-team="${escapeHtml(teamName)}"`
       : '';
-    h += `<tr${rowAttrs}><td>${seasonLabel(r.season)}</td><td><span class="lbl-full">${DIS_LABELS[r.dis]||r.dis}</span><span class="lbl-short">${r.dis}</span></td><td><span class="lbl-full">${KAT_LABELS[r.kat]||r.kat}</span><span class="lbl-short">${r.kat}</span></td>${teamColLabel ? `<td>${escapeHtml(teamName)}</td>` : ''}<td class="num">${placeCell}</td></tr>`;
+    h += `<tr${rowAttrs}><td>${seasonLabel(r.season)}</td><td><span class="lbl-full">${DIS_LABELS[r.dis]||r.dis}</span><span class="lbl-short">${r.dis}</span></td><td><span class="lbl-full">${KAT_LABELS[r.kat]||r.kat}</span><span class="lbl-short">${r.kat}</span></td>${teamColLabel ? `<td><span class="lbl-full">${escapeHtml(teamName)}</span><span class="lbl-short">${escapeHtml(teamShortName(teamName, r.dis))}</span></td>` : ''}<td class="num">${placeCell}</td></tr>`;
   });
   h += '</tbody></table></div>';
   return h;
@@ -2723,9 +2724,9 @@ function matchRowHtml(m){
   return `
     <div class="match-row" data-id="${m.id}">
       <div class="match-date">${formatDate(m.date)}</div>
-      <div class="match-team ${m.winner===1?'winner':'loser'}"><span class="team-name-txt">${escapeHtml(m.team1)}</span>${clubLogoImgHtml(m.team1, m.dis)}</div>
+      <div class="match-team ${m.winner===1?'winner':'loser'}"><span class="team-name-txt"><span class="lbl-full">${escapeHtml(m.team1)}</span><span class="lbl-short">${escapeHtml(m.team1Short || m.team1)}</span></span>${clubLogoImgHtml(m.team1, m.dis)}</div>
       ${scoreHtml}
-      <div class="match-team right ${m.winner===2?'winner':'loser'}">${clubLogoImgHtml(m.team2, m.dis)}<span class="team-name-txt">${escapeHtml(m.team2)}</span></div>
+      <div class="match-team right ${m.winner===2?'winner':'loser'}">${clubLogoImgHtml(m.team2, m.dis)}<span class="team-name-txt"><span class="lbl-full">${escapeHtml(m.team2)}</span><span class="lbl-short">${escapeHtml(m.team2Short || m.team2)}</span></span></div>
       <div class="chevron">›</div>
     </div>
   `;
@@ -2823,13 +2824,29 @@ function computeGroupStandings(matches, legacyMode, skipH2H){
   return ranked;
 }
 
+// Skraćeni nazivi ekipa (npr. "Čunjaš 2", "LegZg") - iz kolone Ekipa1/Ekipa2 u Excelu, ugrađeno
+// u phc-data.json kao team1Short/team2Short. Koristi se samo na malim ekranima (lbl-short),
+// u popisu utakmica i tablicama po fazi - NE u "Konačnom poretku" (tamo ostaje puni naziv).
+let TEAM_SHORT_CACHE = null;
+function teamShortName(team, dis){
+  if(!TEAM_SHORT_CACHE){
+    TEAM_SHORT_CACHE = {};
+    DATA.matches.forEach(m => {
+      if(m.team1Short) TEAM_SHORT_CACHE[m.dis + '|' + m.team1] = m.team1Short;
+      if(m.team2Short) TEAM_SHORT_CACHE[m.dis + '|' + m.team2] = m.team2Short;
+    });
+  }
+  return TEAM_SHORT_CACHE[dis + '|' + team] || team;
+}
+
 function standingsTableHtml(rows, legacyMode, dis){
   if(rows.length === 0) return '<div class="empty-state">Nema odigranih utakmica.</div>';
   const lastCol = legacyMode ? '<th class="num">Endova</th><th class="num">Kamenova</th>' : '<th class="num">RPP</th>';
   let h = `<table class="standings"><thead><tr><th>Ekipa</th><th class="num">Utakmica</th><th class="num">Bodova</th>${lastCol}</tr></thead><tbody>`;
   rows.forEach((r,i) => {
     const lastCell = legacyMode ? `<td class="num">${r.endsWon}</td><td class="num">${r.stonesWon}</td>` : `<td class="num">${formatRpp(r.rpp)}</td>`;
-    h += `<tr><td><span class="rank">${i+1}</span>${clubLogoImgHtml(r.team, dis)}${escapeHtml(r.team)}</td><td class="num">${r.played}</td><td class="num">${r.points}</td>${lastCell}</tr>`;
+    const teamNameHtml = `<span class="lbl-full">${escapeHtml(r.team)}</span><span class="lbl-short">${escapeHtml(teamShortName(r.team, dis))}</span>`;
+    h += `<tr><td><span class="rank">${i+1}</span>${clubLogoImgHtml(r.team, dis)}${teamNameHtml}</td><td class="num">${r.played}</td><td class="num">${r.points}</td>${lastCell}</tr>`;
   });
   h += `</tbody></table>`;
   return h;
