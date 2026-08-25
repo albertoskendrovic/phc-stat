@@ -169,6 +169,21 @@
   table.ekipe-table td.ekipe-name .club-logo, table.ekipe-table th.ekipe-name .club-logo{margin-right:6px; vertical-align:middle;}
   table.ekipe-table thead th{position:sticky; top:0; z-index:2;}
   table.ekipe-table thead th.ekipe-rank, table.ekipe-table thead th.ekipe-name{background:var(--ice-2); z-index:3;}
+  table.ekipe-table thead th.ekipe-name-search{position:sticky; left:0; top:0; z-index:3; background:var(--ice-2); text-align:left; padding:6px 8px;}
+
+  /* ---------- pretraga igrača u zaglavlju tablice (Igrači) ---------- */
+  .name-search-wrap{position:relative; width:100%;}
+  .name-search-input{width:100%; padding:6px 26px 6px 9px; font-size:12px; font-family:'Inter', sans-serif; font-weight:500; text-transform:none; border:1.5px solid var(--sheet-line); border-radius:6px; background:var(--white); color:var(--navy);}
+  .name-search-input::placeholder{color:var(--text-muted); font-weight:400;}
+  .name-search-input:focus{outline:none; border-color:var(--navy-2);}
+  .name-search-clear{position:absolute; right:3px; top:50%; transform:translateY(-50%); width:18px; height:18px; border:none; background:none; color:var(--text-muted); font-size:14px; line-height:1; cursor:pointer; border-radius:50%; display:flex; align-items:center; justify-content:center;}
+  .name-search-clear:hover{background:var(--ice-2); color:var(--navy);}
+  .name-search-list{position:absolute; top:100%; left:0; right:0; margin-top:2px; background:var(--white); border:1.5px solid var(--sheet-line); border-radius:8px; max-height:220px; overflow-y:auto; z-index:50; box-shadow:0 8px 20px rgba(0,0,0,0.15); text-align:left; display:none;}
+  .name-search-list.open{display:block;}
+  .name-search-item{padding:7px 10px; font-size:12.5px; font-weight:500; cursor:pointer; color:var(--text);}
+  .name-search-item:hover, .name-search-item.active{background:var(--ice-2);}
+  .name-search-empty{padding:8px 10px; font-size:12px; color:var(--text-muted); font-style:italic;}
+  tr.row-highlight td{background:#fff3cf !important; transition:background 1.8s ease;}
   .top-scrollbar{overflow-x:auto; overflow-y:hidden; height:14px;}
   .top-scrollbar-spacer{height:1px;}
   table.ekipe-table td.cell-best{background:#d7ecd9; font-weight:700;}
@@ -446,6 +461,7 @@
     .lbl-full{display:none;}
     .lbl-short{display:inline;}
     .ph2h-input{font-size:16px;}
+    .name-search-input{font-size:16px;}
     header .wrap{display:flex; flex-direction:column;}
     .header-top{display:contents;}
     header .eyebrow{order:1;}
@@ -637,6 +653,12 @@ fetch('phc-data.json')
 
     // --- Postignuća (zasebna stranica, bez filtera) ---
     renderPostignuca();
+
+    // --- URL rutiranje (npr. #statistika/igraci) ---
+    applyHashRoute();
+    if(!location.hash){
+      history.replaceState(null, '', '#prvenstva');
+    }
   })
   .catch(err => {
     document.querySelectorAll('.panel > div').forEach(p => {
@@ -695,15 +717,17 @@ function addTopScrollbar(containerEl, scrollWrapEl){
 }
 
 // ---------- tabs ----------
+function switchToTab(tab){
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + tab));
+  updateFilterVisibility();
+  syncFilterBarToState();
+  renderActiveTab();
+}
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
-    updateFilterVisibility();
-    syncFilterBarToState();
-    renderActiveTab();
+    switchToTab(btn.dataset.tab);
+    updateHash();
   });
 });
 
@@ -1629,7 +1653,13 @@ function renderIgraci(){
     cols = cols.filter(c => !mpExclude.has(c.k));
   }
 
-  let html = '<div class="h2h-wrap scroll-limited"><table class="ekipe-table"><thead><tr><th class="ekipe-rank"></th><th class="ekipe-name">Ime i prezime</th>';
+  let html = `<div class="h2h-wrap scroll-limited"><table class="ekipe-table"><thead><tr><th class="ekipe-name-search" colspan="2">
+    <div class="name-search-wrap">
+      <input class="name-search-input" id="igraciNameSearch" placeholder="Pretraži igrača..." autocomplete="off">
+      <button class="name-search-clear" id="igraciNameSearchClear" type="button" aria-label="Obriši">×</button>
+      <div class="name-search-list" id="igraciNameSearchList"></div>
+    </div>
+  </th>`;
   html += cols.map(c => `<th>${c.label}</th>`).join('');
   html += '</tr></thead><tbody>';
 
@@ -1659,6 +1689,44 @@ function renderIgraci(){
   });
   content.querySelectorAll("[data-nhc-player]").forEach(el => {
     el.addEventListener("click", () => openNhcBreakdownModal(el.dataset.nhcPlayer, false, kat, dis, true, seasonTo));
+  });
+
+  // Pretraga u zaglavlju - filtrirajući dropdown, klik na igrača skoči na njegov redak (ne filtrira tablicu)
+  const searchInput = document.getElementById('igraciNameSearch');
+  const searchList = document.getElementById('igraciNameSearchList');
+  const searchClear = document.getElementById('igraciNameSearchClear');
+  const allNames = rows.map(r => r.name);
+
+  function renderSearchList(query){
+    const q = (query || '').trim().toLowerCase();
+    const filtered = q ? allNames.filter(n => n.toLowerCase().includes(q)) : allNames;
+    searchList.innerHTML = filtered.length
+      ? filtered.map(n => `<div class="name-search-item" data-name="${escapeHtml(n)}">${escapeHtml(n)}</div>`).join('')
+      : '<div class="name-search-empty">Nema rezultata.</div>';
+    searchList.classList.add('open');
+  }
+  searchInput.addEventListener('focus', () => renderSearchList(searchInput.value));
+  searchInput.addEventListener('input', () => renderSearchList(searchInput.value));
+  searchInput.addEventListener('blur', () => setTimeout(() => searchList.classList.remove('open'), 150));
+  searchClear.addEventListener('click', () => {
+    searchInput.value = '';
+    searchList.classList.remove('open');
+    searchInput.focus();
+  });
+  searchList.addEventListener('mousedown', (e) => {
+    const item = e.target.closest('[data-name]');
+    if(!item) return;
+    const name = item.dataset.name;
+    searchList.classList.remove('open');
+    searchInput.value = '';
+
+    const cell = content.querySelector(`td.ekipe-name[data-player="${CSS.escape(name)}"]`);
+    if(!cell) return;
+    const row = cell.closest('tr');
+    content.querySelectorAll('tr.row-highlight').forEach(r => r.classList.remove('row-highlight'));
+    row.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    requestAnimationFrame(() => row.classList.add('row-highlight'));
+    setTimeout(() => row.classList.remove('row-highlight'), 1800);
   });
 }
 
@@ -2474,14 +2542,55 @@ function openH2hMatchListModal(entityA, entityB, groupByClub, dis, kat){
 }
 
 // ===================== Page switcher (Prvenstva / Statistika) =====================
+function switchToPage(pageId){
+  document.querySelectorAll('.page-nav-btn').forEach(b => b.classList.toggle('active', b.dataset.page === pageId));
+  document.querySelectorAll('.page-section').forEach(s => s.classList.toggle('active', s.id === 'page-' + pageId));
+}
 document.querySelectorAll('.page-nav-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.page-nav-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
-    document.getElementById('page-' + btn.dataset.page).classList.add('active');
+    switchToPage(btn.dataset.page);
+    updateHash();
   });
 });
+
+// ===================== URL rutiranje (npr. #statistika/igraci) =====================
+// Hash format: #prvenstva | #postignuca | #statistika | #statistika/<tab>
+// updateHash() se zove SAMO iz klika (kad korisnik sam nešto promijeni) - koristi pushState
+// da tipke natrag/naprijed rade. applyHashRoute() se zove kad se hash promijeni izvana
+// (link, natrag/naprijed) i NIKAD sama ne zove updateHash() - hash je već točan jer na
+// njega reagiramo, a pozivanje updateHash() usred obrade natrag/naprijed bi pokvarilo
+// povijest (dodalo bi pogrešan međukorak u sredinu stoga povijesti).
+function updateHash(){
+  const pageId = document.querySelector('.page-nav-btn.active')?.dataset.page || 'prvenstva';
+  let h;
+  if(pageId === 'statistika'){
+    const tab = document.querySelector('.tab-btn.active')?.dataset.tab;
+    h = (tab && tab !== 'poretci') ? `#statistika/${tab}` : '#statistika';
+  } else {
+    h = `#${pageId}`;
+  }
+  if(location.hash !== h){
+    history.pushState(null, '', h);
+  }
+}
+
+function applyHashRoute(){
+  const hash = location.hash.replace(/^#/, '');
+  if(!hash) return;
+  const [pageId, tab] = hash.split('/');
+  if(!document.getElementById('page-' + pageId)) return;
+  switchToPage(pageId);
+
+  if(pageId === 'statistika'){
+    if(tab && document.getElementById('panel-' + tab)){
+      switchToTab(tab);
+    } else {
+      switchToTab('poretci');
+    }
+  }
+}
+
+window.addEventListener('hashchange', applyHashRoute);
 
 // ===================== Prvenstva (pregled pojedinog prvenstva) =====================
 
