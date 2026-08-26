@@ -214,7 +214,7 @@
   .entity-meta a{color:var(--navy-2); text-decoration:none;}
   .entity-meta a:hover{text-decoration:underline;}
 
-  .nhc-chart-block{margin:18px 0 22px;}
+  .nhc-chart-block{margin:18px 0 22px; border:1px solid var(--sheet-line); border-radius:10px; padding:10px 8px;}
   .nhc-chart-title{font-family:'Space Grotesk', sans-serif; font-size:15px; font-weight:600; color:var(--navy-2); margin-bottom:8px;}
   .nhc-chart-empty{font-size:12.5px; color:var(--text-muted); font-style:italic; padding:10px 0;}
 
@@ -479,6 +479,10 @@
     .lbl-short{display:inline;}
     .ph2h-input{font-size:16px;}
     .name-search-input{font-size:16px;}
+    .entity-stat-row{grid-template-columns:78px 34px 1fr; column-gap:6px;}
+    .entity-stat-row-detail{margin-left:0;}
+    .modal{padding:20px 16px 20px;}
+    .entity-stat-rows{padding:4px 10px;}
     header .wrap{display:flex; flex-direction:column;}
     .header-top{display:contents;}
     header .eyebrow{order:1;}
@@ -2487,7 +2491,7 @@ function computePlayerNhcHistory(name, kat, dis, axisFrom, axisTo){
 }
 
 function nhcHistoryChartSvg(points){
-  const W = 700, H = 165, padL = 34, padR = 8, padT = 26, padB = 22;
+  const W = 700, H = 165, padL = 34, padR = 8, padT = 30, padB = 22;
   const innerW = W - padL - padR, innerH = H - padT - padB;
   const maxVal = Math.max(1, ...points.map(p => p.value));
   const maxIdx = points.reduce((best, p, i) => p.value > points[best].value ? i : best, 0);
@@ -2510,10 +2514,10 @@ function nhcHistoryChartSvg(points){
     const y = padT + innerH - h;
     bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${h.toFixed(1)}" rx="1.5" fill="var(--navy-2)"><title>${seasonLabel(p.season)}: ${Math.round(p.value)}</title></rect>`;
     if(i === maxIdx && p.value > 0){
-      maxAnnotation = `<text x="${(x + barW/2).toFixed(1)}" y="${(y - 6).toFixed(1)}" font-size="10.5" font-weight="700" fill="var(--navy)" text-anchor="middle" font-family="'Space Grotesk', sans-serif">${Math.round(p.value)}</text>`;
+      maxAnnotation = `<text x="${(x + barW/2).toFixed(1)}" y="${(y - 7).toFixed(1)}" font-size="14" font-weight="700" fill="var(--navy)" text-anchor="middle" font-family="'Space Grotesk', sans-serif">${Math.round(p.value)}</text>`;
     }
     if(i % labelSkip === 0){
-      labels += `<text x="${(x + barW/2).toFixed(1)}" y="${H - 6}" font-size="8.5" fill="var(--text-muted)" text-anchor="middle" font-family="'IBM Plex Mono', monospace">${p.season}</text>`;
+      labels += `<text x="${(x + barW/2).toFixed(1)}" y="${H - 6}" font-size="9.5" fill="var(--text-muted)" text-anchor="middle" font-family="'IBM Plex Mono', monospace">${p.season}</text>`;
     }
   });
 
@@ -2591,9 +2595,9 @@ function openEntityModal(name, groupByClub, kat, dis, seasonFrom, seasonTo){
         ${statRow('Prvenstava', prvenstava, prvenstavaDetail)}
         ${statRow('Utakmica', es.utakmica, `${es.w}-${es.d}-${es.l}${uspjeh != null ? ` (${uspjeh}%)` : ''}`)}
         ${statRow('Endova', es.endova, `${es.endsFor}-${blankEnds}-${es.endsAgainst}${endsForAvg!=null ? ` (${fmtAvg(endsForAvg)}-${fmtAvg(endsAgainstAvg)})` : ''}`)}
-        ${statRow('Ukradenih endova', es.stolenBy + es.stolenFrom, `${es.stolenBy}-${es.stolenFrom}${stolenByAvg!=null ? ` (${fmtAvg(stolenByAvg)}-${fmtAvg(stolenFromAvg)})` : ''}`)}
+        ${statRow('<span class="lbl-full">Ukradenih endova</span><span class="lbl-short">Ukradeni</span>', es.stolenBy + es.stolenFrom, `${es.stolenBy}-${es.stolenFrom}${stolenByAvg!=null ? ` (${fmtAvg(stolenByAvg)}-${fmtAvg(stolenFromAvg)})` : ''}`)}
         ${statRow('Kamenova', Math.round(es.stonesFor + es.stonesAgainst), `${Math.round(es.stonesFor)}-${Math.round(es.stonesAgainst)}${stonesForAvg!=null ? ` (${fmtAvg(stonesForAvg)}-${fmtAvg(stonesAgainstAvg)})` : ''}`)}
-        ${statRow('Preciznih polaganja', es.lsdMatches, `${es.pkWon}-${es.pkLost}${lsdAvgVal!=null ? ` (${fmtAvg(lsdAvgVal)} cm)` : ''}`)}
+        ${statRow('<span class="lbl-full">Preciznih polaganja</span><span class="lbl-short">PP</span>', es.lsdMatches, `${es.pkWon}-${es.pkLost}${lsdAvgVal!=null ? ` (${fmtAvg(lsdAvgVal)} cm)` : ''}`)}
       </div>
     `;
 
@@ -2697,9 +2701,9 @@ function openPlayerModal(name, kat, dis, seasonFrom, seasonTo){
         ${statRow('Prvenstava', prvenstava, prvenstavaDetail)}
         ${statRow('Utakmica', ps.utakmica, `${ps.w}-${ps.d}-${ps.l}${uspjeh != null ? ` (${uspjeh}%)` : ''}`)}
         ${statRow('Endova', ps.endova, `${ps.endsFor}-${blankEnds}-${ps.endsAgainst}${endsForAvg!=null ? ` (${fmtAvg(endsForAvg)}-${fmtAvg(endsAgainstAvg)})` : ''}`)}
-        ${statRow('Ukradenih endova', ps.stolenBy + ps.stolenFrom, `${ps.stolenBy}-${ps.stolenFrom}${stolenByAvg!=null ? ` (${fmtAvg(stolenByAvg)}-${fmtAvg(stolenFromAvg)})` : ''}`)}
+        ${statRow('<span class="lbl-full">Ukradenih endova</span><span class="lbl-short">Ukradeni</span>', ps.stolenBy + ps.stolenFrom, `${ps.stolenBy}-${ps.stolenFrom}${stolenByAvg!=null ? ` (${fmtAvg(stolenByAvg)}-${fmtAvg(stolenFromAvg)})` : ''}`)}
         ${statRow('Kamenova', Math.round(ps.stonesFor + ps.stonesAgainst), `${Math.round(ps.stonesFor)}-${Math.round(ps.stonesAgainst)}${stonesForAvg!=null ? ` (${fmtAvg(stonesForAvg)}-${fmtAvg(stonesAgainstAvg)})` : ''}`)}
-        ${statRow('Preciznih polaganja', ps.lsdMatches, `${ps.pkWon}-${ps.pkLost}${lsdAvgVal!=null ? ` (${fmtAvg(lsdAvgVal)} cm)` : ''}`)}
+        ${statRow('<span class="lbl-full">Preciznih polaganja</span><span class="lbl-short">PP</span>', ps.lsdMatches, `${ps.pkWon}-${ps.pkLost}${lsdAvgVal!=null ? ` (${fmtAvg(lsdAvgVal)} cm)` : ''}`)}
       </div>
     `;
 
