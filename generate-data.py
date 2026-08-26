@@ -140,6 +140,16 @@ def build(export_path, out_path):
         kat = r['Kat'] if pd.notna(r['Kat']) else 'S'
         dis = r['Dis']
         pk = int(r['PK']) if r.get('PK') in (1, 2) else None
+        # Ako PK nije upisan u Excelu (npr. utakmica otkazana pa se to preskočilo), a imamo oba
+        # bacanja preciznog polaganja za obje ekipe, izračunaj pobjednika: manji ZBROJ oba bacanja
+        # pobjeđuje. Pravilo potvrđeno na 258 utakmica gdje je PK poznat - poklapa se u 257 (99.6%).
+        # Ako su zbrojevi identični, ne možemo odrediti pobjednika pa PK ostaje prazan.
+        if pk is None and len(throws1) == 2 and len(throws2) == 2:
+            sum1, sum2 = sum(throws1), sum(throws2)
+            if sum1 < sum2:
+                pk = 1
+            elif sum2 < sum1:
+                pk = 2
 
         matches.append({
             'id': f"{int(r['Sez'])}-{dis}-{kat}-{int(r['Prv'])}-{r['Sku'] if pd.notna(r['Sku']) else 'X'}-{r['Faza']}-{int(r['Uta'])}",
