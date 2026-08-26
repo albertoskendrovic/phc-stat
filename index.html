@@ -210,15 +210,20 @@
   .roster-header{display:flex; align-items:flex-start; gap:14px;}
 
   /* ---------- prošireni podaci u modalu kluba/ekipe (graf + statističke kartice) ---------- */
-  .nhc-chart-block{margin:18px 0 20px;}
-  .nhc-chart-title{font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:12.5px; color:var(--navy); margin-bottom:8px;}
+  .entity-meta{margin-top:6px; font-size:12.5px; color:var(--text-muted); display:flex; flex-direction:column; gap:3px;}
+  .entity-meta a{color:var(--navy-2); text-decoration:none;}
+  .entity-meta a:hover{text-decoration:underline;}
+
+  .nhc-chart-block{margin:18px 0 22px;}
+  .nhc-chart-title{font-family:'Space Grotesk', sans-serif; font-size:15px; font-weight:600; color:var(--navy-2); margin-bottom:8px;}
   .nhc-chart-empty{font-size:12.5px; color:var(--text-muted); font-style:italic; padding:10px 0;}
-  .entity-stat-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:10px; margin-bottom:20px;}
-  .entity-stat-card{background:var(--ice-2); border-radius:8px; padding:10px 12px;}
-  .entity-stat-label{font-family:'IBM Plex Mono', monospace; font-size:10px; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-muted); margin-bottom:3px;}
-  .entity-stat-main{font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:19px; color:var(--navy); line-height:1.2;}
-  .entity-stat-main .entity-stat-pct{font-family:'IBM Plex Mono', monospace; font-weight:500; font-size:12px; color:var(--navy-2); margin-left:5px;}
-  .entity-stat-detail{font-size:11px; color:var(--text-muted); margin-top:2px; font-family:'IBM Plex Mono', monospace;}
+
+  .entity-stat-rows{background:var(--ice-2); border-radius:10px; padding:4px 16px; margin-bottom:20px;}
+  .entity-stat-row{display:grid; grid-template-columns:160px 44px 1fr; align-items:baseline; column-gap:12px; padding:9px 0; border-bottom:1px solid rgba(0,0,0,0.06);}
+  .entity-stat-row:last-child{border-bottom:none;}
+  .entity-stat-row-label{font-family:'IBM Plex Mono', monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-muted);}
+  .entity-stat-row-value{font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:16px; color:var(--navy); text-align:right;}
+  .entity-stat-row-detail{font-family:'IBM Plex Mono', monospace; font-weight:400; font-size:11.5px; color:var(--text-muted); margin-left:7px;}
   .roster-header .club-logo-lg{width:100px; height:100px; object-fit:contain; flex-shrink:0; margin-top:2px;}
   .roster-header .entity-title{margin-bottom:10px;}
   .h2h-modal-record{font-family:'IBM Plex Mono', monospace; font-size:13px; font-weight:400; color:var(--text-muted); white-space:nowrap; display:inline-block;}
@@ -532,14 +537,14 @@
 <div class="wrap">
   <div class="tabs">
     <button class="tab-btn active" data-tab="poretci">Poretci</button>
-    <button class="tab-btn" data-tab="statistika">Statistika</button>
-    <button class="tab-btn" data-tab="rekordi">Rekordi</button>
     <button class="tab-btn" data-tab="klubovi">Klubovi</button>
     <button class="tab-btn" data-tab="ekipe">Ekipe</button>
     <button class="tab-btn" data-tab="igraci">Igrači</button>
     <button class="tab-btn" data-tab="klubovih2h">Klubovi međusobno</button>
     <button class="tab-btn" data-tab="ekipeh2h">Ekipe međusobno</button>
     <button class="tab-btn" data-tab="igracih2h">Igrači međusobno</button>
+    <button class="tab-btn" data-tab="rekordi">Rekordi</button>
+    <button class="tab-btn" data-tab="statistika">Statistika</button>
   </div>
 
   <div class="filter-bar">
@@ -637,7 +642,7 @@ const KAT_LABELS = {'S':'Seniori','J':'Juniori','V':'Veterani'};
 // Tabovi za koje "Disciplina" filter NIJE primjenjiv (prikazuju sve discipline u stupcima)
 const NO_DIS_TABS = new Set([]);
 
-const TAB_IDS = ['poretci','statistika','rekordi','klubovi','ekipe','igraci','klubovih2h','ekipeh2h','igracih2h'];
+const TAB_IDS = ['poretci','klubovi','ekipe','igraci','klubovih2h','ekipeh2h','igracih2h','rekordi','statistika'];
 const TAB_STATE = {};
 TAB_IDS.forEach(t => { TAB_STATE[t] = { kat: 'sve', dis: 'sve', seasonMode: 'sve', seasonFrom: null, seasonTo: null }; });
 
@@ -903,14 +908,37 @@ function clubLogoLgDataUri(team, dis){
   return null;
 }
 
-// Zaglavlje modala s velikim logom lijevo (naslov + dodatni sadržaj desno). Ako klub/ekipa
-// nema logo, jednostavno se prikaže samo naslov i sadržaj, bez praznog prostora.
-function entityHeaderHtml(name, dis, innerHtml){
-  const uri = clubLogoLgDataUri(name, dis);
-  if(!uri){
-    return `<h2 class="entity-title">${escapeHtml(name)}</h2>${innerHtml}`;
+// Mjesto i e-adresa kluba - iz DATA.clubMeta (phc-data.json, izvučeno iz DBEkipe u Excelu).
+// 'name' može biti naziv ekipe (npr. "Vis 2"), pa se prvo razriješi pravi klub - ista logika
+// kao za dohvat loga. Ako klub nema tih podataka, jednostavno se ne prikazuje ništa.
+function clubMetaHtml(name, dis){
+  if(!DATA.clubMeta) return '';
+  const disCandidates = dis === 'sve' ? DIS_ORDER : [dis];
+  let club = null;
+  for(const d of disCandidates){
+    const clubMap = (DATA.clubs && DATA.clubs[d]) || {};
+    if(clubMap[name]){ club = clubMap[name]; break; }
   }
-  return `<div class="roster-header"><img class="club-logo-lg" src="${uri}" alt=""><div><h2 class="entity-title">${escapeHtml(name)}</h2>${innerHtml}</div></div>`;
+  if(!club) club = name;
+  const meta = DATA.clubMeta[club];
+  if(!meta) return '';
+  let html = '<div class="entity-meta">';
+  if(meta.mjesto) html += `<div>📍 ${escapeHtml(meta.mjesto)}</div>`;
+  if(meta.email) html += `<div>📨 <a href="mailto:${escapeHtml(meta.email)}">${escapeHtml(meta.email)}</a></div>`;
+  html += '</div>';
+  return html;
+}
+
+// Zaglavlje modala s velikim logom lijevo. 'sideContent' ide desno od loga (uz naslov, uska
+// kolona), 'belowContent' ide ISPOD cijelog retka logo+naslov, preko pune širine (bez uvlake).
+// Ako klub/ekipa nema logo, naslov i sideContent jednostavno stoje bez loga, bez praznog prostora.
+function entityHeaderHtml(name, dis, sideContent, belowContent){
+  const uri = clubLogoLgDataUri(name, dis);
+  const rightCol = `<div><h2 class="entity-title">${escapeHtml(name)}</h2>${sideContent || ''}</div>`;
+  const top = uri
+    ? `<div class="roster-header"><img class="club-logo-lg" src="${uri}" alt="">${rightCol}</div>`
+    : `<h2 class="entity-title">${escapeHtml(name)}</h2>${sideContent || ''}`;
+  return `${top}${belowContent || ''}`;
 }
 
 
@@ -1361,6 +1389,9 @@ function computeTeamClubStats(kat, dis, groupByClub, seasonFrom, seasonTo){
 
   matches.forEach(m => {
     const e1 = entityName(m.team1), e2 = entityName(m.team2);
+    // Napomena: ako obje ekipe pripadaju istom klubu (npr. "Zagreb" protiv "Zagreb 2"), to se
+    // namjerno broji kao DVIJE utakmice za taj klub - jedna pobjeda i jedan poraz (iz
+    // perspektive kluba kao cjeline, obje njegove ekipe su odigrale po jednu utakmicu).
     const a1 = ensure(e1), a2 = ensure(e2);
     a1.utakmica++; a2.utakmica++;
     a1.asTeam1++; a2.asTeam2++;
@@ -1542,11 +1573,14 @@ function computePlayerStats(kat, dis, seasonFrom, seasonTo){
       name,
       medals: {1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0},
       tournamentsSet: new Set(),
-      utakmica: 0, endova: 0,
+      utakmica: 0, played: 0, endova: 0,
       w: 0, d: 0, l: 0,
+      stonesFor: 0, stonesAgainst: 0,
+      endsFor: 0, endsAgainst: 0,
+      stolenBy: 0, stolenFrom: 0,
       posCount: {'Prvi':0,'Drugi':0,'Treći':0,'Četvrti':0,'Rezerva':0},
       skipCount: 0, viceCount: 0,
-      lsdThrows: [],
+      pkWon: 0, pkLost: 0, lsdMatches: 0, lsdThrows: [],
       nhc: 0,
     };
     return stats[name];
@@ -1557,6 +1591,7 @@ function computePlayerStats(kat, dis, seasonFrom, seasonTo){
       const players = t.rosterPool[s.team] || [];
       players.forEach(p => {
         const acc = ensure(p);
+        acc.tournamentsSet.add(`${t.season}-${t.dis}-${t.kat}-${t.p}`);
         if(s.place >= 1 && s.place <= 9) acc.medals[s.place]++;
       });
     });
@@ -1572,20 +1607,47 @@ function computePlayerStats(kat, dis, seasonFrom, seasonTo){
 
   matches.forEach(m => {
     [[m.roster1, 1], [m.roster2, 2]].forEach(([roster, side]) => {
+      const oppSide = side === 1 ? 2 : 1;
       (roster || []).forEach(p => {
         const acc = ensure(p.name);
         acc.utakmica++;
-        acc.tournamentsSet.add(`${m.season}-${m.dis}-${m.kat}-${m.p}`);
+
         if(p.position && acc.posCount[p.position] != null) acc.posCount[p.position]++;
         if(p.role === 'Skip') acc.skipCount++;
         else if(p.role === 'Vice-skip') acc.viceCount++;
-        if(p.lsd) acc.lsdThrows.push(p.lsd.distance);
+
+        if(m.usesLSD){
+          acc.lsdMatches++;
+          if(p.lsd) acc.lsdThrows.push(p.lsd.distance);
+          if(m.pk === side) acc.pkWon++;
+          else if(m.pk === oppSide) acc.pkLost++;
+        }
 
         if(m.winner === side) acc.w++;
         else if(m.winner === 1 || m.winner === 2) acc.l++;
         else if(m.played) acc.d++;
 
-        if(m.played) acc.endova += (m.ends || []).length;
+        if(m.played){
+          acc.played++;
+          const myScore = side === 1 ? m.score1 : m.score2;
+          const oppScore = side === 1 ? m.score2 : m.score1;
+          if(myScore != null && oppScore != null){
+            acc.stonesFor += myScore; acc.stonesAgainst += oppScore;
+          }
+          let hammerTeam = m.pk;
+          (m.ends || []).forEach(e => {
+            acc.endova++;
+            if(e > 0){
+              if(side === 1){ acc.endsFor++; if(hammerTeam === 2) acc.stolenBy++; }
+              else { acc.endsAgainst++; if(hammerTeam === 2) acc.stolenFrom++; }
+              hammerTeam = 2;
+            } else if(e < 0){
+              if(side === 2){ acc.endsFor++; if(hammerTeam === 1) acc.stolenBy++; }
+              else { acc.endsAgainst++; if(hammerTeam === 1) acc.stolenFrom++; }
+              hammerTeam = 1;
+            }
+          });
+        }
       });
     });
   });
@@ -1659,7 +1721,7 @@ function renderIgraci(){
     {k:'lsdCount', label:'Preciznih polaganja'},
     {k:'lsdAvg', label:'Prosjek preciznih polaganja (cm)', avg:true},
     {k:'skip', label:'Skip'}, {k:'vice', label:'Vice-skip'},
-    {k:'p1', label:'Prvi'}, {k:'p2', label:'Drugi'}, {k:'p3', label:'Treći'}, {k:'p4', label:'Četvrti'}, {k:'pr', label:'Rezerva'},
+    {k:'p4', label:'Četvrti'}, {k:'p3', label:'Treći'}, {k:'p2', label:'Drugi'}, {k:'p1', label:'Prvi'}, {k:'pr', label:'Rezerva'},
   ];
   // MP (mješoviti parovi) igraju samo 2 igrača (Ž/M), nemaju Skip/Vice-skip ni 4 pozicije
   if(dis === 'MP'){
@@ -1669,7 +1731,7 @@ function renderIgraci(){
 
   let html = `<div class="h2h-wrap scroll-limited"><table class="ekipe-table"><thead><tr><th class="ekipe-name-search" colspan="2">
     <div class="name-search-wrap">
-      <input class="name-search-input" id="igraciNameSearch" placeholder="Pretraži igrača..." autocomplete="off">
+      <input class="name-search-input" id="igraciNameSearch" placeholder="Traži igrača..." autocomplete="off">
       <button class="name-search-clear" id="igraciNameSearchClear" type="button" aria-label="Obriši">×</button>
       <div class="name-search-list" id="igraciNameSearchList"></div>
     </div>
@@ -2369,7 +2431,7 @@ function getPlayerTournamentHistory(name, kat, dis, seasonFrom, seasonTo){
     t.standings.forEach(s => {
       const players = t.rosterPool[s.team] || [];
       if(players.includes(name)){
-        rows.push({ season: t.season, dis: t.dis, kat: t.kat, place: s.place, team: s.team, p: t.p });
+        rows.push({ season: t.season, dis: t.dis, kat: t.kat, place: s.place, team: s.team, p: t.p, teamsCount: t.teamsCount });
       }
     });
   });
@@ -2399,11 +2461,10 @@ function achvTableHtml(history, teamColLabel, clickableRoster){
 
 // "Klizni" NHC kroz sezone - za svaku sezonu u prikazanom rasponu izračuna se NHC kao da je
 // TA sezona bila "zadnja" (isto pravilo kao za glavni NHC broj: zadnjih 5 sezona, težine
-// 100/80/60/40/20%). Koristi CIJELU povijest entiteta (bez ograničenja donje granice sezone)
-// jer svaka točka treba moći "gledati" do 4 sezone unazad od sebe, čak i ako je ta prošlost
-// izvan trenutno prikazanog raspona.
-function computeNhcHistory(name, groupByClub, kat, dis, axisFrom, axisTo){
-  const fullHistory = getEntityTournamentHistory(name, groupByClub, kat, dis, null, null);
+// 100/80/60/40/20%). Koristi CIJELU povijest (bez ograničenja donje granice sezone) jer svaka
+// točka treba moći "gledati" do 4 sezone unazad od sebe, čak i ako je ta prošlost izvan
+// trenutno prikazanog raspona.
+function nhcHistoryFromRows(fullHistory, axisFrom, axisTo){
   const points = [];
   for(let y = axisFrom; y <= axisTo; y++){
     let sum = 0;
@@ -2415,25 +2476,44 @@ function computeNhcHistory(name, groupByClub, kat, dis, axisFrom, axisTo){
   return points;
 }
 
+function computeNhcHistory(name, groupByClub, kat, dis, axisFrom, axisTo){
+  const fullHistory = getEntityTournamentHistory(name, groupByClub, kat, dis, null, null);
+  return nhcHistoryFromRows(fullHistory, axisFrom, axisTo);
+}
+
+function computePlayerNhcHistory(name, kat, dis, axisFrom, axisTo){
+  const fullHistory = getPlayerTournamentHistory(name, kat, dis, null, null);
+  return nhcHistoryFromRows(fullHistory, axisFrom, axisTo);
+}
+
 function nhcHistoryChartSvg(points){
-  const W = 700, H = 150, padL = 34, padR = 8, padT = 10, padB = 22;
+  const W = 700, H = 165, padL = 34, padR = 8, padT = 26, padB = 22;
   const innerW = W - padL - padR, innerH = H - padT - padB;
   const maxVal = Math.max(1, ...points.map(p => p.value));
+  const maxIdx = points.reduce((best, p, i) => p.value > points[best].value ? i : best, 0);
   const n = points.length;
+  const slotW = innerW / n;
   const barGap = 3;
-  const barW = n > 0 ? Math.max(2, innerW / n - barGap) : innerW;
+  const barW = n > 0 ? Math.max(2, slotW - barGap) : innerW;
+
+  // Dinamički preskoči neke godine na X osi ako je premalo prostora za četveroznamenkasti broj
+  // (npr. "2020") bez preklapanja - što je uži prostor po sezoni, to se rjeđe ispisuje godina.
+  const minLabelSpace = 32;
+  const labelSkip = Math.max(1, Math.ceil(minLabelSpace / slotW));
 
   let bars = '';
   let labels = '';
+  let maxAnnotation = '';
   points.forEach((p, i) => {
-    const x = padL + i * (innerW / n);
+    const x = padL + i * slotW;
     const h = (p.value / maxVal) * innerH;
     const y = padT + innerH - h;
-    bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${h.toFixed(1)}" rx="1.5" fill="var(--navy-2)"><title>${seasonLabel(p.season)}: ${String(p.value).replace('.', ',')}</title></rect>`;
-    // labela svake sezone, ili svaku drugu ako ih ima puno (da se ne zgusne)
-    const showLabel = n <= 14 || i % 2 === 0;
-    if(showLabel){
-      labels += `<text x="${(x + barW/2).toFixed(1)}" y="${H - 6}" font-size="8.5" fill="var(--text-muted)" text-anchor="middle" font-family="'IBM Plex Mono', monospace">${String(p.season).slice(-2)}</text>`;
+    bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${h.toFixed(1)}" rx="1.5" fill="var(--navy-2)"><title>${seasonLabel(p.season)}: ${Math.round(p.value)}</title></rect>`;
+    if(i === maxIdx && p.value > 0){
+      maxAnnotation = `<text x="${(x + barW/2).toFixed(1)}" y="${(y - 6).toFixed(1)}" font-size="10.5" font-weight="700" fill="var(--navy)" text-anchor="middle" font-family="'Space Grotesk', sans-serif">${Math.round(p.value)}</text>`;
+    }
+    if(i % labelSkip === 0){
+      labels += `<text x="${(x + barW/2).toFixed(1)}" y="${H - 6}" font-size="8.5" fill="var(--text-muted)" text-anchor="middle" font-family="'IBM Plex Mono', monospace">${p.season}</text>`;
     }
   });
 
@@ -2441,6 +2521,7 @@ function nhcHistoryChartSvg(points){
   return `<svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" preserveAspectRatio="none" style="overflow:visible;">
     <line x1="${padL}" y1="${gridY}" x2="${W-padR}" y2="${gridY}" stroke="var(--sheet-line)" stroke-width="1"/>
     ${bars}
+    ${maxAnnotation}
     ${labels}
   </svg>`;
 }
@@ -2461,7 +2542,7 @@ function medalSummaryText(history){
 function openEntityModal(name, groupByClub, kat, dis, seasonFrom, seasonTo){
   const overlay = document.getElementById('modalOverlay');
   const body = document.getElementById('modalBody');
-  body.classList.add('modal-wide');
+  body.classList.remove('modal-wide');
 
   const history = getEntityTournamentHistory(name, groupByClub, kat, dis, seasonFrom, seasonTo);
   const prvenstava = new Set(history.map(r => `${r.season}-${r.dis}-${r.kat}-${r.p}`)).size;
@@ -2471,20 +2552,17 @@ function openEntityModal(name, groupByClub, kat, dis, seasonFrom, seasonTo){
   const allStats = computeTeamClubStats(kat, dis, groupByClub, seasonFrom, seasonTo);
   const es = allStats[name];
 
-  let statsGridHtml = '';
+  let statsRowsHtml = '';
   let chartHtml = '';
 
   if(es){
-    // Prvenstava po disciplini - ima smisla samo kad je "Sve discipline" odabrano
-    let prvenstavaDetail = '';
-    if(dis === 'sve'){
-      const disCounts = {};
-      [...es.tournamentsSet].forEach(key => {
-        const d = key.split('-')[1];
-        disCounts[d] = (disCounts[d] || 0) + 1;
-      });
-      prvenstavaDetail = DIS_ORDER.filter(d => disCounts[d]).map(d => `${d} ${disCounts[d]}`).join(' · ');
-    }
+    // Prvenstava po disciplini - uvijek prikazano, neovisno o filteru discipline
+    const disCounts = {};
+    [...es.tournamentsSet].forEach(key => {
+      const d = key.split('-')[1];
+      disCounts[d] = (disCounts[d] || 0) + 1;
+    });
+    const prvenstavaDetail = DIS_ORDER.filter(d => disCounts[d]).map(d => `${d}-${disCounts[d]}`).join(', ');
 
     const total = es.w + es.d + es.l;
     const uspjeh = total > 0 ? Math.round(((es.w*2 + es.d) / (total*2)) * 100) : null;
@@ -2498,43 +2576,24 @@ function openEntityModal(name, groupByClub, kat, dis, seasonFrom, seasonTo){
     const stonesAgainstAvg = played ? (es.stonesAgainst/played) : null;
     const lsdAvgVal = avg(es.lsdThrows.reduce((s,v)=>s+v,0), es.lsdThrows.length);
 
-    statsGridHtml = `
-      <div class="entity-stat-grid">
-        <div class="entity-stat-card">
-          <div class="entity-stat-label">Medalja</div>
-          <div class="entity-stat-main">${es.medals[1]+es.medals[2]+es.medals[3]}</div>
-          <div class="entity-stat-detail">🥇${es.medals[1]} · 🥈${es.medals[2]} · 🥉${es.medals[3]}</div>
-        </div>
-        <div class="entity-stat-card">
-          <div class="entity-stat-label">Prvenstava</div>
-          <div class="entity-stat-main">${prvenstava}</div>
-          ${prvenstavaDetail ? `<div class="entity-stat-detail">${prvenstavaDetail}</div>` : ''}
-        </div>
-        <div class="entity-stat-card">
-          <div class="entity-stat-label">Utakmica</div>
-          <div class="entity-stat-main">${es.utakmica}${uspjeh != null ? `<span class="entity-stat-pct">${uspjeh}%</span>` : ''}</div>
-          <div class="entity-stat-detail">${es.w}-${es.d}-${es.l}</div>
-        </div>
-        <div class="entity-stat-card">
-          <div class="entity-stat-label">Endova</div>
-          <div class="entity-stat-main">${es.endova}</div>
-          <div class="entity-stat-detail">${es.endsFor}-${es.endsAgainst}${endsForAvg!=null ? ` (${fmtAvg(endsForAvg)}-${fmtAvg(endsAgainstAvg)})` : ''}</div>
-        </div>
-        <div class="entity-stat-card">
-          <div class="entity-stat-label">Krađa</div>
-          <div class="entity-stat-main">${es.stolenBy + es.stolenFrom}</div>
-          <div class="entity-stat-detail">${es.stolenBy}-${es.stolenFrom}${stolenByAvg!=null ? ` (${fmtAvg(stolenByAvg)}-${fmtAvg(stolenFromAvg)})` : ''}</div>
-        </div>
-        <div class="entity-stat-card">
-          <div class="entity-stat-label">Kamenova</div>
-          <div class="entity-stat-main">${Math.round(es.stonesFor + es.stonesAgainst)}</div>
-          <div class="entity-stat-detail">${Math.round(es.stonesFor)}-${Math.round(es.stonesAgainst)}${stonesForAvg!=null ? ` (${fmtAvg(stonesForAvg)}-${fmtAvg(stonesAgainstAvg)})` : ''}</div>
-        </div>
-        <div class="entity-stat-card">
-          <div class="entity-stat-label">PP</div>
-          <div class="entity-stat-main">${es.lsdMatches}</div>
-          <div class="entity-stat-detail">${es.pkWon}-${es.pkLost}${lsdAvgVal!=null ? ` · ${fmtAvg(lsdAvgVal)} cm` : ''}</div>
-        </div>
+    // "Prazni" (blank) endovi - nitko nije osvojio bod tog enda - razlika između ukupnog broja
+    // endova i zbroja endova za/protiv. (Precizna polaganja se NE tretiraju na isti način -
+    // ako PK nije poznat u bazi, ta se utakmica jednostavno ne broji ni u pobjede ni u poraze.)
+    const blankEnds = es.endova - es.endsFor - es.endsAgainst;
+
+    function statRow(label, main, detail){
+      return `<div class="entity-stat-row"><div class="entity-stat-row-label">${label}</div><div class="entity-stat-row-value">${main}</div><div class="entity-stat-row-detail">${detail || ''}</div></div>`;
+    }
+
+    statsRowsHtml = `
+      <div class="entity-stat-rows">
+        ${statRow('Medalja', es.medals[1]+es.medals[2]+es.medals[3], `🥇${es.medals[1]} 🥈${es.medals[2]} 🥉${es.medals[3]}`)}
+        ${statRow('Prvenstava', prvenstava, prvenstavaDetail)}
+        ${statRow('Utakmica', es.utakmica, `${es.w}-${es.d}-${es.l}${uspjeh != null ? ` (${uspjeh}%)` : ''}`)}
+        ${statRow('Endova', es.endova, `${es.endsFor}-${blankEnds}-${es.endsAgainst}${endsForAvg!=null ? ` (${fmtAvg(endsForAvg)}-${fmtAvg(endsAgainstAvg)})` : ''}`)}
+        ${statRow('Ukradenih endova', es.stolenBy + es.stolenFrom, `${es.stolenBy}-${es.stolenFrom}${stolenByAvg!=null ? ` (${fmtAvg(stolenByAvg)}-${fmtAvg(stolenFromAvg)})` : ''}`)}
+        ${statRow('Kamenova', Math.round(es.stonesFor + es.stonesAgainst), `${Math.round(es.stonesFor)}-${Math.round(es.stonesAgainst)}${stonesForAvg!=null ? ` (${fmtAvg(stonesForAvg)}-${fmtAvg(stonesAgainstAvg)})` : ''}`)}
+        ${statRow('Preciznih polaganja', es.lsdMatches, `${es.pkWon}-${es.pkLost}${lsdAvgVal!=null ? ` (${fmtAvg(lsdAvgVal)} cm)` : ''}`)}
       </div>
     `;
 
@@ -2548,14 +2607,16 @@ function openEntityModal(name, groupByClub, kat, dis, seasonFrom, seasonTo){
     `;
   }
 
-  const summaryHtml = `${chartHtml}${statsGridHtml}`;
+  const belowContent = `${chartHtml}${statsRowsHtml}`;
+  // Mjesto/e-adresa kluba - prikazuje se čim ti podaci budu dostupni u bazi (DBEkipe).
+  const sideContent = clubMetaHtml(name, dis);
 
-  const headerHtml = entityHeaderHtml(name, dis, summaryHtml);
+  const headerHtml = entityHeaderHtml(name, dis, sideContent, belowContent);
 
   body.innerHTML = `
     <button class="modal-close" onclick="closeModal()">×</button>
     ${headerHtml}
-    <h3 class="group-h" style="margin-top:0;">Postignuća kroz sezone</h3>
+    <h3 class="group-h" style="margin-top:0;">Plasmani kroz sezone</h3>
     ${achvTableHtml(history, 'Ekipa', true)}
   `;
   overlay.classList.add('open');
@@ -2586,22 +2647,79 @@ function openPlayerModal(name, kat, dis, seasonFrom, seasonTo){
 
   const earnedBadges = playerBadges(name);
   const badgesHtml = earnedBadges.length
-    ? earnedBadges.map(e => `<span class="badge-icon" data-tip="${escapeHtml(e.badge)} - ${BADGE_TIER_LABELS[e.tier]}">${BADGE_ICONS[e.badge][e.tier]}</span>`).join('')
+    ? `<div class="player-badge-row">${earnedBadges.map(e => `<span class="badge-icon" data-tip="${escapeHtml(e.badge)} - ${BADGE_TIER_LABELS[e.tier]}">${BADGE_ICONS[e.badge][e.tier]}</span>`).join('')}</div>`
     : '';
 
-  const summaryHtml = `
-    <div class="info-block">
-      <div>Ukupno prvenstava: <span>${prvenstava}</span></div>
-      <div>Osvojenih medalja: <span>${medalSummaryText(history)}</span></div>
-    </div>
-  `;
+  // Detaljna statistika - isti izračun (i isti brojevi) kao glavna tablica Igrači, u okviru
+  // trenutno primijenjenog filtera. Isti prikaz kao kod kluba/ekipe, uz dodatni red "Pozicije".
+  const allStats = computePlayerStats(kat, dis, seasonFrom, seasonTo);
+  const ps = allStats[name];
+
+  let statsRowsHtml = '';
+  let chartHtml = '';
+
+  if(ps){
+    const disCounts = {};
+    [...ps.tournamentsSet].forEach(key => {
+      const d = key.split('-')[1];
+      disCounts[d] = (disCounts[d] || 0) + 1;
+    });
+    const prvenstavaDetail = DIS_ORDER.filter(d => disCounts[d]).map(d => `${d}-${disCounts[d]}`).join(', ');
+
+    const total = ps.w + ps.d + ps.l;
+    const uspjeh = total > 0 ? Math.round(((ps.w*2 + ps.d) / (total*2)) * 100) : null;
+
+    const played = ps.played || 0;
+    const endsForAvg = played ? (ps.endsFor/played) : null;
+    const endsAgainstAvg = played ? (ps.endsAgainst/played) : null;
+    const stolenByAvg = played ? (ps.stolenBy/played) : null;
+    const stolenFromAvg = played ? (ps.stolenFrom/played) : null;
+    const stonesForAvg = played ? (ps.stonesFor/played) : null;
+    const stonesAgainstAvg = played ? (ps.stonesAgainst/played) : null;
+    const lsdAvgVal = avg(ps.lsdThrows.reduce((s,v)=>s+v,0), ps.lsdThrows.length);
+    const blankEnds = ps.endova - ps.endsFor - ps.endsAgainst;
+
+    // Pozicije/uloge: S=Skip, V=Vice-skip, P=Prvi, D=Drugi, T=Treći, Č=Četvrti, R=Rezerva
+    const posLabels = [
+      ['S', ps.skipCount], ['V', ps.viceCount],
+      ['P', ps.posCount['Prvi']], ['D', ps.posCount['Drugi']], ['T', ps.posCount['Treći']],
+      ['Č', ps.posCount['Četvrti']], ['R', ps.posCount['Rezerva']],
+    ];
+    const pozicijeDetail = posLabels.filter(([,v]) => v > 0).map(([k,v]) => `${k}-${v}`).join(', ');
+
+    function statRow(label, main, detail){
+      return `<div class="entity-stat-row"><div class="entity-stat-row-label">${label}</div><div class="entity-stat-row-value">${main}</div><div class="entity-stat-row-detail">${detail || ''}</div></div>`;
+    }
+
+    statsRowsHtml = `
+      <div class="entity-stat-rows">
+        ${statRow('Medalja', ps.medals[1]+ps.medals[2]+ps.medals[3], `🥇${ps.medals[1]} 🥈${ps.medals[2]} 🥉${ps.medals[3]}`)}
+        ${statRow('Prvenstava', prvenstava, prvenstavaDetail)}
+        ${statRow('Utakmica', ps.utakmica, `${ps.w}-${ps.d}-${ps.l}${uspjeh != null ? ` (${uspjeh}%)` : ''}`)}
+        ${statRow('Endova', ps.endova, `${ps.endsFor}-${blankEnds}-${ps.endsAgainst}${endsForAvg!=null ? ` (${fmtAvg(endsForAvg)}-${fmtAvg(endsAgainstAvg)})` : ''}`)}
+        ${statRow('Ukradenih endova', ps.stolenBy + ps.stolenFrom, `${ps.stolenBy}-${ps.stolenFrom}${stolenByAvg!=null ? ` (${fmtAvg(stolenByAvg)}-${fmtAvg(stolenFromAvg)})` : ''}`)}
+        ${statRow('Kamenova', Math.round(ps.stonesFor + ps.stonesAgainst), `${Math.round(ps.stonesFor)}-${Math.round(ps.stonesAgainst)}${stonesForAvg!=null ? ` (${fmtAvg(stonesForAvg)}-${fmtAvg(stonesAgainstAvg)})` : ''}`)}
+        ${statRow('Preciznih polaganja', ps.lsdMatches, `${ps.pkWon}-${ps.pkLost}${lsdAvgVal!=null ? ` (${fmtAvg(lsdAvgVal)} cm)` : ''}`)}
+      </div>
+    `;
+
+    const chartPoints = computePlayerNhcHistory(name, kat, dis, seasonFrom, seasonTo);
+    const hasAnyValue = chartPoints.some(p => p.value > 0);
+    chartHtml = `
+      <div class="nhc-chart-block">
+        <div class="nhc-chart-title">NHC bodovi kroz sezone</div>
+        ${hasAnyValue ? nhcHistoryChartSvg(chartPoints) : '<div class="nhc-chart-empty">Nema NHC bodova u odabranom razdoblju.</div>'}
+      </div>
+    `;
+  }
+
+  // Igrači nemaju logo kluba - entityHeaderHtml se elegantno svede na samo naslov+sadržaj
+  const headerHtml = entityHeaderHtml(name, null, badgesHtml, `${chartHtml}${statsRowsHtml}`);
 
   body.innerHTML = `
     <button class="modal-close" onclick="closeModal()">×</button>
-    <h2 class="entity-title" style="margin-bottom:6px;">${escapeHtml(name)}</h2>
-    ${badgesHtml ? `<div class="player-badge-row">${badgesHtml}</div>` : ''}
-    ${summaryHtml}
-    <h3 class="group-h" style="margin-top:0;">Postignuća kroz sezone</h3>
+    ${headerHtml}
+    <h3 class="group-h" style="margin-top:0;">Plasmani kroz sezone</h3>
     ${achvTableHtml(history, 'Ekipa', true)}
   `;
   overlay.classList.add('open');

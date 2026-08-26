@@ -217,7 +217,32 @@ def build(export_path, out_path):
         if pd.notna(r['Ekipa']) and r['Ekipa'] != '-' and pd.notna(r['Klub']) and r['Klub'] != '-':
             clubs.setdefault(r['Disc'], {})[r['Ekipa']] = r['Klub']
 
-    combined = {'matches': matches, 'tournaments': tournaments_list, 'clubs': clubs}
+    # --- mjesto i e-adresa po klubu (ako postoje te kolone u DBEkipe) ---
+    club_meta = {}
+    if 'Mjesto' in ek.columns or 'E-adresa' in ek.columns:
+        ek_valid = ek[(ek.get('Klub', '-') != '-') & ek['Klub'].notna()]
+        for klub, group in ek_valid.groupby('Klub'):
+            mjesto = None
+            email = None
+            if 'Mjesto' in group.columns:
+                vals = group['Mjesto'].dropna()
+                vals = vals[vals != '-']
+                if len(vals):
+                    mjesto = vals.mode().iloc[0]  # najčešća vrijednost (otporno na tipfelere)
+            if 'E-adresa' in group.columns:
+                vals = group['E-adresa'].dropna()
+                vals = vals[vals != '-']
+                if len(vals):
+                    email = vals.mode().iloc[0]
+            if mjesto or email:
+                entry = {}
+                if mjesto:
+                    entry['mjesto'] = mjesto
+                if email:
+                    entry['email'] = email
+                club_meta[klub] = entry
+
+    combined = {'matches': matches, 'tournaments': tournaments_list, 'clubs': clubs, 'clubMeta': club_meta}
     with open(out_path, 'w', encoding='utf-8') as f:
         json.dump(combined, f, ensure_ascii=False)
 
