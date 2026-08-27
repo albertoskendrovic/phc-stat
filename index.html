@@ -54,7 +54,7 @@
   .control-group{display:flex; flex-direction:column; gap:4px;}
   .control-group label{font-size:11.5px; color:var(--text-muted); font-family:'IBM Plex Mono', monospace; text-transform:uppercase; letter-spacing:0.05em;}
   select{font-family:'Inter', sans-serif; font-size:14px; padding:8px 12px; border-radius:8px; border:1.5px solid var(--sheet-line); background:var(--white); color:var(--text); cursor:pointer;}
-  #page-statistika .radio-row{display:flex; gap:6px;}
+  #page-statistika .radio-row, #page-reprezentacija .radio-row{display:flex; gap:6px;}
   .radio-btn{font-family:'Inter', sans-serif; font-size:13px; padding:7px 14px; border-radius:20px; border:1.5px solid var(--sheet-line); background:var(--white); color:var(--text-muted); cursor:pointer;}
   .radio-btn.active{background:var(--navy); color:var(--ice); border-color:var(--navy);}
   .radio-btn.sve-btn{border-color:var(--stone-yellow); color:var(--stone-yellow); font-weight:600;}
@@ -79,6 +79,22 @@
   .season-title{font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:18px; margin:0 0 12px; padding-bottom:8px; border-bottom:1.5px solid var(--sheet-line);}
   .dis-grid{display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; align-items:start;}
   .dis-col{background:var(--white); border-radius:10px; box-shadow:0 0 0 1px var(--sheet-line); overflow:hidden;}
+
+  /* ---------- Reprezentacija (nastupi na svjetskim/europskim prvenstvima) ---------- */
+  .dis-col.rep-dis-col{background:transparent; box-shadow:none; overflow:visible;}
+  .rep-card{background:var(--white); border-radius:10px; box-shadow:0 0 0 1px var(--sheet-line); overflow:hidden; margin-bottom:10px;}
+  .rep-card:last-child{margin-bottom:0;}
+  .rep-card-infoblock{background:var(--ice-2);}
+  .rep-card-header{display:flex; align-items:baseline; justify-content:space-between; gap:8px; padding:9px 12px 4px;}
+  .rep-card-dis{font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:13.5px; color:var(--navy);}
+  .rep-card-nat{font-family:'IBM Plex Mono', monospace; font-size:10.5px; color:var(--navy-2); background:var(--white); border-radius:5px; padding:2px 6px; flex-shrink:0;}
+  .rep-card-loc{font-size:12px; color:var(--text-muted); padding:2px 12px 0;}
+  .rep-card-stats{display:flex; gap:16px; padding:6px 12px 10px; font-size:13px; color:var(--text);}
+  .rep-card-stats-label{font-family:'IBM Plex Mono', monospace; font-size:10px; text-transform:uppercase; color:var(--text-muted); margin-right:4px;}
+  table.rep-roster-table{width:100%; border-collapse:collapse;}
+  table.rep-roster-table td{padding:5px 12px; font-size:12.5px; border-bottom:1px solid var(--ice-2); color:var(--text); font-weight:500;}
+  table.rep-roster-table tr:last-child td{border-bottom:none;}
+  .rep-roster-skip-tag{font-weight:400; color:var(--text-muted); font-size:11.5px;}
   .dis-col.dis-col-empty{visibility:hidden;}
   .dis-col h3{font-family:'Space Grotesk', sans-serif; font-size:12.5px; font-weight:600; margin:0; padding:9px 10px; background:var(--ice-2); color:var(--navy);}
   .standing-list{list-style:none; margin:0; padding:6px 0;}
@@ -509,6 +525,7 @@
         <button class="page-nav-btn active" data-page="prvenstva">🏆 Prvenstva</button>
         <button class="page-nav-btn" data-page="statistika">📊 Statistika</button>
         <button class="page-nav-btn" data-page="postignuca">🏅 Postignuća</button>
+        <button class="page-nav-btn" data-page="reprezentacija">🌍 Reprezentacija</button>
       </div>
     </div>
     <h1>Prvenstva Hrvatske u curlingu</h1>
@@ -622,6 +639,48 @@
 </div>
 </div>
 
+<div id="page-reprezentacija" class="page-section">
+<div class="wrap">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:20px; margin:4px 0 4px; color:var(--navy);">Nastupi reprezentacije</h2>
+  <p style="font-size:13.5px; color:var(--text-muted); margin:0 0 20px;">Rezultati hrvatskih reprezentacija na svjetskim i europskim prvenstvima</p>
+
+  <div class="filter-bar">
+    <div class="filter-group">
+      <div class="filter-group-label-row">
+        <span class="filter-group-label">Kategorija</span>
+        <button class="radio-btn sve-btn mini active" id="repKatSveBtn" data-kat="sve">Sve</button>
+      </div>
+      <div class="radio-row" id="repKatRow"></div>
+    </div>
+    <div class="filter-group">
+      <div class="filter-group-label-row">
+        <span class="filter-group-label">Disciplina</span>
+        <button class="radio-btn sve-btn mini active" id="repDisSveBtn" data-dis="sve">Sve</button>
+      </div>
+      <div class="radio-row" id="repDisRow"></div>
+    </div>
+    <div class="filter-group">
+      <div class="filter-group-label-row">
+        <span class="filter-group-label">Sezona</span>
+        <button class="radio-btn sve-btn mini active" id="repSeasonSveBtn">Sve</button>
+      </div>
+      <div class="season-controls">
+        <div class="season-dd">
+          <span class="season-dd-label">Od</span>
+          <select id="repSeasonFrom"></select>
+        </div>
+        <div class="season-dd">
+          <span class="season-dd-label">Do</span>
+          <select id="repSeasonTo"></select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="repContent"></div>
+</div>
+</div>
+
 <div id="page-postignuca" class="page-section">
 <div class="wrap">
   <div id="postignucaContent"></div>
@@ -651,7 +710,20 @@ const TAB_STATE = {};
 TAB_IDS.forEach(t => { TAB_STATE[t] = { kat: 'sve', dis: 'sve', seasonMode: 'sve', seasonFrom: null, seasonTo: null }; });
 
 let DATA = { matches: [], tournaments: [], clubs: {} };
+let WC_DATA = { entries: [], natLabels: {} };
 let MIN_SEASON = null, MAX_SEASON = null;
+
+fetch('wc-data.json')
+  .then(r => r.json())
+  .then(data => {
+    WC_DATA = data;
+    initReprezentacijaFilters();
+    renderReprezentacija();
+  })
+  .catch(() => {
+    const el = document.getElementById('repContent');
+    if(el) el.innerHTML = '<div class="empty-state">Greška pri učitavanju wc-data.json (nastupi reprezentacije).</div>';
+  });
 
 fetch('phc-data.json')
   .then(r => r.json())
@@ -3421,6 +3493,219 @@ function renderBadgeDetail(name){
     </div>
   </div>`;
 }
+
+// ===================== Reprezentacija (nastupi na svjetskim/europskim prvenstvima) =====================
+const REP_STATE = { kat: 'sve', dis: 'sve', seasonMode: 'sve', seasonFrom: null, seasonTo: null };
+
+function initReprezentacijaFilters(){
+  const seasons = WC_DATA.entries.map(e => e.season);
+  const repMin = Math.min(...seasons), repMax = Math.max(...seasons);
+  REP_STATE.seasonFrom = repMin;
+  REP_STATE.seasonTo = repMax;
+
+  const kats = [...new Set(WC_DATA.entries.map(e => e.kat))].sort((a,b) => KAT_ORDER.indexOf(a) - KAT_ORDER.indexOf(b));
+  const disList = [...new Set(WC_DATA.entries.map(e => e.dis))].sort((a,b) => DIS_ORDER.indexOf(a) - DIS_ORDER.indexOf(b));
+
+  const katRow = document.getElementById('repKatRow');
+  const katSveBtn = document.getElementById('repKatSveBtn');
+  katRow.innerHTML = kats.map(k => `<button class="radio-btn" data-kat="${k}"><span class="lbl-full">${KAT_LABELS[k]||k}</span><span class="lbl-short">${k}</span></button>`).join('');
+  katSveBtn.addEventListener('click', () => {
+    katRow.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('active'));
+    katSveBtn.classList.add('active');
+    REP_STATE.kat = 'sve';
+    renderReprezentacija();
+  });
+  katRow.querySelectorAll('.radio-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      katRow.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('active'));
+      katSveBtn.classList.remove('active');
+      btn.classList.add('active');
+      REP_STATE.kat = btn.dataset.kat;
+      renderReprezentacija();
+    });
+  });
+
+  const disRow = document.getElementById('repDisRow');
+  const disSveBtn = document.getElementById('repDisSveBtn');
+  disRow.innerHTML = disList.map(d => `<button class="radio-btn" data-dis="${d}"><span class="lbl-full">${DIS_LABELS[d]}</span><span class="lbl-short">${d}</span></button>`).join('');
+  disSveBtn.addEventListener('click', () => {
+    disRow.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('active'));
+    disSveBtn.classList.add('active');
+    REP_STATE.dis = 'sve';
+    renderReprezentacija();
+  });
+  disRow.querySelectorAll('.radio-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      disRow.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('active'));
+      disSveBtn.classList.remove('active');
+      btn.classList.add('active');
+      REP_STATE.dis = btn.dataset.dis;
+      renderReprezentacija();
+    });
+  });
+
+  const fromSel = document.getElementById('repSeasonFrom');
+  const toSel = document.getElementById('repSeasonTo');
+  let opts = '';
+  for(let y = repMax; y >= repMin; y--) opts += `<option value="${y}">${seasonLabel(y)}</option>`;
+  fromSel.innerHTML = opts;
+  toSel.innerHTML = opts;
+  fromSel.value = repMin;
+  toSel.value = repMax;
+
+  const seasonSveBtn = document.getElementById('repSeasonSveBtn');
+  const seasonControlsEl = fromSel.closest('.season-controls');
+  seasonSveBtn.addEventListener('click', () => {
+    seasonSveBtn.classList.add('active');
+    REP_STATE.seasonMode = 'sve';
+    REP_STATE.seasonFrom = repMin;
+    REP_STATE.seasonTo = repMax;
+    fromSel.value = repMin; toSel.value = repMax;
+    seasonControlsEl.classList.remove('season-is-range');
+    renderReprezentacija();
+  });
+  function onRangeChange(){
+    seasonSveBtn.classList.remove('active');
+    REP_STATE.seasonMode = 'range';
+    let from = Number(fromSel.value), to = Number(toSel.value);
+    if(from > to){ to = from; toSel.value = to; }
+    REP_STATE.seasonFrom = from;
+    REP_STATE.seasonTo = to;
+    seasonControlsEl.classList.add('season-is-range');
+    renderReprezentacija();
+  }
+  fromSel.addEventListener('change', onRangeChange);
+  toSel.addEventListener('change', onRangeChange);
+}
+
+function repRosterHtml(entry){
+  const rows = entry.players.map(p => {
+    const suffix = (p.role === 'Skip' && entry.dis !== 'MP') ? ' <span class="rep-roster-skip-tag">(skip)</span>' : '';
+    return `<tr><td class="rep-roster-name clickable-name" data-rep-player="${escapeHtml(p.name)}">${escapeHtml(p.name)}${suffix}</td></tr>`;
+  }).join('');
+  return `<table class="rep-roster-table"><tbody>${rows}</tbody></table>`;
+}
+
+function repCardHtml(e){
+  return `
+    <div class="rep-card">
+      <div class="rep-card-infoblock">
+        <div class="rep-card-header">
+          <div class="rep-card-dis">${DIS_LABELS[e.dis]||e.dis}</div>
+          <div class="rep-card-nat" title="${escapeHtml(e.natLabel)}">${escapeHtml(e.nat)}</div>
+        </div>
+        <div class="rep-card-loc">📍 ${escapeHtml(e.mjesto)}, ${escapeHtml(e.drzava)}</div>
+        <div class="rep-card-stats">
+          <div><span class="rep-card-stats-label">Plasman</span> ${e.plasman != null ? `${e.plasman}${e.sudionika != null ? ` / ${e.sudionika}` : ''}` : '–'}</div>
+          <div><span class="rep-card-stats-label">Skor</span> ${escapeHtml(e.skor || '–')}</div>
+        </div>
+      </div>
+      ${repRosterHtml(e)}
+    </div>
+  `;
+}
+
+// Isti obrazac kao renderDisGridHtml (Poretci) - fiksni redoslijed M/Ž/MC/MP stupaca, prazan
+// stupac (bez podataka za tu disciplinu) sakriven ali i dalje zauzima mjesto u mreži (desktop).
+function repDisGridHtml(season, katForBlock, disList){
+  let html = '<div class="dis-grid">';
+  disList.forEach(d => {
+    const entries = filteredRepEntries().filter(e => e.season === season && e.dis === d && e.kat === katForBlock);
+    if(!entries.length){
+      html += `<div class="dis-col dis-col-empty"></div>`;
+      return;
+    }
+    html += `<div class="dis-col rep-dis-col">${entries.map(repCardHtml).join('')}</div>`;
+  });
+  html += '</div>';
+  return html;
+}
+
+let _repFilteredCache = null;
+function filteredRepEntries(){
+  return _repFilteredCache;
+}
+
+function renderReprezentacija(){
+  const content = document.getElementById('repContent');
+  if(!WC_DATA.entries.length){
+    content.innerHTML = '<div class="empty-state">Nema podataka o nastupima reprezentacije.</div>';
+    return;
+  }
+
+  const { kat, dis, seasonFrom, seasonTo } = REP_STATE;
+  const disList = dis === 'sve' ? DIS_ORDER : [dis];
+  const filtered = WC_DATA.entries.filter(e =>
+    (kat === 'sve' || e.kat === kat) &&
+    disList.includes(e.dis) &&
+    e.season >= seasonFrom && e.season <= seasonTo
+  );
+  _repFilteredCache = filtered;
+
+  if(!filtered.length){
+    content.innerHTML = '<div class="empty-state">Nema nastupa za odabrani filter.</div>';
+    return;
+  }
+
+  const seasons = [...new Set(filtered.map(e => e.season))].sort((a,b) => b - a);
+
+  let html = '';
+  seasons.forEach(season => {
+    html += `<div class="season-block" style="max-width:none;"><div class="season-title">Sezona ${seasonLabel(season)}</div>`;
+
+    const katsThisSeason = kat === 'sve'
+      ? KAT_ORDER.filter(k => filtered.some(e => e.season === season && e.kat === k))
+      : [kat];
+
+    if(katsThisSeason.length > 1){
+      katsThisSeason.forEach(k => {
+        html += `<h4 class="kat-section-h">${KAT_LABELS[k] || k}</h4>`;
+        html += repDisGridHtml(season, k, disList);
+      });
+    } else {
+      html += repDisGridHtml(season, katsThisSeason[0], disList);
+    }
+
+    html += `</div>`;
+  });
+
+  content.innerHTML = html;
+
+  content.querySelectorAll('[data-rep-player]').forEach(el => {
+    el.addEventListener('click', () => openRepPlayerModal(el.dataset.repPlayer));
+  });
+}
+
+// Modal s nastupima igrača na svjetskim/europskim prvenstvima (sezona, disciplina,
+// kategorija, natjecanje, plasman).
+function openRepPlayerModal(name){
+  const overlay = document.getElementById('modalOverlay');
+  const body = document.getElementById('modalBody');
+  body.classList.remove('modal-wide');
+
+  const history = WC_DATA.entries
+    .filter(e => e.players.some(p => p.name === name))
+    .sort((a,b) => b.season - a.season);
+
+  const rows = history.map(e => `
+    <tr>
+      <td>${seasonLabel(e.season)}</td>
+      <td><span class="lbl-full">${DIS_LABELS[e.dis]||e.dis}</span><span class="lbl-short">${e.dis}</span></td>
+      <td><span class="lbl-full">${KAT_LABELS[e.kat]||e.kat}</span><span class="lbl-short">${e.kat}</span></td>
+      <td title="${escapeHtml(e.natLabel)}">${escapeHtml(e.nat)}</td>
+      <td class="num">${e.plasman != null ? `${e.plasman}${e.sudionika != null ? ` / ${e.sudionika}` : ''}` : '–'}</td>
+    </tr>
+  `).join('');
+
+  body.innerHTML = `
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <h2 class="entity-title">${escapeHtml(name)}</h2>
+    <h3 class="group-h" style="margin-top:0;">Reprezentativni nastupi</h3>
+    <div class="achv-table-scroll"><table class="achv-table"><thead><tr><th>Sezona</th><th><span class="lbl-full">Disciplina</span><span class="lbl-short">Dis.</span></th><th><span class="lbl-full">Kategorija</span><span class="lbl-short">Kat.</span></th><th>Natjecanje</th><th class="num">Plasman</th></tr></thead><tbody>${rows}</tbody></table></div>
+  `;
+  overlay.classList.add('open');
+}
+
 
 </script>
 
