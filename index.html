@@ -85,10 +85,9 @@
   .rep-card{background:var(--white); border-radius:10px; box-shadow:0 0 0 1px var(--sheet-line); overflow:hidden; margin-bottom:10px;}
   .rep-card:last-child{margin-bottom:0;}
   .rep-card-infoblock{background:var(--ice-2);}
-  .rep-card-header{display:flex; align-items:baseline; justify-content:space-between; gap:8px; padding:9px 12px 4px;}
-  .rep-card-dis{font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:13.5px; color:var(--navy);}
-  .rep-card-nat{font-family:'IBM Plex Mono', monospace; font-size:10.5px; color:var(--navy-2); background:var(--white); border-radius:5px; padding:2px 6px; flex-shrink:0;}
-  .rep-card-loc{font-size:12px; color:var(--text-muted); padding:2px 12px 0;}
+  .rep-card-natlabel{font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:13.5px; color:var(--navy); padding:9px 12px 0;}
+  .rep-card-loc{font-size:12px; color:var(--text-muted); padding:3px 12px 0;}
+  .rep-card-dis{font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:12.5px; color:var(--navy); padding:3px 12px 0;}
   .rep-card-stats{display:flex; gap:16px; padding:6px 12px 10px; font-size:13px; color:var(--text);}
   .rep-card-stats-label{font-family:'IBM Plex Mono', monospace; font-size:10px; text-transform:uppercase; color:var(--text-muted); margin-right:4px;}
   table.rep-roster-table{width:100%; border-collapse:collapse;}
@@ -219,7 +218,7 @@
   .modal-overlay{display:none; position:fixed; inset:0; background:rgba(28,43,57,0.55); z-index:100; align-items:flex-start; justify-content:center; padding:40px 16px; overflow-y:auto;}
   .modal-overlay.open{display:flex;}
   .modal{background:var(--white); border-radius:14px; max-width:640px; width:100%; padding:28px 28px 26px; position:relative;}
-  .modal-close{position:absolute; top:16px; right:16px; width:30px; height:30px; border-radius:50%; border:none; background:var(--ice-2); font-size:16px; cursor:pointer; color:var(--navy);}
+  .modal-close{position:absolute; top:16px; right:16px; width:30px; height:30px; border-radius:50%; border:none; background:var(--ice-2); font-size:16px; cursor:pointer; color:var(--navy); z-index:10;}
   .modal .info-block{font-size:13.5px; color:var(--text-muted); margin-bottom:20px; display:flex; flex-direction:column; gap:5px;}
   .modal .info-block div span{color:var(--text); font-weight:500;}
   .modal h2.entity-title{font-family:'Space Grotesk', sans-serif; font-size:19px; margin:0 0 16px; color:var(--navy);}
@@ -291,8 +290,14 @@
   .video-thumb:hover .video-play-icon{background:rgba(0,0,0,0.3);}
   .video-modal-player{width:100%; max-height:70vh; border-radius:8px; display:block; background:#000;}
 
-  .lightbox{display:flex; align-items:center; justify-content:center; gap:12px;}
+  .lightbox{display:flex; align-items:center; justify-content:center; gap:12px; position:relative;}
   .lightbox-image{max-width:100%; max-height:70vh; border-radius:8px; display:block;}
+  .lightbox-fullscreen-btn{position:absolute; bottom:8px; right:8px; background:rgba(28,43,57,0.65); border:none; border-radius:6px; width:34px; height:34px; font-size:16px; color:#fff; cursor:pointer; z-index:2; display:flex; align-items:center; justify-content:center;}
+  .lightbox-fullscreen-btn:hover{background:rgba(28,43,57,0.85);}
+  .lightbox:fullscreen{background:#000; width:100vw; height:100vh; border-radius:0;}
+  .lightbox:fullscreen .lightbox-image{max-width:96vw; max-height:96vh; border-radius:0;}
+  .lightbox:-webkit-full-screen{background:#000; width:100vw; height:100vh;}
+  .lightbox:-webkit-full-screen .lightbox-image{max-width:96vw; max-height:96vh; border-radius:0;}
   .lightbox-nav{background:var(--ice-2); border:none; border-radius:50%; width:38px; height:38px; font-size:20px; color:var(--navy); cursor:pointer; flex-shrink:0;}
   .lightbox-nav:hover{background:var(--sheet-line);}
   .lightbox-nav:disabled{opacity:0.3; cursor:default;}
@@ -454,7 +459,7 @@
   .modal-overlay.open{display:flex;}
   .modal{background:var(--white); border-radius:14px; max-width:640px; width:100%; padding:28px 28px 26px; position:relative;}
   .modal.modal-wide{max-width:880px;}
-  .modal-close{position:absolute; top:16px; right:16px; width:30px; height:30px; border-radius:50%; border:none; background:var(--ice-2); font-size:16px; cursor:pointer; color:var(--navy);}
+  .modal-close{position:absolute; top:16px; right:16px; width:30px; height:30px; border-radius:50%; border:none; background:var(--ice-2); font-size:16px; cursor:pointer; color:var(--navy); z-index:10;}
   .modal .info-block{font-size:13.5px; color:var(--text-muted); margin-bottom:20px; display:flex; flex-direction:column; gap:5px;}
   .modal .info-block div span{color:var(--text); font-weight:500;}
 
@@ -713,7 +718,7 @@ let DATA = { matches: [], tournaments: [], clubs: {} };
 let WC_DATA = { entries: [], natLabels: {} };
 let MIN_SEASON = null, MAX_SEASON = null;
 
-fetch('wc-data.json')
+fetch('wc-data.json?v=' + Date.now(), { cache: 'no-store' })
   .then(r => r.json())
   .then(data => {
     WC_DATA = data;
@@ -725,7 +730,7 @@ fetch('wc-data.json')
     if(el) el.innerHTML = '<div class="empty-state">Greška pri učitavanju wc-data.json (nastupi reprezentacije).</div>';
   });
 
-fetch('phc-data.json')
+fetch('phc-data.json?v=' + Date.now(), { cache: 'no-store' })
   .then(r => r.json())
   .then(data => {
     DATA = data;
@@ -3353,14 +3358,30 @@ function openPhotoLightbox(photos, index, captions){
 
 function renderLightbox(){
   const body = document.getElementById('modalBody');
-  body.classList.remove('modal-wide');
   const n = _lightboxPhotos.length;
   const src = _lightboxPhotos[_lightboxIndex];
   const caption = _lightboxCaptions[_lightboxIndex + 1];
 
+  // Ako je fullscreen aktivan, ne re-renderiramo cijeli #lightboxStage element (to bi ga
+  // uklonilo iz DOM-a i preglednik bi automatski izašao iz fullscreena) - samo zamijenimo
+  // sliku i natpis/brojač na mjestu, fullscreen ostaje aktivan dok se "vrti" kroz fotografije.
+  const isFs = document.fullscreenElement || document.webkitFullscreenElement;
+  const existingStage = document.getElementById('lightboxStage');
+  if(existingStage && isFs){
+    const img = existingStage.querySelector('.lightbox-image');
+    if(img){ img.src = src; img.alt = `Fotografija ${_lightboxIndex+1}`; }
+    const counterEl = document.querySelector('.lightbox-counter');
+    if(counterEl) counterEl.textContent = `${_lightboxIndex+1}/${n}`;
+    const captionEl = document.querySelector('.lightbox-caption');
+    if(captionEl) captionEl.textContent = caption || '';
+    return;
+  }
+
+  body.classList.remove('modal-wide');
   body.innerHTML = `
     <button class="modal-close" onclick="closeModal()">×</button>
-    <div class="lightbox">
+    <div class="lightbox" id="lightboxStage">
+      <button class="lightbox-fullscreen-btn" onclick="toggleLightboxFullscreen()" title="Prikaži preko cijelog ekrana">⛶</button>
       <button class="lightbox-nav lightbox-prev" onclick="lightboxNav(-1)" ${n<=1?'disabled':''}>‹</button>
       <img class="lightbox-image" src="${src}" alt="Fotografija ${_lightboxIndex+1}">
       <button class="lightbox-nav lightbox-next" onclick="lightboxNav(1)" ${n<=1?'disabled':''}>›</button>
@@ -3370,6 +3391,19 @@ function renderLightbox(){
       <div class="lightbox-counter">${_lightboxIndex+1}/${n}</div>
     </div>
   `;
+}
+
+function toggleLightboxFullscreen(){
+  const el = document.getElementById('lightboxStage');
+  if(!el) return;
+  const isFs = document.fullscreenElement || document.webkitFullscreenElement;
+  if(!isFs){
+    const req = el.requestFullscreen || el.webkitRequestFullscreen;
+    if(req) req.call(el);
+  } else {
+    const exit = document.exitFullscreen || document.webkitExitFullscreen;
+    if(exit) exit.call(document);
+  }
 }
 
 function lightboxNav(delta){
@@ -3590,11 +3624,9 @@ function repCardHtml(e){
   return `
     <div class="rep-card">
       <div class="rep-card-infoblock">
-        <div class="rep-card-header">
-          <div class="rep-card-dis">${DIS_LABELS[e.dis]||e.dis}</div>
-          <div class="rep-card-nat" title="${escapeHtml(e.natLabel)}">${escapeHtml(e.nat)}</div>
-        </div>
-        <div class="rep-card-loc">📍 ${escapeHtml(e.mjesto)}, ${escapeHtml(e.drzava)}</div>
+        <div class="rep-card-natlabel">${escapeHtml(e.natLabel)}</div>
+        <div class="rep-card-loc">${escapeHtml(e.mjesto)}, ${escapeHtml(e.drzava)}</div>
+        <div class="rep-card-dis">${DIS_LABELS[e.dis]||e.dis}</div>
         <div class="rep-card-stats">
           <div><span class="rep-card-stats-label">Plasman</span> ${e.plasman != null ? `${e.plasman}${e.sudionika != null ? ` / ${e.sudionika}` : ''}` : '–'}</div>
           <div><span class="rep-card-stats-label">Skor</span> ${escapeHtml(e.skor || '–')}</div>

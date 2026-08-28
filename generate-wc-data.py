@@ -17,19 +17,19 @@ import sys
 import json
 import pandas as pd
 
-# Nazivi natjecanja - pretpostavljeni puni nazivi prema uobičajenim WCF kraticama.
-# Slobodno ispravi/dopuni ako neki naziv nije točan.
-NAT_LABELS = {
-    'ECC': 'Europsko prvenstvo',
-    'ECCC': 'Europsko prvenstvo (Challenge)',
-    'WCPQ': 'Svjetska pre-kvalifikacija',
-    'WMXCC': 'Svjetsko prvenstvo u mješovitom curlingu',
-    'EMCC': 'Europsko prvenstvo u mješovitom curlingu',
-    'WMDQE': 'Svjetska kvalifikacija u mješovitim parovima (Europa)',
-    'WMDCC': 'Svjetsko prvenstvo u mješovitim parovima',
-    'WJBCC': 'Svjetsko juniorsko prvenstvo (B skupina)',
-    'EYOF': 'Europski youth olimpijski festival',
-    'WSCC': 'Svjetsko veteransko prvenstvo',
+# Rezervni nazivi ako kolona "Naziv" u Excelu za neki redak nedostaje - inače se uvijek
+# koristi stvarni puni naziv natjecanja upisan u bazi.
+NAT_LABELS_FALLBACK = {
+    'ECC': 'European Championship',
+    'ECCC': 'European Championship C-group',
+    'WCPQ': 'World Championship Pre-Qualifier',
+    'WMXCC': 'World Mixed Championship',
+    'EMCC': 'European Mixed Championship',
+    'WMDQE': 'World Mixed-Doubles Qualifier',
+    'WMDCC': 'World Mixed-Doubles Championship',
+    'WJBCC': 'World Junior Championship B-group',
+    'EYOF': 'European Youth Olympic Festival',
+    'WSCC': 'World Senior Championship',
 }
 
 DIS_LABELS = {'M': 'Muškarci', 'Ž': 'Žene', 'MC': 'Mješoviti curling', 'MP': 'Mješoviti parovi'}
@@ -53,11 +53,12 @@ def main():
                 players.append({'name': str(r[col]).strip(), 'role': label})
 
         nat = str(r['Nat']).strip()
+        nat_label = str(r['Naziv']).strip() if pd.notna(r.get('Naziv')) else NAT_LABELS_FALLBACK.get(nat, nat)
         entries.append({
             'dis': r['Dis'],
             'kat': r['Kat'],
             'nat': nat,
-            'natLabel': NAT_LABELS.get(nat, nat),
+            'natLabel': nat_label,
             'season': int(r['Sezona']),
             'mjesto': r['Mjesto'],
             'drzava': r['Država'],
@@ -69,7 +70,7 @@ def main():
 
     entries.sort(key=lambda e: (-e['season'], e['dis'], e['kat']))
 
-    out = {'entries': entries, 'natLabels': NAT_LABELS}
+    out = {'entries': entries}
     with open(out_path, 'w', encoding='utf-8') as f:
         json.dump(out, f, ensure_ascii=False)
 
