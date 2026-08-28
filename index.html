@@ -3625,7 +3625,7 @@ function repCardHtml(e){
     <div class="rep-card">
       <div class="rep-card-infoblock">
         <div class="rep-card-natlabel">${escapeHtml(e.natLabel)}</div>
-        <div class="rep-card-loc">${escapeHtml(e.mjesto)}, ${escapeHtml(e.drzava)}</div>
+        <div class="rep-card-loc">${escapeHtml(e.mjesto)}, ${escapeHtml(e.drzava)}${e.datum ? `, ${escapeHtml(e.datum)}` : ''}</div>
         <div class="rep-card-dis">${DIS_LABELS[e.dis]||e.dis}</div>
         <div class="rep-card-stats">
           <div><span class="rep-card-stats-label">Plasman</span> ${e.plasman != null ? `${e.plasman}${e.sudionika != null ? ` / ${e.sudionika}` : ''}` : '–'}</div>

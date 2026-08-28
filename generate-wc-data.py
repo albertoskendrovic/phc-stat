@@ -60,6 +60,7 @@ def main():
             'nat': nat,
             'natLabel': nat_label,
             'season': int(r['Sezona']),
+            'datum': str(r['Datum']).strip() if pd.notna(r.get('Datum')) else None,
             'mjesto': r['Mjesto'],
             'drzava': r['Država'],
             'plasman': int(r['Plasman']) if pd.notna(r['Plasman']) else None,
