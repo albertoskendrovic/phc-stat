@@ -84,7 +84,8 @@
   .dis-col.rep-dis-col{background:transparent; box-shadow:none; overflow:visible;}
   .rep-card{background:var(--white); border-radius:10px; box-shadow:0 0 0 1px var(--sheet-line); overflow:hidden; margin-bottom:10px;}
   .rep-card:last-child{margin-bottom:0;}
-  .rep-card-infoblock{background:var(--ice-2);}
+  .rep-card-infoblock{background:var(--ice-2); display:block; text-decoration:none; color:inherit; cursor:pointer;}
+  .rep-card-infoblock:hover{background:var(--sheet-line); box-shadow:inset 3px 0 0 var(--navy);}
   .rep-card-natlabel{font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:13.5px; color:var(--navy); padding:9px 12px 0;}
   .rep-card-loc{font-size:12px; color:var(--text-muted); padding:3px 12px 0;}
   .rep-card-dis{font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:12.5px; color:var(--navy); padding:3px 12px 0;}
@@ -3621,9 +3622,12 @@ function repRosterHtml(entry){
 }
 
 function repCardHtml(e){
+  const wcdbUrl = e.wcdb != null ? `https://results.worldcurling.org/Championship/Details/${e.wcdb}` : null;
+  const infoTag = wcdbUrl ? 'a' : 'div';
+  const infoAttrs = wcdbUrl ? ` href="${escapeHtml(wcdbUrl)}" target="_blank" rel="noopener noreferrer"` : '';
   return `
     <div class="rep-card">
-      <div class="rep-card-infoblock">
+      <${infoTag} class="rep-card-infoblock"${infoAttrs}>
         <div class="rep-card-natlabel">${escapeHtml(e.natLabel)}</div>
         <div class="rep-card-loc">${escapeHtml(e.mjesto)}, ${escapeHtml(e.drzava)}${e.datum ? `, ${escapeHtml(e.datum)}` : ''}</div>
         <div class="rep-card-dis">${DIS_LABELS[e.dis]||e.dis}</div>
@@ -3631,7 +3635,7 @@ function repCardHtml(e){
           <div><span class="rep-card-stats-label">Plasman</span> ${e.plasman != null ? `${e.plasman}${e.sudionika != null ? ` / ${e.sudionika}` : ''}` : '–'}</div>
           <div><span class="rep-card-stats-label">Skor</span> ${escapeHtml(e.skor || '–')}</div>
         </div>
-      </div>
+      </${infoTag}>
       ${repRosterHtml(e)}
     </div>
   `;

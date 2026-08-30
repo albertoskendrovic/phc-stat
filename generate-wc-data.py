@@ -54,18 +54,27 @@ def main():
 
         nat = str(r['Nat']).strip()
         nat_label = str(r['Naziv']).strip() if pd.notna(r.get('Naziv')) else NAT_LABELS_FALLBACK.get(nat, nat)
+
+        # "Sezona" je sad puna oznaka (npr. "2025-2026") - internо i dalje koristimo samo
+        # "kasniju" godinu (2026) za filtriranje/sortiranje, isto kao ostatak aplikacije.
+        sezona_raw = str(r['Sezona']).strip()
+        season_year = int(sezona_raw.split('-')[-1]) if '-' in sezona_raw else int(sezona_raw)
+
+        wcdb = int(r['WCDB']) if pd.notna(r.get('WCDB')) else None
+
         entries.append({
             'dis': r['Dis'],
             'kat': r['Kat'],
             'nat': nat,
             'natLabel': nat_label,
-            'season': int(r['Sezona']),
+            'season': season_year,
             'datum': str(r['Datum']).strip() if pd.notna(r.get('Datum')) else None,
             'mjesto': r['Mjesto'],
             'drzava': r['Država'],
             'plasman': int(r['Plasman']) if pd.notna(r['Plasman']) else None,
             'sudionika': int(r['Sudionika']) if pd.notna(r['Sudionika']) else None,
             'skor': r['Skor'],
+            'wcdb': wcdb,
             'players': players,
         })
 
